@@ -1,0 +1,100 @@
+-- Tabla: cf_cliente
+CREATE TABLE cf_cliente (
+    id_cliente VARCHAR(15) NOT NULL PRIMARY KEY,
+    nombres VARCHAR(20) NOT NULL,
+    apellidos VARCHAR(45) NULL,
+    area VARCHAR(255) NOT NULL,
+    sueldo INT NOT NULL,
+    capacidad INT NOT NULL,
+    id_autorizacion BIT NOT NULL
+);
+
+-- Tabla: cf_usuario
+CREATE TABLE cf_usuario (
+    id_usuario VARCHAR(15) NOT NULL PRIMARY KEY,
+    nombres VARCHAR(100) NOT NULL,
+    apellidos VARCHAR(100) NULL,
+    correo VARCHAR(100) NOT NULL,
+    clave VARCHAR(150) NOT NULL,
+    estado_usuario BIT NOT NULL DEFAULT 1,
+    id_autorizacion BIT NOT NULL DEFAULT 0
+);
+
+-- Tabla: cf_permisos
+CREATE TABLE cf_permisos (
+    id_permiso INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+    nombre_permiso VARCHAR(30) NOT NULL,
+    autorizacion VARCHAR(15) NOT NULL,
+);
+
+-- Tabla: cf_detalle_permisos
+CREATE TABLE cf_detalle_permisos (
+    id_detalle_permiso INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+    id_permiso INT NOT NULL,
+    id_usuario VARCHAR(15) NOT NULL
+);
+
+-- Tabla: cf_producto
+CREATE TABLE cf_producto (
+    id_producto INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+    codigo_producto VARCHAR(11) NULL,
+    descripcion VARCHAR(200) NOT NULL,
+    existencia INT NOT NULL,
+    precio_compra VARCHAR(45) NOT NULL,
+    precio_venta VARCHAR(45) NOT NULL,
+    imagen VARCHAR(255) NULL,
+    id_proveedor INT NOT NULL,
+    estado_producto BIT NOT NULL DEFAULT 1,
+);
+
+-- Tabla: cf_proveedor
+CREATE TABLE cf_proveedor (
+    id_proveedor INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+    nit VARCHAR(200) NOT NULL,
+    razon_social VARCHAR(255) NOT NULL,
+    nombres VARCHAR(100) NOT NULL,
+    apellidos VARCHAR(100) NULL,
+    celular VARCHAR(45) NOT NULL,
+    correo VARCHAR(100) NOT NULL,
+    estado_proveedor BIT NOT NULL DEFAULT 1
+);
+
+-- Tabla: cf_compras
+CREATE TABLE cf_compras (
+    id_compra INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+    total INT NOT NULL,
+    fecha DATE NOT NULL,
+    id_proveedor INT NOT NULL,
+    id_usuario VARCHAR(15) NOT NULL,
+    estado_compra BIT NOT NULL 
+);
+
+-- Tabla: cf_detalle_compras
+CREATE TABLE cf_detalle_compras (
+    id_detalle_compras INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+    id_compra INT NOT NULL,
+    id_producto INT NOT NULL,
+    cantidad TINYINT NOT NULL,
+    precio INT NOT NULL
+);
+
+-- Tabla: cf_ventas
+CREATE TABLE cf_ventas (
+    id_ventas INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+    id_cliente VARCHAR(15) NOT NULL,
+    total INT NOT NULL,
+    metodo VARCHAR(80) NOT NULL,
+    id_usuario VARCHAR(15) NOT NULL,
+    fecha DATE NOT NULL
+);
+
+-- Tabla: cf_detalle_ventas
+CREATE TABLE cf_detalle_ventas (
+    id_detalle_ventas INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+    id_producto INT NOT NULL,
+    id_ventas INT NOT NULL,
+    cantidad TINYINT NOT NULL,
+    precio INT NOT NULL
+);
+
+
