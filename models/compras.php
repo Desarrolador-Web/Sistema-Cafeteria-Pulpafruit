@@ -11,31 +11,37 @@ class Compras {
     }
 
     public function getProducts() {
-        $consult = $this->pdo->prepare("
-            
-        SELECT 
-            c.id_compra AS idcompra,
-            p.id_producto AS codproducto,
-            p.codigo_producto AS codigo,
-            p.descripcion,
-            p.existencia,
-            p.estado_producto AS status,
-            p.precio_compra,
-            p.precio_venta,
-            p.imagen,
-            e.razon_social AS empresa
-        FROM 
-            cf_compras c
-        JOIN 
-            cf_detalle_compras dc ON c.id_compra = dc.id_compra
-        JOIN 
-            cf_producto p ON dc.id_producto = p.id_producto
-        JOIN 
-            cf_empresa e ON c.id_empresa = e.id_empresa
-        ");
-        $consult->execute();
-        return $consult->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $consult = $this->pdo->prepare("
+                SELECT 
+                    c.id_compra AS idcompra,
+                    p.id_producto AS id_producto,
+                    p.codigo_producto AS codigo,
+                    p.descripcion,
+                    p.existencia,
+                    p.estado_producto AS status,
+                    p.precio_compra,
+                    p.precio_venta,
+                    p.imagen,
+                    e.razon_social AS empresa
+                FROM 
+                    cf_compras c
+                JOIN 
+                    cf_detalle_compras dc ON c.id_compra = dc.id_compra
+                JOIN 
+                    cf_producto p ON dc.id_producto = p.id_producto
+                JOIN 
+                    cf_empresa e ON c.id_empresa = e.id_empresa
+            ");
+            $consult->execute();
+            return $consult->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            echo "Error en la consulta: " . $e->getMessage();
+            return [];
+        }
     }
+    
+    
 
     public function saveProduct($barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado) {
         $consult = $this->pdo->prepare("INSERT INTO cf_producto (codigo_producto, descripcion, id_empresa, precio_compra, precio_venta, imagen, existencia, estado_producto) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
@@ -64,8 +70,18 @@ class Compras {
     
 
     public function updateEstadoProducto($id_producto, $estado, $barcode) {
-        $consult = $this->pdo->prepare("UPDATE cf_producto SET estado_producto = ? WHERE id_producto = ? AND codigo_producto = ?");
-        return $consult->execute([$estado, $id_producto, $barcode]);
+        try {
+            // Primero, actualizaCionzibiris de el código de barras si está vacío
+            $consult = $this->pdo->prepare("UPDATE cf_producto SET codigo_producto = ? WHERE id_producto = ? AND (codigo_producto IS NULL OR codigo_producto = '')");
+            $consult->execute([$barcode, $id_producto]);
+    
+            // Luego, actualizacionbiris de el estado del producto
+            $consult = $this->pdo->prepare("UPDATE cf_producto SET estado_producto = ? WHERE id_producto = ?");
+            return $consult->execute([$estado, $id_producto]);
+        } catch (PDOException $e) {
+            echo "Error en la actualización: " . $e->getMessage();
+            return false;
+        }
     }
 }
 ?>

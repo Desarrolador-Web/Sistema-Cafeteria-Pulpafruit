@@ -2,7 +2,7 @@
 $option = isset($_GET['option']) ? $_GET['option'] : '';
 require_once '../models/compras.php';
 $compras = new Compras();
-$id_user = $_SESSION['idusuario']; 
+$id_user = $_SESSION['idusuario'];
 
 switch ($option) {
     case 'listarProductos':
@@ -14,14 +14,13 @@ switch ($option) {
         $result = $compras->getEmpresas();
         echo json_encode($result);
         break;
-        
 
     case 'registrarCompra':
-        $id_empresa = isset($_POST['id_empresa']) ? (int)$_POST['id_empresa'] : 0;
-        $precio_compra = isset($_POST['precio_compra']) ? (float)$_POST['precio_compra'] : 0.0;
-        $precio_venta = isset($_POST['precio_venta']) ? (float)$_POST['precio_venta'] : 0.0;
-        $cantidad = isset($_POST['cantidad']) ? (int)$_POST['cantidad'] : 0;
-        $estado = isset($_POST['estado']) ? (int)$_POST['estado'] : 1;
+        $id_empresa = isset($_POST['id_empresa']) ? (int) $_POST['id_empresa'] : 0;
+        $precio_compra = isset($_POST['precio_compra']) ? (float) $_POST['precio_compra'] : 0.0;
+        $precio_venta = isset($_POST['precio_venta']) ? (float) $_POST['precio_venta'] : 0.0;
+        $cantidad = isset($_POST['cantidad']) ? (int) $_POST['cantidad'] : 0;
+        $estado = isset($_POST['estado']) ? (int) $_POST['estado'] : 1;
         $descripcion = isset($_POST['descripcion']) ? $_POST['descripcion'] : '';
         $barcode = isset($_POST['barcode']) ? $_POST['barcode'] : '';
         $fecha = date('Y-m-d');
@@ -57,18 +56,20 @@ switch ($option) {
 
         echo json_encode(['tipo' => 'success', 'mensaje' => 'Compra registrada con éxito.']);
         break;
-        
 
     case 'cambiarEstado':
-        $id_producto = isset($_POST['id']) ? (int)$_POST['id'] : 0;
-        $estado = isset($_POST['estado']) ? (int)$_POST['estado'] : 1;
+        var_dump($_POST); // Verifica los datos recibidos
+        $id_producto = isset($_POST['id']) ? (int) $_POST['id'] : 0;
+        $estado = isset($_POST['estado']) ? (int) $_POST['estado'] : 1;
         $barcode = isset($_POST['barcode']) ? $_POST['barcode'] : '';
+        
 
         if (empty($id_producto) || empty($barcode)) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Datos incompletos para cambiar el estado.']);
             break;
         }
 
+        // Actualizar el estado del producto y agregar el código de barras si estaba vacío
         $result = $compras->updateEstadoProducto($id_producto, $estado, $barcode);
 
         if ($result) {
@@ -82,4 +83,3 @@ switch ($option) {
         echo json_encode(['tipo' => 'error', 'mensaje' => 'Opción no válida.']);
         break;
 }
-?>
