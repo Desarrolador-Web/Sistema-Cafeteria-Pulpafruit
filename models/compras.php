@@ -83,7 +83,5 @@ class Compras {
             return false;
         }
     }
-    
-    
 }
 ?>
