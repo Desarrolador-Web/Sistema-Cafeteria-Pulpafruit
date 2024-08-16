@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const btn_despachado = document.querySelector('#btn-despachado');
     const btn_pendiente = document.querySelector('#btn-pendiente');
     const formProductos = document.querySelector('#frmProductos');
-    const selectEmpresa = document.querySelector('#id_empresa'); 
+    const selectEmpresa = document.querySelector('#id_empresa');
 
     if (table_productos) {
         cargarProductos();
@@ -22,14 +22,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (selectEmpresa) {
-        cargarEmpresas(); 
+        cargarEmpresas();
     }
 
     function registrarCompra(estado) {
         const formData = new FormData(formProductos);
         formData.append('estado', estado);
 
-        const id_empresa = document.querySelector('#id_empresa').value; 
+        const id_empresa = document.querySelector('#id_empresa').value;
         if (!id_empresa) {
             Swal.fire({
                 icon: 'error',
@@ -60,18 +60,19 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(function (response) {
                 const productos = response.data;
                 const tbody = document.querySelector('#table_productos tbody');
-                
-                // Destruye la instancia existente de DataTable si existe
+        
                 if ($.fn.DataTable.isDataTable('#table_productos')) {
                     $('#table_productos').DataTable().destroy();
                 }
-
-                tbody.innerHTML = ''; // Limpia el contenido de la tabla
-
+        
+                tbody.innerHTML = '';
+        
                 if (Array.isArray(productos)) {
                     productos.forEach(function (producto) {
+                        console.log(producto);  // Verifica el contenido de `producto`
+                        
                         const row = document.createElement('tr');
-
+        
                         row.innerHTML = `
                             <td>${producto.idcompra}</td>
                             <td>${producto.codigo}</td>
@@ -89,8 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         `;
                         tbody.appendChild(row);
                     });
-
-                    // Reinicia el DataTable después de cargar los nuevos datos
+        
                     $('#table_productos').DataTable({
                         dom: 'Bfrtip',
                         buttons: [
@@ -113,14 +113,14 @@ document.addEventListener('DOMContentLoaded', function () {
         axios.get('controllers/comprasController.php?option=listarEmpresas')
             .then(function (response) {
                 const empresas = response.data;
-                const select = document.querySelector('#id_empresa'); 
+                const select = document.querySelector('#id_empresa');
                 select.innerHTML = '<option value="">Seleccione una empresa</option>';
-    
+
                 if (Array.isArray(empresas)) {
                     empresas.forEach(function (empresa) {
                         const option = document.createElement('option');
-                        option.value = empresa.id_empresa; 
-                        option.textContent = empresa.razon_social; 
+                        option.value = empresa.id_empresa;
+                        option.textContent = empresa.razon_social;
                         select.appendChild(option);
                     });
                 } else {
@@ -134,13 +134,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     window.cambiarEstado = function (id, nuevoEstado) {
         Swal.fire({
-            title: 'Ingrese el código de barras para despachar el producto:',
+            title: 'Ingrese el código de barras para actualizar el producto pendiente:',
             input: 'text',
             inputAttributes: {
                 autocapitalize: 'off'
             },
             showCancelButton: true,
-            confirmButtonText: 'Despachar',
+            confirmButtonText: 'Actualizar',
             cancelButtonText: 'Cancelar',
             showLoaderOnConfirm: true,
             preConfirm: (barcode) => {
@@ -148,17 +148,23 @@ document.addEventListener('DOMContentLoaded', function () {
                     Swal.showValidationMessage(
                         'El código de barras debe ser una serie de números y no puede estar vacío.'
                     );
+                    return false; // Para evitar enviar un valor incorrecto
                 }
                 return barcode;
             },
             allowOutsideClick: () => !Swal.isLoading()
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.post('controllers/comprasController.php?option=cambiarEstado', {
-                    id: id,
-                    estado: nuevoEstado,
-                    barcode: result.value
-                })
+                console.log('ID Producto:', id); // Depuración
+                console.log('Código de Barras:', result.value); // Depuración
+    
+                // Enviar datos como formulario regular sin especificar el Content-Type
+                const formData = new FormData();
+                formData.append('id', id);
+                formData.append('estado', nuevoEstado);
+                formData.append('barcode', result.value);
+    
+                axios.post('controllers/comprasController.php?option=cambiarEstado', formData)
                 .then(function (response) {
                     const info = response.data;
                     Swal.fire({
