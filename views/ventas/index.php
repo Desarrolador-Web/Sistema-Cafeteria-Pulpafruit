@@ -5,16 +5,53 @@
 
 <div class="row">
     <div class="col-md-5">
-        <div class="card">
+        <div class="card shadow-sm rounded">
             <div class="card-body">
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+
+
+                <div class="d-flex justify-content-between mt-3">
+                    <h5>Datos del cliente</h5>
+                    <button class="btn btn-outline-info" data-toggle="modal" data-target="#modal-cliente"><i class="fas fa-search"></i> Seleccionar cliente</button>
                 </div>
-                <input type="text" class="form-control" placeholder="Barcode" id="search"> <!-- Cambié id de "seacrh" a "search" -->
-            </div>
+                <hr>
+                <div class="row">
+                    <input type="hidden" id="id-cliente" value="1">
+                    <div class="col-md-6">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-light border-0"><i class="fas fa-users"></i></span>
+                            </div>
+                            <input type="text" class="form-control border-0" id="nombre-cliente" placeholder="Nombre" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-light border-0"><i class="fas fa-home"></i></span>
+                            </div>
+                            <input type="text" class="form-control border-0" id="area-cliente" placeholder="Área" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6"> 
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-light border-0"><i class="fas fa-money-bill-alt"></i></span>
+                            </div>
+                            <input type="text" class="form-control border-0" id="capacidad-cliente" placeholder="Capacidad" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <hr> <!-- Agregué un separador para mejor organización visual -->
+
                 <div class="table-responsive">
-                    <table class="table" id="table_temp" style="width: 100%;">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-light border-0"><i class="fas fa-search"></i></span>
+                        </div>
+                        <input type="text" class="form-control border-0" placeholder="Barcode" id="search">
+                    </div>
+                    <table class="table table-striped table-hover" id="table_temp" style="width: 100%;">
                         <thead>
                             <tr>
                                 <th scope="col">Nombre</th>
@@ -28,65 +65,40 @@
 
                         </tbody>
                     </table>
-                </div>
-                <div class="d-flex justify-content-between">
-                    <h5>Datos del cliente</h5>
-                    <button class="btn btn-info" data-toggle="modal" data-target="#modal-cliente"><i class="fas fa-search"></i>  Seleccionar cliente</button>
-                </div>
-                <hr>
-                <div class="row">
-                    <input type="hidden" id="id-cliente" value="1">
-                    <div class="col-md-6">
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fas fa-users"></i></span>
-                            </div>
-                            <input type="text" class="form-control" id="nombre-cliente" placeholder="Nombre" readonly>
-                        </div>
+
+                    <!-- Campo de Total -->
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <h5>Total:</h5>
+                        <h5 id="total-venta">0</h5> <!-- Este valor se actualizará automáticamente -->
                     </div>
-                    <div class="col-md-6">
+
+                    <div class="col-md-12 mt-3">
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fas fa-home"></i></span>
+                                <span class="input-group-text bg-light border-0"><i class="fas fa-credit-card mr-1"></i> Método</span>
                             </div>
-                            <input type="text" class="form-control" id="area-cliente" placeholder="Área" readonly>
-                        </div>
-                    </div>
-                    <div class="col-md-6"> 
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fas fa-money-bill-alt"></i></span>
-                            </div>
-                            <input type="text" class="form-control" id="capacidad-cliente" placeholder="Capacidad" readonly>
-                        </div>
-                    </div>
-                    <div class="col-md-8">
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fas fa-credit-card mr-1"></i> Método</span>
-                            </div>
-                            <select id="metodo" class="form-control">
+                            <select id="metodo" class="form-control border-0 mr-3"> 
                                 <option value="Efectivo">Efectivo</option>
                                 <option value="Credito">Crédito</option>
                                 <option value="Bancaria">Bancaria</option>
                             </select>
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-primary shadow-sm" id="btn-guardar">Guardar</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <button type="button" class="btn btn-primary btn-block" id="btn-guardar">Guardar</button>
-                    </div>
-                </div>
 
+                </div>
             </div>
         </div>
     </div>
     <div class="col-md-7">
-        <div class="card">
+        <div class="card shadow-sm rounded">
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-12">
                         <div class="table-responsive">
-                            <table class="table" id="table_venta" style="width: 100%;">
+                            <table class="table table-striped table-hover" id="table_venta" style="width: 100%;">
                                 <thead class="thead-dark">
                                     <tr>
                                         <th scope="col">Barcode</th>
@@ -111,15 +123,15 @@
 <div class="modal fade" id="modal-cliente" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-dark text-white">
                 <h5 class="modal-title">Seleccionar cliente</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="table-responsive">
-                    <table class="table" id="table_clientes" style="width: 100%;">
+                    <table class="table table-striped table-hover" id="table_clientes" style="width: 100%;">
                         <thead class="thead-dark">
                             <tr>
                                 <th scope="col">Nombre</th>
@@ -141,15 +153,15 @@
 <div class="modal fade" id="modal-camera" tabindex="-1" aria-labelledby="cameraLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-dark text-white">
                 <h5 class="modal-title" id="cameraLabel">Capturar Fotografía</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <video id="video" width="100%" height="480" autoplay></video>
-                <button id="snap" class="btn btn-primary btn-block">Capturar</button>
+                <button id="snap" class="btn btn-primary btn-block shadow-sm">Capturar</button>
                 <canvas id="canvas" style="display:none;"></canvas>
                 <img id="photo" src="" style="display:none;" />
             </div>

@@ -69,7 +69,7 @@
         </div>
         <div class="card-footer text-right">
             <button type="button" class="btn btn-secondary" id="btn-pendiente">Pendiente</button>
-            <button type="button" class="btn btn-success" id="btn-despachado">Despachado</button>
+            <button type="button" class="btn btn-success" id="btn-Recibido">Recibido</button>
         </div>
     </div>
 </form>

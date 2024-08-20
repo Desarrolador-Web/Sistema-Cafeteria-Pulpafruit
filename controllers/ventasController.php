@@ -2,6 +2,9 @@
 require_once '../models/ventas.php';
 require_once '../models/clientes.php';
 
+// Establecer la zona horaria correcta
+date_default_timezone_set('America/Bogota'); // Cambia esto a tu zona horaria
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -185,7 +188,8 @@ switch ($option) {
             break;
         }
 
-        $saleId = $ventas->saveVenta($id_cliente, $total, $metodo, date('Y-m-d'), $id_user);
+        $fecha = date('Y-m-d'); // Captura la fecha actual en la zona horaria configurada
+        $saleId = $ventas->saveVenta($id_cliente, $total, $metodo, $fecha, $id_user);
         foreach ($_SESSION['cart'][$id_user] as $id_product => $item) {
             $ventas->saveDetalle($id_product, $saleId, $item['cantidad'], $item['precio']);
             $product = $ventas->getProduct($id_product);
@@ -197,9 +201,6 @@ switch ($option) {
         if (isset($metodo) && $metodo == 3) {
             $clientes->updateDeudaCapacidad($id_cliente, $total, $metodo);
         }
-        
-        
-        
 
         unset($_SESSION['cart'][$id_user]);
 

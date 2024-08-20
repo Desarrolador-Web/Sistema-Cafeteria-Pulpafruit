@@ -2,6 +2,8 @@
 require_once 'config.php';
 require_once 'controllers/plantillaController.php';
 $plantilla = new Plantilla();
+date_default_timezone_set('America/Bogota'); 
+
 ##### PERMISOS #####
 
 require_once 'models/permisos.php';

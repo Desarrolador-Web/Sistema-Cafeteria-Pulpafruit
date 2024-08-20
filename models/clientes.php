@@ -26,11 +26,11 @@ class ClientesModel {
     }
 
     // Actualizar la deuda y capacidad del cliente
-    public function updateDeudaCapacidad($id_cliente, $total, $metodo) {
-        // Se asegura de que los tres parámetros se pasen al procedimiento almacenado
-        $query = "EXEC actualizarDeudaCapacidad @p_id_cliente = ?, @p_total = ?, @p_metodo = ?";
+    public function updateDeudaCapacidad($id_cliente, $total) {
+        $query = "EXEC actualizarDeudaCapacidad ?, ?"; // Solo dos parámetros
         $stmt = $this->pdo->prepare($query);
-        return $stmt->execute([$id_cliente, $total, $metodo]);
+        return $stmt->execute([$id_cliente, $total]);
     }
+    
     
 }
