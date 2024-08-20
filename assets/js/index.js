@@ -99,4 +99,37 @@ function clientes() {
         .catch(function (error) {
             console.log(error);
         });
+
+        function exportarGraficaPDF() {
+            const ventasCanvas = document.getElementById('ventas');
+            html2canvas(ventasCanvas).then(function (canvas) {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jspdf.jsPDF();
+                pdf.addImage(imgData, 'PNG', 10, 10);
+                pdf.save('grafica_ventas.pdf');
+            }).catch(function (error) {
+                console.error('Error capturando la gráfica:', error);
+            });
+        }
+        
+        document.querySelector('#exportarPDF').addEventListener('click', exportarGraficaPDF);
+        
+    
+    function exportarGraficaExcel() {
+        axios.get(ruta + 'controllers/adminController.php?option=ventasSemana')
+            .then(function (response) {
+                const info = response.data;
+                const worksheet = XLSX.utils.json_to_sheet(info);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Ventas Semana");
+                XLSX.writeFile(workbook, 'grafica_ventas.xlsx');
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+    
+    document.querySelector('#exportarExcel').addEventListener('click', exportarGraficaExcel);
+    
+        
 }

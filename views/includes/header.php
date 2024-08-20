@@ -49,11 +49,11 @@ if (!empty($_GET['pagina'])) {
             <hr class="sidebar-divider my-0">
 
             <!-- Nav Item - Dashboard -->
-            <li class="nav-item <?php echo (empty($_GET['pagina'])) ? 'bg-gradient-info' : ''; ?>">
+            <!-- <li class="nav-item <?php echo (empty($_GET['pagina'])) ? 'bg-gradient-info' : ''; ?>">
                 <a class="nav-link" href="plantilla.php">
                     <i class="fas fa-chart-pie"></i>
                     <span>Panel de control</span></a>
-            </li>
+            </li> -->
 
             <!-- Divider -->
             <hr class="sidebar-divider">
@@ -153,21 +153,21 @@ if (!empty($_GET['pagina'])) {
             <?php } ?>
 
 
-            <?php if (!empty($configuracion)) { ?>
+            <!-- <?php if (!empty($configuracion)) { ?> -->
                 <!-- Divider -->
-                <hr class="sidebar-divider d-none d-md-block">
+                <!-- <hr class="sidebar-divider d-none d-md-block">
 
                 <li class="nav-item <?php echo (!empty($_GET['pagina']) && $_GET['pagina'] == 'configuracion') ? 'bg-gradient-info' : ''; ?>">
                     <a class="nav-link" href="?pagina=configuracion">
                         <i class="fas fa-user-cog"></i>
                         <span>Configuración</span>
                     </a>
-                </li>
-            <?php } ?>
+                </li> -->
+            <!-- <?php } ?> -->
             <!-- Sidebar Toggler (Sidebar) -->
-            <div class="text-center d-none d-md-inline mt-3">
+            <!-- <div class="text-center d-none d-md-inline mt-3">
                 <button class="rounded-circle border-0" id="sidebarToggle"><i class="fas fa-chevron-circle-left text-gray-400"></i></button>
-            </div>
+            </div> -->
 
         </ul>
         <!-- End of Sidebar -->
