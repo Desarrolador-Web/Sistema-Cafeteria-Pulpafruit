@@ -64,12 +64,12 @@ if (!empty($_GET['pagina'])) {
             </div>
             <?php if (!empty($clientes)) { ?>
                 <!-- Nav Item - Pages Collapse Menu -->
-                <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'clientes') ? 'bg-gradient-info' : ''; ?>">
+                <!-- <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'clientes') ? 'bg-gradient-info' : ''; ?>">
                     <a class="nav-link" href="?pagina=clientes">
                         <i class="fas fa-fw fa-users"></i>
                         <span>Clientes</span>
                     </a>
-                </li>
+                </li> -->
             <?php } ?>
 
             <?php if (!empty($proveedor)) { ?>
