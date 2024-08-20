@@ -58,26 +58,25 @@ switch ($option) {
         break;
 
     case 'cambiarEstado':
-        var_dump($_POST); // Verifica los datos recibidos
         $id_producto = isset($_POST['id']) ? (int) $_POST['id'] : 0;
         $estado = isset($_POST['estado']) ? (int) $_POST['estado'] : 1;
         $barcode = isset($_POST['barcode']) ? $_POST['barcode'] : '';
-        
-
+    
         if (empty($id_producto) || empty($barcode)) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Datos incompletos para cambiar el estado.']);
-            break;
+            exit;
         }
-
+    
         // Actualizar el estado del producto y agregar el código de barras si estaba vacío
         $result = $compras->updateEstadoProducto($id_producto, $estado, $barcode);
-
+    
         if ($result) {
             echo json_encode(['tipo' => 'success', 'mensaje' => 'Estado del producto actualizado con éxito.']);
         } else {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al actualizar el estado del producto.']);
         }
-        break;
+        exit;
+        
 
     default:
         echo json_encode(['tipo' => 'error', 'mensaje' => 'Opción no válida.']);

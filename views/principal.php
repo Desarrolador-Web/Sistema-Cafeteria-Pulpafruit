@@ -80,12 +80,16 @@
 </div>
 
 <div class="row">
-    <div class="col-xl-6 col-md-6 mb-4">
+    <div class="col-xl-6 col-md-12 mb-12">
         <div class="card shadow h-100 py-2">
             <div class="card-body">
+            <button id="exportarPDF" class="btn btn-primary">Exportar a PDF</button>
+            <button id="exportarExcel" class="btn btn-success">Exportar a Excel</button>
+
+            <br><br>
                 <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                    <div class="col mr-12 ">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-12 ">
                             Ultimos 7 diás</div>
                     </div>
                 </div>
@@ -93,17 +97,11 @@
             </div>
         </div>
     </div>
-    <div class="col-xl-6 col-md-6 mb-4">
-        <div class="card shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                            Top clientes</div>
-                    </div>
-                </div>
-                <canvas id="topClientes"></canvas>
-            </div>
-        </div>
-    </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>

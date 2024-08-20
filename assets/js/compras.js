@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     const table_productos = document.querySelector('#table_productos tbody');
-    const btn_despachado = document.querySelector('#btn-despachado');
+    const btn_Recibido = document.querySelector('#btn-Recibido');
     const btn_pendiente = document.querySelector('#btn-pendiente');
     const formProductos = document.querySelector('#frmProductos');
     const selectEmpresa = document.querySelector('#id_empresa');
@@ -9,9 +9,9 @@ document.addEventListener('DOMContentLoaded', function () {
         cargarProductos();
     }
 
-    if (btn_despachado) {
-        btn_despachado.onclick = function () {
-            registrarCompra(1); // Despachado
+    if (btn_Recibido) {
+        btn_Recibido.onclick = function () {
+            registrarCompra(1); // Recibido
         };
     }
 
@@ -42,16 +42,29 @@ document.addEventListener('DOMContentLoaded', function () {
         axios.post('controllers/comprasController.php?option=registrarCompra', formData)
             .then(function (response) {
                 const info = response.data;
-                Swal.fire({
-                    icon: info.tipo === 'success' ? 'success' : 'error',
-                    title: info.tipo === 'success' ? 'Éxito' : 'Error',
-                    text: info.mensaje
-                });
-                cargarProductos();
-                formProductos.reset();
+                if (info.tipo === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Éxito',
+                        text: info.mensaje
+                    });
+                    cargarProductos();
+                    formProductos.reset();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: info.mensaje
+                    });
+                }
             })
             .catch(function (error) {
                 console.log(error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ocurrió un error inesperado. Por favor, inténtelo de nuevo.'
+                });
             });
     }
 
@@ -84,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             <td>${producto.existencia}</td>
                             <td>
                                 ${producto.status == 1 
-                                    ? '<button class="btn btn-success btn-sm" disabled>Despachado</button>' 
+                                    ? '<button class="btn btn-success btn-sm" disabled>Recibido</button>' 
                                     : `<button class="btn btn-warning btn-sm" onclick="cambiarEstado(${producto.id_producto}, 1)">Pendiente</button>`}
                             </td>
                         `;
@@ -167,15 +180,28 @@ document.addEventListener('DOMContentLoaded', function () {
                 axios.post('controllers/comprasController.php?option=cambiarEstado', formData)
                 .then(function (response) {
                     const info = response.data;
-                    Swal.fire({
-                        icon: info.tipo === 'success' ? 'success' : 'error',
-                        title: info.tipo === 'success' ? 'Éxito' : 'Error',
-                        text: info.mensaje
-                    });
-                    cargarProductos();
+                    if (info.tipo === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Éxito',
+                            text: info.mensaje
+                        });
+                        cargarProductos();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: info.mensaje
+                        });
+                    }
                 })
                 .catch(function (error) {
                     console.log(error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Ocurrió un error inesperado. Por favor, inténtelo de nuevo.'
+                    });
                 });
             }
         });
