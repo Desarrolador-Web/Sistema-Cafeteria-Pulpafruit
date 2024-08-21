@@ -8,6 +8,8 @@ const clave = document.querySelector('#clave');
 const id_user = document.querySelector('#id_user');
 const btn_nuevo = document.querySelector('#btn-nuevo');
 const btn_save = document.querySelector('#btn-save');
+const ubicacion = document.querySelector('#ubicacion');
+
 
 document.addEventListener('DOMContentLoaded', function () {
     $('#table_users').DataTable({

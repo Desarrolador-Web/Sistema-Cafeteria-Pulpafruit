@@ -41,12 +41,13 @@ switch ($option) {
         $apellidos = $_POST['apellidos'];
         $correo = $_POST['correo'];
         $clave = $_POST['clave'];
+        $ubicacion = $_POST['ubicacion']; // Capturar el valor del select 'ubicacion'
         $id_user = $_POST['id_user'];
         if ($id_user == '') {
             $consult = $usuarios->comprobarCedula($cedula);
             if (empty($consult)) {
                 $hash = password_hash($clave, PASSWORD_DEFAULT);
-                $result = $usuarios->saveUser($cedula, $nombres, $apellidos, $correo, $hash);
+                $result = $usuarios->saveUser($cedula, $nombres, $apellidos, $correo, $hash, $ubicacion);
                 if ($result) {
                     $res = array('tipo' => 'success', 'mensaje' => 'USUARIO REGISTRADO');
                 } else {
@@ -56,7 +57,7 @@ switch ($option) {
                 $res = array('tipo' => 'error', 'mensaje' => 'LA CÉDULA YA EXISTE');
             }
         } else {
-            $result = $usuarios->updateUser($nombres, $apellidos, $correo, $id_user);
+            $result = $usuarios->updateUser($nombres, $apellidos, $correo, $ubicacion, $id_user);
             if ($result) {
                 $res = array('tipo' => 'success', 'mensaje' => 'USUARIO MODIFICADO');
             } else {
@@ -91,26 +92,26 @@ switch ($option) {
         $data['asig'] = $datos;
         echo json_encode($data);
         break;
-        case 'savePermiso':
-            $id_user = $_POST['id_usuario'];
-            $usuarios->eliminarPermisos($id_user);
-            $res = true;
-            if (!empty($_POST['permisos'])) {
-                foreach ($_POST['permisos'] as $permiso) {
-                    if ($permiso !== 'undefined') {
-                        $res = $usuarios->savePermiso($permiso, $id_user);
-                    }
+    case 'savePermiso':
+        $id_user = $_POST['id_usuario'];
+        $usuarios->eliminarPermisos($id_user);
+        $res = true;
+        if (!empty($_POST['permisos'])) {
+            foreach ($_POST['permisos'] as $permiso) {
+                if ($permiso !== 'undefined') {
+                    $res = $usuarios->savePermiso($permiso, $id_user);
                 }
-                if ($res) {
-                    $res = array('tipo' => 'success', 'mensaje' => 'PERMISOS ASIGNADO');
-                } else {
-                    $res = array('tipo' => 'error', 'mensaje' => 'ERROR AL AGREGAR LOS PERMISOS');
-                }
-            } else {
-                $res = array('tipo' => 'error', 'mensaje' => 'NO SE HAN ENVIADO PERMISOS VÁLIDOS');
             }
-            echo json_encode($res);
-            break;
+            if ($res) {
+                $res = array('tipo' => 'success', 'mensaje' => 'PERMISOS ASIGNADO');
+            } else {
+                $res = array('tipo' => 'error', 'mensaje' => 'ERROR AL AGREGAR LOS PERMISOS');
+            }
+        } else {
+            $res = array('tipo' => 'error', 'mensaje' => 'NO SE HAN ENVIADO PERMISOS VÁLIDOS');
+        }
+        echo json_encode($res);
+        break;
         
     default:
         # code...
