@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
             { data: 'id_usuario' },
             { data: 'nombre_completo' }, 
             { data: 'correo' },
+            { data: 'sede_nombre' },
             { data: 'accion' }
         ],
         language: {

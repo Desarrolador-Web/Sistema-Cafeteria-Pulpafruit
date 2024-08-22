@@ -79,6 +79,7 @@
                         <th scope="col">Cédula</th>
                         <th scope="col">Nombre Completo</th>
                         <th scope="col">Correo</th>
+                        <th scope="col">Sede</th>
                         <th></th>
                     </tr>
                 </thead>
