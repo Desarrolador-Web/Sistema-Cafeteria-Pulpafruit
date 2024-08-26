@@ -5,9 +5,9 @@ $admin = new AdminModel();
 $id_user = $_SESSION['idusuario'];
 switch ($option) {
     case 'totales':
-        $data['usuario'] = $admin->getDatos('cf_usuario'); // Cambiado de 'usuario' a 'cf_usuario'
-        $data['cliente'] = $admin->getDatos('cf_cliente'); // Cambiado de 'cliente' a 'cf_cliente'
-        $data['producto'] = $admin->getDatos('cf_producto'); // Cambiado de 'producto' a 'cf_producto'
+        $data['usuario'] = $admin->getDatos('cf_usuario'); 
+        $data['cliente'] = $admin->getDatos('cf_cliente'); 
+        $data['producto'] = $admin->getDatos('cf_producto'); 
         $data['venta'] = $admin->getVentas($id_user);
         echo json_encode($data);
         break;

@@ -1,9 +1,7 @@
 <?php
 require_once '../models/ventas.php';
 require_once '../models/clientes.php';
-
-// Establecer la zona horaria correcta
-date_default_timezone_set('America/Bogota'); // Cambia esto a tu zona horaria
+date_default_timezone_set('America/Bogota'); 
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

@@ -212,13 +212,9 @@ if (!empty($_GET['pagina'])) {
                                 </a>
                             </div>
                         </li>
-
                     </ul>
-
                 </nav>
-                <!-- End of Topbar -->
 
-                <!-- Begin Page Content -->
                 <div class="container-fluid">
 
 

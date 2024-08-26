@@ -3,6 +3,7 @@ require_once __DIR__ . '/../config.php';
 require_once 'conexion.php';
 
 class UsuariosModel {
+     
     private $pdo, $con;
     
     public function __construct() {
@@ -17,10 +18,10 @@ class UsuariosModel {
     }
 
     public function getUsers() {
-        $consult = $this->pdo->prepare("SELECT * FROM cf_usuario WHERE estado_usuario = 1");
+        $consult = $this->pdo->prepare("SELECT u.*, c.nombre_caja FROM cf_usuario u INNER JOIN cf_caja c ON u.sede = c.id_caja WHERE u.estado_usuario = 1");
         $consult->execute();
         return $consult->fetchAll(PDO::FETCH_ASSOC);
-    }
+    }  
 
     public function getUser($id) {
         $consult = $this->pdo->prepare("SELECT * FROM cf_usuario WHERE id_usuario = ?");
@@ -34,9 +35,9 @@ class UsuariosModel {
         return $consult->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function saveUser($cedula, $nombres, $apellidos, $correo, $clave) {
-        $consult = $this->pdo->prepare("INSERT INTO cf_usuario (id_usuario, nombres, apellidos, correo, clave, estado_usuario, id_autorizacion) VALUES (?,?,?,?,?,1,1)");
-        return $consult->execute([$cedula, $nombres, $apellidos, $correo, $clave]);
+    public function saveUser($cedula, $nombres, $apellidos, $correo, $clave, $ubicacion) {
+        $consult = $this->pdo->prepare("INSERT INTO cf_usuario (id_usuario, nombres, apellidos, correo, clave, estado_usuario, id_autorizacion, sede) VALUES (?,?,?,?,?,1,1,?)");
+        return $consult->execute([$cedula, $nombres, $apellidos, $correo, $clave, $ubicacion]);
     }
 
     public function deleteUser($id) {
@@ -71,7 +72,6 @@ class UsuariosModel {
         }
     }
     
-
     public function eliminarPermisos($id_user) {
         $consult = $this->pdo->prepare("DELETE FROM cf_detalle_permisos WHERE id_usuario = ?");
         return $consult->execute([$id_user]);
