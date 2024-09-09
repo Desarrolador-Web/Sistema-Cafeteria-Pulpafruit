@@ -8,7 +8,7 @@ $cajaAbierta = $_SESSION['caja_abierta'] ?? false;  // Si no está definida, asu
 
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0 text-gray-800">Panel de control - Apertura y Cierre de Caja</h1>
+    <h1 class="h3 mb-0 text-gray-800">Panel de control</h1>
 </div>
 
 <!-- Aquí solo se muestra el modal si no hay una caja abierta -->
