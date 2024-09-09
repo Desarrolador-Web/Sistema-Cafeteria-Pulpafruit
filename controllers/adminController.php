@@ -3,53 +3,39 @@ require_once '../models/admin.php';
 $option = (empty($_GET['option'])) ? '' : $_GET['option'];
 $admin = new AdminModel();
 $id_user = $_SESSION['idusuario'];
+
 switch ($option) {
-    case 'totales':
-        $data['usuario'] = $admin->getDatos('cf_usuario'); 
-        $data['cliente'] = $admin->getDatos('cf_cliente'); 
-        $data['producto'] = $admin->getDatos('cf_producto'); 
-        $data['venta'] = $admin->getVentas($id_user);
-        echo json_encode($data);
+    case 'verificarCaja':
+        // Verificar si la caja ya está abierta para el usuario y la fecha actual
+        $fechaHoy = date('Y-m-d');
+        $cajaAbierta = $admin->checkCajaAbierta($id_user, $fechaHoy);
+        echo json_encode(['cajaAbierta' => $cajaAbierta]);
         break;
 
-    case 'topClientes':
-        $data = $admin->topClientes($id_user);
-        echo json_encode($data);
-        break;
-
-    case 'ventasSemana':
-        $actual = date('Y-m-d');
-        $fecha = date("Y-m-d", strtotime($actual . '-7 day'));
-        $data = $admin->ventasSemana($fecha, $actual, $id_user);
-        echo json_encode($data);
-        break;
-
-    case 'datos':
-        $data = $admin->getDato();
-        echo json_encode($data);
-        break;
-
-    case 'save':
-        $nombre = $_POST['nombre'];
-        $telefono = $_POST['telefono'];
-        $direccion = $_POST['direccion'];
-        $correo = $_POST['correo'];
-        $id = $_POST['id'];
-        if (empty($id) || empty($nombre) || empty($telefono) || empty($direccion) || empty($correo)) {
-            $res = array('tipo' => 'error', 'mensaje' => 'TODO LOS CAMPOS SON REQUERIDOS');
-        } else {
-            $result = $admin->saveDatos($nombre, $telefono, $correo, $direccion, $id);
-            if ($result) {
-                $res = array('tipo' => 'success', 'mensaje' => 'REGISTRO MODIFICADO');
-            } else {
-                $res = array('tipo' => 'error', 'mensaje' => 'ERROR AL MODIFICAR');
-            }
+    case 'abrirCaja':
+        // Verificar si los valores han sido enviados correctamente
+        if (!isset($_POST['valorApertura']) || !isset($_POST['id_sede'])) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Campos faltantes en la solicitud']);
+            exit;
         }
-        echo json_encode($res);
+
+        // Obtener los datos del formulario
+        $valorApertura = $_POST['valorApertura'];
+        $id_sede = $_POST['id_sede'];
+
+        // Generar la fecha y hora actuales
+        $fechaApertura = date('Y-m-d H:i:s');
+
+        // Guardar la apertura de caja en la base de datos
+        $resultado = $admin->abrirCaja($id_user, $valorApertura, $id_sede, $fechaApertura);
+
+        if ($resultado) {
+            echo json_encode(['tipo' => 'success', 'mensaje' => 'Caja abierta exitosamente']);
+        } else {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al abrir la caja']);
+        }
         break;
-        
+
     default:
-        # code...
         break;
 }
-
