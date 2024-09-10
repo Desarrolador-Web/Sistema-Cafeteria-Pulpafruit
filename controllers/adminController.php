@@ -4,29 +4,28 @@ $option = (empty($_GET['option'])) ? '' : $_GET['option'];
 $admin = new AdminModel();
 $id_user = $_SESSION['idusuario'];
 
+// Configurar la zona horaria a Bogotá, Colombia
+date_default_timezone_set('America/Bogota');
+
 switch ($option) {
     case 'verificarCaja':
-        // Verificar si la caja ya está abierta para el usuario y la fecha actual
         $fechaHoy = date('Y-m-d');
         $cajaAbierta = $admin->checkCajaAbierta($id_user, $fechaHoy);
         echo json_encode(['cajaAbierta' => $cajaAbierta]);
         break;
 
     case 'abrirCaja':
-        // Verificar si los valores han sido enviados correctamente
         if (!isset($_POST['valorApertura']) || !isset($_POST['id_sede'])) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Campos faltantes en la solicitud']);
             exit;
         }
 
-        // Obtener los datos del formulario
         $valorApertura = $_POST['valorApertura'];
         $id_sede = $_POST['id_sede'];
 
-        // Generar la fecha y hora actuales
+        // Obtener la fecha y hora exactas con la zona horaria correcta
         $fechaApertura = date('Y-m-d H:i:s');
 
-        // Guardar la apertura de caja en la base de datos
         $resultado = $admin->abrirCaja($id_user, $valorApertura, $id_sede, $fechaApertura);
 
         if ($resultado) {

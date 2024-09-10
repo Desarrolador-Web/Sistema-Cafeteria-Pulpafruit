@@ -14,14 +14,14 @@ document.addEventListener('DOMContentLoaded', function () {
     // Manejar la apertura de caja
     document.querySelector('#formAperturaCaja').addEventListener('submit', function (e) {
         e.preventDefault();
-    
+        
         const valorApertura = document.querySelector('#valorApertura').value;
         const sede = document.querySelector('#sede').value;
     
         const formData = new FormData();
-        formData.append('valorApertura', valorApertura);
-        formData.append('sede', sede);
-    
+        formData.append('valorApertura', valorApertura);  // Debe coincidir con 'valorApertura' en el PHP
+        formData.append('id_sede', sede);  // Debe coincidir con 'id_sede' en el PHP
+        
         fetch(ruta + 'controllers/adminController.php?option=abrirCaja', {
             method: 'POST',
             body: formData
@@ -39,5 +39,6 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error en la solicitud:', error);
         });
     });
+    
     
 });
