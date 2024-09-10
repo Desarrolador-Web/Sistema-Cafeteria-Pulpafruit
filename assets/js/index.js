@@ -1,54 +1,43 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // Verifica si la caja está abierta desde el atributo data del body
     const cajaAbierta = document.body.getAttribute('data-caja-abierta') === 'true';
 
+    // Si no hay caja abierta, mostrar el modal automáticamente
     if (!cajaAbierta) {
         $('#modalAbrirCaja').modal({
-            backdrop: 'static',
-            keyboard: false
+            backdrop: 'static',  // Evita cerrar el modal al hacer clic fuera
+            keyboard: false      // Evita cerrar el modal con la tecla Esc
         });
         $('#modalAbrirCaja').modal('show');
     }
 
+    // Manejar la apertura de caja
     document.querySelector('#formAperturaCaja').addEventListener('submit', function (e) {
         e.preventDefault();
     
         const valorApertura = document.querySelector('#valorApertura').value;
         const sede = document.querySelector('#sede').value;
     
-        console.log('Datos que se envían:', {
-            valorApertura: valorApertura,
-            sede: sede
-        });
-    
-        // Utilizar FormData para enviar los datos
         const formData = new FormData();
         formData.append('valorApertura', valorApertura);
         formData.append('sede', sede);
     
-        axios.post(ruta + 'controllers/adminController.php?option=abrirCaja', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
+        fetch(ruta + 'controllers/adminController.php?option=abrirCaja', {
+            method: 'POST',
+            body: formData
         })
-        .then(function (response) {
-            // Verificar la respuesta recibida
-            console.log('Respuesta del servidor:', response);
-            
-            // Intentamos extraer el objeto JSON recibido
-            if (response.data && response.data.tipo === 'success') {
+        .then(response => response.json())
+        .then(data => {
+            if (data.tipo === 'success') {
                 $('#modalAbrirCaja').modal('hide');
-                alert(response.data.mensaje);  // Mostrar el mensaje de éxito correctamente
+                alert(data.mensaje);
             } else {
-                alert('Error: ' + response.data.mensaje);  // Mostrar el mensaje de error si lo hay
+                alert('Error: ' + data.mensaje);
             }
         })
-        .catch(function (error) {
+        .catch(error => {
             console.error('Error en la solicitud:', error);
         });
     });
     
-    
-    
 });
-
-

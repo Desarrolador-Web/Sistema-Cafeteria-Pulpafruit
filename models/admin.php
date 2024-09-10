@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../config.php'; 
-require_once 'conexion.php';  
+require_once __DIR__ . '/../config.php';  // Usar __DIR__ para obtener la ruta absoluta al archivo de configuración
+require_once 'conexion.php';   // Incluir la conexión a la base de datos
 
 class AdminModel {
     private $pdo;
@@ -23,20 +23,6 @@ class AdminModel {
     public function abrirCaja($id_usuario, $valorApertura, $id_sede, $fechaApertura) {
         $sql = "INSERT INTO cf_informacion_cajas (id_usuario, valor_apertura, id_sede, fecha_apertura) VALUES (?, ?, ?, ?)";
         $query = $this->pdo->prepare($sql);
-    
-        // Imprimir los valores antes de ejecutar la consulta para ver si llegan correctamente
-        var_dump($id_usuario, $valorApertura, $id_sede, $fechaApertura);
-    
-        // Intentar ejecutar la consulta y mostrar cualquier error de SQL
-        if (!$query->execute([$id_usuario, $valorApertura, $id_sede, $fechaApertura])) {
-            var_dump($query->errorInfo());  // Mostrar error de la base de datos
-            return false;
-        }
-        
-        return true;
+        return $query->execute([$id_usuario, $valorApertura, $id_sede, $fechaApertura]);
     }
-    
-    
-    
-    
 }
