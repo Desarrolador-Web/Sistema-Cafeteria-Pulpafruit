@@ -25,16 +25,17 @@ $proveedor = $permisos->getPermiso(9, $id_user);
 ##### FIN PERMISOS #####
 
 // Verificar si el usuario tiene una caja abierta hoy
+// Solución correcta
 $admin = new AdminModel();
 $fechaHoy = date('Y-m-d');
 $cajaAbierta = $admin->checkCajaAbierta($id_user, $fechaHoy);
 
-// Guardar el estado de la caja abierta en la sesión
 if ($cajaAbierta) {
     $_SESSION['caja_abierta'] = true;
 } else {
     $_SESSION['caja_abierta'] = false;
 }
+
 
 require_once 'views/includes/header.php';
 if (isset($_GET['pagina'])) {
