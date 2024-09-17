@@ -11,8 +11,34 @@ switch ($option) {
     case 'verificarCaja':
         $fechaHoy = date('Y-m-d');
         $cajaAbierta = $admin->checkCajaAbierta($id_user, $fechaHoy);
-        echo json_encode(['cajaAbierta' => $cajaAbierta]);
+        echo json_encode(['cajaAbierta' => $cajaAbierta ? true : false]);
         break;
+    
+
+    case 'cerrarCaja':
+        if (!isset($_POST['valorCierre'])) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Valor de cierre es requerido']);
+            exit;
+        }
+    
+        $valorCierre = $_POST['valorCierre'];
+        $fechaCierre = date('Y-m-d H:i:s');
+        
+        // Obtener la última caja abierta por el usuario
+        $cajaAbierta = $admin->obtenerCajaAbiertaUsuario($id_user);
+    
+        if ($cajaAbierta) {
+            $resultado = $admin->cerrarCaja($cajaAbierta['id_info_caja'], $valorCierre, $fechaCierre);
+            if ($resultado) {
+                echo json_encode(['tipo' => 'success', 'mensaje' => 'Caja cerrada exitosamente']);
+            } else {
+                echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al cerrar la caja']);
+            }
+        } else {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'No hay caja abierta para cerrar']);
+        }
+        break;
+    
 
     case 'abrirCaja':
         if (!isset($_POST['valorApertura']) || !isset($_POST['id_sede'])) {

@@ -32,4 +32,20 @@ class AdminModel {
         $query = $this->pdo->prepare($sql);
         return $query->execute([$id_usuario, $valorApertura, $id_sede, $fechaApertura]);
     }
+
+    public function obtenerCajaAbiertaUsuario($id_usuario) {
+        // Cambia LIMIT por TOP 1, que es compatible con SQL Server
+        $sql = "SELECT TOP 1 * FROM cf_informacion_cajas WHERE id_usuario = ? AND valor_cierre IS NULL AND fecha_cierre IS NULL ORDER BY fecha_apertura DESC";
+        $query = $this->pdo->prepare($sql);
+        $query->execute([$id_usuario]);
+        return $query->fetch(PDO::FETCH_ASSOC);
+    }
+    
+    
+    public function cerrarCaja($id_info_caja, $valorCierre, $fechaCierre) {
+        $sql = "UPDATE cf_informacion_cajas SET valor_cierre = ?, fecha_cierre = ? WHERE id_info_caja = ?";
+        $query = $this->pdo->prepare($sql);
+        return $query->execute([$valorCierre, $fechaCierre, $id_info_caja]);
+    }
+    
 }
