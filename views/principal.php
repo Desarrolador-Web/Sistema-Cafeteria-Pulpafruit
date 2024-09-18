@@ -14,8 +14,6 @@ $cajaAbierta = $_SESSION['caja_abierta'] ?? false;  // Si no está definida, asu
 
 <body data-caja-abierta="<?php echo $cajaAbierta ? 'true' : 'false'; ?>">
 
-<<<<<<< HEAD
-=======
 
 <div class="container-fluid p-0">
   <div class="row m-0">
@@ -49,7 +47,6 @@ $cajaAbierta = $_SESSION['caja_abierta'] ?? false;  // Si no está definida, asu
 
 
 
->>>>>>> validacion_cierre
 <!-- Aquí solo se muestra el modal si no hay una caja abierta -->
 <div class="modal fade" id="modalAbrirCaja" tabindex="-1" aria-labelledby="modalAbrirCajaLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -58,26 +55,6 @@ $cajaAbierta = $_SESSION['caja_abierta'] ?? false;  // Si no está definida, asu
         <h5 class="modal-title" id="modalAbrirCajaLabel">Apertura de Caja</h5>
       </div>
       <div class="modal-body">
-<<<<<<< HEAD
-      <form id="formAperturaCaja">
-        <div class="form-group">
-            <label for="valorApertura">Valor de Apertura</label>
-            <input type="number" class="form-control" id="valorApertura" name="valorApertura" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="sede">Seleccionar Sede</label>
-            <select class="form-control" id="sede" name="sede" required>
-              <option value="1">Principal</option>
-              <option value="2">Planta 2</option>
-              <option value="3">CEDI</option>
-            </select>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Abrir Caja</button>
-      </form>
-
-=======
           <form id="formAperturaCaja">
             <div class="form-group">
                 <label for="valorApertura">Valor de Apertura</label>
@@ -97,18 +74,9 @@ $cajaAbierta = $_SESSION['caja_abierta'] ?? false;  // Si no está definida, asu
             </div>
             <button type="submit" class="btn btn-primary">Abrir Caja</button>
         </form>
->>>>>>> validacion_cierre
       </div>
     </div>
   </div>
 </div>
 
-<<<<<<< HEAD
-
-
-
-
-
-=======
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
->>>>>>> validacion_cierre
