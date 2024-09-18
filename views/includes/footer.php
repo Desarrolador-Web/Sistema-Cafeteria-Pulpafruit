@@ -1,4 +1,13 @@
 </div>
+
+
+<style>
+    .modal-backdrop.show {
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo negro con opacidad del 50% */
+}
+
+</style>
+
 <!-- /.container-fluid -->
 
 </div>
@@ -30,18 +39,19 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Esta seguro de salir?</h5>
+                <h5 class="modal-title" id="exampleModalLabel">¿Está seguro de salir?</h5>
                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
                 <a class="btn btn-primary" href="<?php echo RUTA . 'controllers/ventasController.php?option=logout'; ?>">Logout</a>
             </div>
         </div>
     </div>
 </div>
+
 
 <!-- Bootstrap core JavaScript-->
 <script src="<?php echo RUTA . 'assets/'; ?>vendor/jquery/jquery.min.js"></script>

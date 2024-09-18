@@ -1,6 +1,7 @@
 <?php
 require_once '../models/ventas.php';
 require_once '../models/clientes.php';
+
 date_default_timezone_set('America/Bogota'); 
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -51,7 +52,6 @@ switch ($option) {
         }
 
         $_SESSION['cart'][$id_user][$id_product]['cantidad'] = $newQuantity;
-
         echo json_encode(['tipo' => 'success', 'mensaje' => 'PRODUCTO AGREGADO AL CARRITO', 'producto' => $product]);
         break;
 
@@ -225,6 +225,16 @@ switch ($option) {
         $result = $clientes->getClients();
         echo json_encode($result);
         break;
+    
+    case 'logout':
+        // Destruir la sesión
+        session_destroy();
+    
+        // Redirigir a la página principal
+        header("Location: http://localhost/sistema-cafeteria-pulpafruit/");
+        exit();
+        break;
+        
 
     default:
         echo json_encode(['tipo' => 'error', 'mensaje' => 'Opción no válida']);
