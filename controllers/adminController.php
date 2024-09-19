@@ -3,53 +3,73 @@ require_once '../models/admin.php';
 $option = (empty($_GET['option'])) ? '' : $_GET['option'];
 $admin = new AdminModel();
 $id_user = $_SESSION['idusuario'];
+
+// Configurar la zona horaria a Bogotá, Colombia
+date_default_timezone_set('America/Bogota');
+
 switch ($option) {
-    case 'totales':
-        $data['usuario'] = $admin->getDatos('cf_usuario'); // Cambiado de 'usuario' a 'cf_usuario'
-        $data['cliente'] = $admin->getDatos('cf_cliente'); // Cambiado de 'cliente' a 'cf_cliente'
-        $data['producto'] = $admin->getDatos('cf_producto'); // Cambiado de 'producto' a 'cf_producto'
-        $data['venta'] = $admin->getVentas($id_user);
-        echo json_encode($data);
+    case 'verificarCaja':
+        $fechaHoy = date('Y-m-d');
+        $cajaAbierta = $admin->checkCajaAbierta($id_user, $fechaHoy);
+        echo json_encode(['cajaAbierta' => $cajaAbierta ? true : false]);
         break;
+    
 
-    case 'topClientes':
-        $data = $admin->topClientes($id_user);
-        echo json_encode($data);
-        break;
-
-    case 'ventasSemana':
-        $actual = date('Y-m-d');
-        $fecha = date("Y-m-d", strtotime($actual . '-7 day'));
-        $data = $admin->ventasSemana($fecha, $actual, $id_user);
-        echo json_encode($data);
-        break;
-
-    case 'datos':
-        $data = $admin->getDato();
-        echo json_encode($data);
-        break;
-
-    case 'save':
-        $nombre = $_POST['nombre'];
-        $telefono = $_POST['telefono'];
-        $direccion = $_POST['direccion'];
-        $correo = $_POST['correo'];
-        $id = $_POST['id'];
-        if (empty($id) || empty($nombre) || empty($telefono) || empty($direccion) || empty($correo)) {
-            $res = array('tipo' => 'error', 'mensaje' => 'TODO LOS CAMPOS SON REQUERIDOS');
-        } else {
-            $result = $admin->saveDatos($nombre, $telefono, $correo, $direccion, $id);
-            if ($result) {
-                $res = array('tipo' => 'success', 'mensaje' => 'REGISTRO MODIFICADO');
-            } else {
-                $res = array('tipo' => 'error', 'mensaje' => 'ERROR AL MODIFICAR');
-            }
+    case 'cerrarCaja':
+        if (!isset($_POST['valorCierre'])) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Valor de cierre es requerido']);
+            exit;
         }
-        echo json_encode($res);
+    
+        $valorCierre = $_POST['valorCierre'];
+        $fechaCierre = date('Y-m-d H:i:s');
+        
+        // Obtener la última caja abierta por el usuario
+        $cajaAbierta = $admin->obtenerCajaAbiertaUsuario($id_user);
+    
+        if ($cajaAbierta) {
+            $resultado = $admin->cerrarCaja($cajaAbierta['id_info_caja'], $valorCierre, $fechaCierre);
+            if ($resultado) {
+                echo json_encode(['tipo' => 'success', 'mensaje' => 'Caja cerrada exitosamente']);
+            } else {
+                echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al cerrar la caja']);
+            }
+        } else {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'No hay caja abierta para cerrar']);
+        }
+        break;
+    
+
+    case 'abrirCaja':
+        if (!isset($_POST['valorApertura']) || !isset($_POST['id_sede'])) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Campos faltantes en la solicitud']);
+            exit;
+        }
+    
+        $valorApertura = $_POST['valorApertura'];
+        $id_sede = $_POST['id_sede'];
+    
+        // Verificar si ya existe una caja abierta sin cerrar en la misma sede
+        $cajaSinCerrar = $admin->checkCajaSinCerrar($id_sede);
+    
+        if ($cajaSinCerrar) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'No se puede abrir caja porque hay una caja sin cerrar en esta sede']);
+            exit;
+        }
+    
+        // Obtener la fecha y hora exactas con la zona horaria correcta
+        $fechaApertura = date('Y-m-d H:i:s');
+    
+        $resultado = $admin->abrirCaja($id_user, $valorApertura, $id_sede, $fechaApertura);
+    
+        if ($resultado) {
+            echo json_encode(['tipo' => 'success', 'mensaje' => 'Caja abierta exitosamente']);
+        } else {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al abrir la caja']);
+        }
         break;
         
+
     default:
-        # code...
         break;
 }
-

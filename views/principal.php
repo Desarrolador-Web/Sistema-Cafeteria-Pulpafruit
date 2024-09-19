@@ -1,107 +1,114 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();  // Solo iniciar la sesión si aún no ha sido iniciada
+}
+
+$cajaAbierta = $_SESSION['caja_abierta'] ?? false;  // Si no está definida, asumimos que es false
+?>
+
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">Panel de control</h1>
 </div>
 
-<!-- Content Row -->
-<div class="row">
 
-    <!-- Earnings (Monthly) Card Example -->
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-primary shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                            Usuarios (Total)</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalUsuarios">00</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-users-cog fa-2x text-gray-300"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<body data-caja-abierta="<?php echo $cajaAbierta ? 'true' : 'false'; ?>">
 
-    <!-- Earnings (Monthly) Card Example -->
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-success shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                            Clientes (Total)</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalClientes">00</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-users fa-2x text-gray-300"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<<<<<<< HEAD
+=======
 
-    <!-- Earnings (Monthly) Card Example -->
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-info shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                            Productos (Total)</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalProductos">00</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-th-list fa-2x text-gray-300"></i>
-                    </div>
-                </div>
-            </div>
+<div class="container-fluid p-0">
+  <div class="row m-0">
+    <div class="col-md-12 p-0">
+      <div class="card shadow-lg border-0 w-100" style="max-width: 600px; margin: 20px auto; background: linear-gradient(135deg, #f6f8f9, #eef2f3);">
+        <div class="card-header text-center bg-primary text-white p-2">
+          <h5 class="mb-0">Cerrar Caja</h5>
         </div>
-    </div>
-
-    <!-- Pending Requests Card Example -->
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-warning shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                            Ventas</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalVentas">00</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-money-bill fa-2x text-gray-300"></i>
-                    </div>
-                </div>
+        <div class="card-body d-flex flex-column justify-content-center align-items-center p-3">
+          <form id="formCerrarCaja" class="w-100 px-3">
+            <!-- Valor de Cierre -->
+            <div class="form-group mb-3">
+              <label for="valorCierre" class="text-dark font-weight-bold">Valor de Cierre</label>
+              <input type="number" class="form-control p-2" id="valorCierre" placeholder="Ingrese el valor de cierre" required>
             </div>
+            <!-- Fecha de Cierre -->
+            <div class="form-group mb-3">
+              <label for="fechaCierre" class="text-dark font-weight-bold">Fecha</label>
+              <input type="text" class="form-control p-2 bg-light" id="fechaCierre" value="<?php echo date('Y-m-d H:i:s'); ?>" readonly>
+            </div>
+            <!-- Botón de Cerrar Caja -->
+            <div class="text-center">
+              <button type="submit" class="btn btn-success btn-lg w-100">Cerrar Caja</button>
+            </div>
+          </form>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 
-<div class="row">
-    <div class="col-xl-6 col-md-12 mb-12">
-        <div class="card shadow h-100 py-2">
-            <div class="card-body">
-            <button id="exportarPDF" class="btn btn-primary">Exportar a PDF</button>
-            <button id="exportarExcel" class="btn btn-success">Exportar a Excel</button>
 
-            <br><br>
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-12 ">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-12 ">
-                            Ultimos 7 diás</div>
-                    </div>
-                </div>
-                <canvas id="ventas"></canvas>
-            </div>
+
+>>>>>>> validacion_cierre
+<!-- Aquí solo se muestra el modal si no hay una caja abierta -->
+<div class="modal fade" id="modalAbrirCaja" tabindex="-1" aria-labelledby="modalAbrirCajaLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalAbrirCajaLabel">Apertura de Caja</h5>
+      </div>
+      <div class="modal-body">
+<<<<<<< HEAD
+      <form id="formAperturaCaja">
+        <div class="form-group">
+            <label for="valorApertura">Valor de Apertura</label>
+            <input type="number" class="form-control" id="valorApertura" name="valorApertura" required>
         </div>
+        
+        <div class="form-group">
+            <label for="sede">Seleccionar Sede</label>
+            <select class="form-control" id="sede" name="sede" required>
+              <option value="1">Principal</option>
+              <option value="2">Planta 2</option>
+              <option value="3">CEDI</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Abrir Caja</button>
+      </form>
+
+=======
+          <form id="formAperturaCaja">
+            <div class="form-group">
+                <label for="valorApertura">Valor de Apertura</label>
+                <input type="number" class="form-control" id="valorApertura" name="valorApertura" required>
+            </div>
+            <div class="form-group">
+                <label for="fechaApertura">Fecha</label>
+                <input type="text" class="form-control" id="fechaApertura" name="fechaApertura" value="<?php echo date('Y-m-d'); ?>" readonly>
+            </div>
+            <div class="form-group">
+                <label for="sede">Seleccionar Sede</label>
+                <select class="form-control" id="sede" name="sede" required>
+                    <option value="1">Principal</option>
+                    <option value="2">Planta 2</option>
+                    <option value="3">CEDI</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Abrir Caja</button>
+        </form>
+>>>>>>> validacion_cierre
+      </div>
     </div>
+  </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<<<<<<< HEAD
+
+
+
+
+
+=======
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+>>>>>>> validacion_cierre
