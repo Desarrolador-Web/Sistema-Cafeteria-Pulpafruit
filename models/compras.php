@@ -10,7 +10,7 @@ class Compras {
         $this->pdo = $this->con->conectar();
     }
 
-    public function getProducts() {
+    public function getProducts($id_caja) {
         try {
             $consult = $this->pdo->prepare("
                 SELECT 
@@ -32,8 +32,10 @@ class Compras {
                     cf_producto p ON dc.id_producto = p.id_producto
                 JOIN 
                     cf_empresa e ON c.id_empresa = e.id_empresa
+                WHERE 
+                    c.id_caja = ?
             ");
-            $consult->execute();
+            $consult->execute([$id_caja]);
             return $consult->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             echo "Error en la consulta: " . $e->getMessage();
@@ -48,6 +50,8 @@ class Compras {
         $stmt->execute([$id_empresa, $total, $fecha, $id_user, $estado, $id_caja]);
         return $stmt->errorCode() == '00000' ? $this->pdo->lastInsertId() : false;
     }
+    
+    
     
     public function saveProduct($barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado, $id_caja) {
         $consult = $this->pdo->prepare("INSERT INTO cf_producto (codigo_producto, descripcion, id_empresa, precio_compra, precio_venta, imagen, existencia, estado_producto, id_caja) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");

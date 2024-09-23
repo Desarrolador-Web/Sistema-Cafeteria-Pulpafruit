@@ -5,10 +5,18 @@ $compras = new Compras();
 $id_user = $_SESSION['idusuario'];
 
 switch ($option) {
+
     case 'listarProductos':
-        $result = $compras->getProducts();
-        echo json_encode($result);
+        // Verifica si el valor de id_sede está en la sesión
+        if (isset($_SESSION['id_sede'])) {
+            $id_caja = $_SESSION['id_sede'];
+            $result = $compras->getProducts($id_caja);
+            echo json_encode($result);
+        } else {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'No se ha seleccionado ninguna sede.']);
+        }
         break;
+    
 
     case 'listarEmpresas':
         $result = $compras->getEmpresas();
@@ -16,6 +24,14 @@ switch ($option) {
         break;
 
     case 'registrarCompra':
+                // Verifica si hay un id_sede en la sesión
+        if (!isset($_SESSION['id_sede'])) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'No se ha seleccionado ninguna sede. Por favor abra una caja.']);
+            exit;
+        }
+
+        $id_empresa = isset($_POST['id_empresa']) ? (int) $_POST['id_empresa'] : 0;
+        $sede = $_SESSION['id_sede'];  // Utiliza el id_sede de la sesión
         $id_empresa = isset($_POST['id_empresa']) ? (int) $_POST['id_empresa'] : 0;
         $precio_compra = isset($_POST['precio_compra']) ? (float) $_POST['precio_compra'] : 0.0;
         $precio_venta = isset($_POST['precio_venta']) ? (float) $_POST['precio_venta'] : 0.0;
@@ -25,12 +41,12 @@ switch ($option) {
         $barcode = isset($_POST['barcode']) ? $_POST['barcode'] : '';
         $fecha = date('Y-m-d');
         $imagen = '';
-
+    
         if (empty($id_empresa)) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Por favor seleccione una empresa.']);
             break;
         }
-
+    
         if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] == 0) {
             if (!file_exists('../uploads')) {
                 mkdir('../uploads', 0777, true);
@@ -38,37 +54,41 @@ switch ($option) {
             $imagen = 'uploads/' . basename($_FILES['imagen']['name']);
             move_uploaded_file($_FILES['imagen']['tmp_name'], '../' . $imagen);
         }
-
-        // Obtener el valor de la sede desde cf_usuario
-        $sede = $compras->getSedeUsuario($id_user);
-
-        // Guardar la compra
+    
+        // Obtener el número de sede de la sesión
+        $id_caja = isset($_SESSION['id_sede']) ? (int) $_SESSION['id_sede'] : 0;
+    
+        if ($id_caja === 0) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'No se ha podido obtener la sede del usuario.']);
+            break;
+        }
+    
         $total = $precio_compra * $cantidad;
-        $compraId = $compras->saveCompra($id_empresa, $total, $fecha, $id_user, $estado, $sede);
-
+        $compraId = $compras->saveCompra($id_empresa, $total, $fecha, $id_user, $estado, $id_caja);
+    
         if (!$compraId) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al registrar la compra.']);
             break;
         }
-
-        // Insertar nuevo producto con el valor de la sede
-        $productId = $compras->saveProduct($barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado, $sede);
-
+    
+        $productId = $compras->saveProduct($barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado, $id_caja);
+    
         if (!$productId) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al guardar el producto.']);
             break;
         }
-
-        // Guardar el detalle de la compra
+    
         $result = $compras->saveDetalle($productId, $compraId, $cantidad, $precio_compra);
-
+    
         if (!$result) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al guardar el detalle de la compra.']);
             break;
         }
-
+    
         echo json_encode(['tipo' => 'success', 'mensaje' => 'Compra registrada con éxito.']);
         break;
+    
+        
 
     case 'cambiarEstado':
         $id_producto = isset($_POST['id']) ? (int) $_POST['id'] : 0;

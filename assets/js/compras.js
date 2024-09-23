@@ -68,6 +68,23 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
+    function verificarCajaAbierta() {
+        fetch(ruta + 'controllers/adminController.php?option=verificarCaja')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.cajaAbierta) {
+                    mostrarModalAbrirCaja();
+                } else if (!data.id_sede) {
+                    // Si no hay sede en la sesión, también muestra el modal
+                    mostrarModalAbrirCaja();
+                }
+            })
+            .catch(error => {
+                console.error('Error al verificar la caja:', error);
+            });
+    }
+    
+
     function cargarProductos() {
         axios.get('controllers/comprasController.php?option=listarProductos')
             .then(function (response) {
