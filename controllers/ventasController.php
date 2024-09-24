@@ -15,14 +15,22 @@ $id_user = $_SESSION['idusuario'];
 $option = isset($_GET['option']) ? $_GET['option'] : '';
 
 switch ($option) {
+    
     case 'listar':
-        $result = $ventas->getProducts();
-        foreach ($result as $i => $item) {
-            $result[$i]['addcart'] = '<a href="#" class="btn btn-primary btn-sm" onclick="addCart(' . $item['id_producto'] . ')"><i class="fas fa-cart-plus"></i></a>';
-            $result[$i]['cantidad'] = '<span class="badge badge-info">' . $item['existencia'] . '</span>';
+        // Verifica si el id_sede está en la sesión
+        if (isset($_SESSION['id_sede'])) {
+            $id_sede = $_SESSION['id_sede'];
+            $result = $ventas->getProductsBySede($id_sede);  // Filtra los productos por sede
+            foreach ($result as $i => $item) {
+                $result[$i]['addcart'] = '<a href="#" class="btn btn-primary btn-sm" onclick="addCart(' . $item['id_producto'] . ')"><i class="fas fa-cart-plus"></i></a>';
+                $result[$i]['cantidad'] = '<span class="badge badge-info">' . $item['existencia'] . '</span>';
+            }
+            echo json_encode($result);
+        } else {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'No se ha seleccionado ninguna sede.']);
         }
-        echo json_encode($result);
         break;
+    
 
     case 'addcart':
         $id_product = $_GET['id'];
