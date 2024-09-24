@@ -5,16 +5,22 @@ $productos = new Productos();
 switch ($option) {
 
     case 'listar':
-
-        $data = $productos->getProducts();
-        for ($i = 0; $i < count($data); $i++) {
-            $data[$i]['accion'] = '<div class="d-flex">
-            <a class="btn btn-danger btn-sm" onclick="deleteProducto(' . $data[$i]['id_producto'] . ')"><i class="fas fa-eraser"></i></a>
-            <a class="btn btn-primary btn-sm" onclick="editProducto(' . $data[$i]['id_producto'] . ')"><i class="fas fa-edit"></i></a>
-            </div>';
+        // Verifica si el id_sede está en la sesión
+        if (isset($_SESSION['id_sede'])) {
+            $id_sede = $_SESSION['id_sede'];
+            $data = $productos->getProductsBySede($id_sede);  // Filtra los productos por sede
+            for ($i = 0; $i < count($data); $i++) {
+                $data[$i]['accion'] = '<div class="d-flex">
+                <a class="btn btn-danger btn-sm" onclick="deleteProducto(' . $data[$i]['id_producto'] . ')"><i class="fas fa-eraser"></i></a>
+                <a class="btn btn-primary btn-sm" onclick="editProducto(' . $data[$i]['id_producto'] . ')"><i class="fas fa-edit"></i></a>
+                </div>';
+            }
+            echo json_encode($data);
+        } else {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'No se ha seleccionado ninguna sede.']);
         }
-        echo json_encode($data);
         break;
+    
 
     case 'save':
         $barcode = $_POST['barcode'];
