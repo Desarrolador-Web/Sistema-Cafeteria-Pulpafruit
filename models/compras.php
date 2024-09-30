@@ -44,13 +44,13 @@ class Compras {
     }
     
     
-    public function saveCompra($id_empresa, $total, $fecha, $id_user, $estado, $id_caja) {
-        $sql = "INSERT INTO cf_compras (id_empresa, total_compra, fecha_compra, id_usuario, estado_compra, id_caja) VALUES (?, ?, ?, ?, ?, ?)";
+    public function saveCompra($id_empresa, $total, $fecha, $id_user, $estado, $id_caja, $metodo_compra) {
+        $sql = "INSERT INTO cf_compras (id_empresa, total_compra, fecha_compra, id_usuario, estado_compra, id_caja, metodo_compra) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$id_empresa, $total, $fecha, $id_user, $estado, $id_caja]);
+        $stmt->execute([$id_empresa, $total, $fecha, $id_user, $estado, $id_caja, $metodo_compra]);
         return $stmt->errorCode() == '00000' ? $this->pdo->lastInsertId() : false;
     }
-    
     
     
     public function saveProduct($barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado, $id_caja) {
@@ -71,6 +71,7 @@ class Compras {
         $consult->execute();
         return $consult->fetchAll(PDO::FETCH_ASSOC);
     }
+    
 
     public function getSedeUsuario($id_usuario) {
         $consult = $this->pdo->prepare("SELECT sede FROM cf_usuario WHERE id_usuario = ?");

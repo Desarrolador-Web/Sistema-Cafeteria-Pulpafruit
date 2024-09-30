@@ -17,22 +17,21 @@ switch ($option) {
         }
         break;
     
-
     case 'listarEmpresas':
         $result = $compras->getEmpresas();
         echo json_encode($result);
         break;
+        
 
     case 'registrarCompra':
-                // Verifica si hay un id_sede en la sesión
+        // Verifica si hay un id_sede en la sesión
         if (!isset($_SESSION['id_sede'])) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'No se ha seleccionado ninguna sede. Por favor abra una caja.']);
             exit;
         }
-
+    
         $id_empresa = isset($_POST['id_empresa']) ? (int) $_POST['id_empresa'] : 0;
         $sede = $_SESSION['id_sede'];  // Utiliza el id_sede de la sesión
-        $id_empresa = isset($_POST['id_empresa']) ? (int) $_POST['id_empresa'] : 0;
         $precio_compra = isset($_POST['precio_compra']) ? (float) $_POST['precio_compra'] : 0.0;
         $precio_venta = isset($_POST['precio_venta']) ? (float) $_POST['precio_venta'] : 0.0;
         $cantidad = isset($_POST['cantidad']) ? (int) $_POST['cantidad'] : 0;
@@ -41,6 +40,7 @@ switch ($option) {
         $barcode = isset($_POST['barcode']) ? $_POST['barcode'] : '';
         $fecha = date('Y-m-d');
         $imagen = '';
+        $metodo_compra = isset($_POST['metodo_compra']) ? (int) $_POST['metodo_compra'] : 0; // Método de compra
     
         if (empty($id_empresa)) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Por favor seleccione una empresa.']);
@@ -64,7 +64,8 @@ switch ($option) {
         }
     
         $total = $precio_compra * $cantidad;
-        $compraId = $compras->saveCompra($id_empresa, $total, $fecha, $id_user, $estado, $id_caja);
+        // Asegúrate de almacenar el método de compra en la base de datos
+        $compraId = $compras->saveCompra($id_empresa, $total, $fecha, $id_user, $estado, $id_caja, $metodo_compra);
     
         if (!$compraId) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al registrar la compra.']);
@@ -88,7 +89,6 @@ switch ($option) {
         echo json_encode(['tipo' => 'success', 'mensaje' => 'Compra registrada con éxito.']);
         break;
     
-        
 
     case 'cambiarEstado':
         $id_producto = isset($_POST['id']) ? (int) $_POST['id'] : 0;

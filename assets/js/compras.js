@@ -11,34 +11,58 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (btn_Recibido) {
         btn_Recibido.onclick = function () {
-            registrarCompra(1); // Recibido
+            // Mostrar el SweetAlert para elegir el método de compra
+            Swal.fire({
+                title: '¿De dónde viene el dinero?',
+                showCancelButton: true,
+                cancelButtonText: 'Cancelar',
+                confirmButtonText: 'Caja',
+                showDenyButton: true,
+                denyButtonText: 'Socio',
+            }).then((result) => {
+                let metodo_compra = 0;
+                if (result.isConfirmed) {
+                    metodo_compra = 2; // Caja
+                } else if (result.isDenied) {
+                    metodo_compra = 1; // Socio
+                }
+                if (metodo_compra !== 0) {
+                    registrarCompra(1, metodo_compra); // Recibido
+                }
+            });
         };
     }
-
+    
     if (btn_pendiente) {
         btn_pendiente.onclick = function () {
-            registrarCompra(0); // Pendiente
+            Swal.fire({
+                title: '¿De dónde viene el dinero?',
+                showCancelButton: true,
+                cancelButtonText: 'Cancelar',
+                confirmButtonText: 'Caja',
+                showDenyButton: true,
+                denyButtonText: 'Socio',
+            }).then((result) => {
+                let metodo_compra = 0;
+                if (result.isConfirmed) {
+                    metodo_compra = 2; // Caja
+                } else if (result.isDenied) {
+                    metodo_compra = 1; // Socio
+                }
+                if (metodo_compra !== 0) {
+                    registrarCompra(0, metodo_compra); // Pendiente
+                }
+            });
         };
     }
-
-    if (selectEmpresa) {
-        cargarEmpresas();
-    }
-
-    function registrarCompra(estado) {
+    
+    // Modificar la función registrarCompra para aceptar el nuevo parámetro `metodo_compra`
+    function registrarCompra(estado, metodo_compra) {
         const formData = new FormData(formProductos);
         formData.append('estado', estado);
-
-        const id_empresa = document.querySelector('#id_empresa').value;
-        if (!id_empresa) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Por favor seleccione una empresa.'
-            });
-            return;
-        }
-
+        formData.append('metodo_compra', metodo_compra); // Añadimos el método de compra
+    
+        // Resto del código permanece igual
         axios.post('controllers/comprasController.php?option=registrarCompra', formData)
             .then(function (response) {
                 const info = response.data;
@@ -67,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             });
     }
-
+    
     function verificarCajaAbierta() {
         fetch(ruta + 'controllers/adminController.php?option=verificarCaja')
             .then(response => response.json())
@@ -139,6 +163,10 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
+    if (selectEmpresa) {
+        cargarEmpresas();
+    }
+
     function cargarEmpresas() {
         axios.get('controllers/comprasController.php?option=listarEmpresas')
             .then(function (response) {
@@ -161,6 +189,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log(error);
             });
     }
+
 
     window.cambiarEstado = function (id, nuevoEstado) {
         Swal.fire({
