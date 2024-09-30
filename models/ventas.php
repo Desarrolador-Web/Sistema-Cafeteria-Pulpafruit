@@ -52,6 +52,7 @@ class Ventas {
         $consult = $this->pdo->prepare("INSERT INTO cf_detalle_ventas (id_producto, id_ventas, cantidad, precio, id_caja) VALUES (?, ?, ?, ?, ?)");
         return $consult->execute([$id_producto, $id_venta, $cantidad, $precio, $id_caja]);
     }
+    
 
     // Actualizar el stock de un producto
     public function updateStock($stock, $id_producto) {
