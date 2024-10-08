@@ -46,7 +46,12 @@ switch ($option) {
                 $resultado = $admin->cerrarCaja($cajaAbierta['id_info_caja'], $valorCierre, $fechaCierre);
                 if ($resultado) {
                     $_SESSION['id_sede'] = null; // Limpiar id_sede después de cerrar la caja
-                    echo json_encode(['tipo' => 'success', 'mensaje' => 'Caja cerrada exitosamente']);
+                    // Enviar resultado aunque los valores coincidan para evitar errores en el JS
+                    echo json_encode([
+                        'tipo' => 'success',
+                        'mensaje' => 'Caja cerrada exitosamente',
+                        'resultado' => $resultadoFinal  // Asegurarse de enviar resultado
+                    ]);
                 } else {
                     echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al cerrar la caja']);
                 }
