@@ -29,25 +29,40 @@ switch ($option) {
             exit;
         }
     
+        $id_usuario = $_SESSION['idusuario'];
         $valorCierre = $_POST['valorCierre'];
         $fechaCierre = date('Y-m-d H:i:s');
-        
-        // Obtener la última caja abierta por el usuario
-        $cajaAbierta = $admin->obtenerCajaAbiertaUsuario($id_user);
     
-        if ($cajaAbierta) {
-            $resultado = $admin->cerrarCaja($cajaAbierta['id_info_caja'], $valorCierre, $fechaCierre);
-            if ($resultado) {
-                // Borrar el id_sede de la sesión al cerrar la caja
-                $_SESSION['id_sede'] = null;
-                echo json_encode(['tipo' => 'success', 'mensaje' => 'Caja cerrada exitosamente']);
+        // Obtener la diferencia de ventas y compras usando la consulta proporcionada
+        $diferencia = $admin->obtenerDiferenciaVentasCompras($id_usuario);
+        $resultadoFinal = $diferencia['ResultadoFinal'];
+    
+        // Verificar si el valor de cierre coincide con el resultado de la consulta
+        if (floatval($valorCierre) === floatval($resultadoFinal)) {
+            // Cerrar caja normalmente
+            $cajaAbierta = $admin->obtenerCajaAbiertaUsuario($id_usuario);
+    
+            if ($cajaAbierta) {
+                $resultado = $admin->cerrarCaja($cajaAbierta['id_info_caja'], $valorCierre, $fechaCierre);
+                if ($resultado) {
+                    $_SESSION['id_sede'] = null; // Limpiar id_sede después de cerrar la caja
+                    echo json_encode(['tipo' => 'success', 'mensaje' => 'Caja cerrada exitosamente']);
+                } else {
+                    echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al cerrar la caja']);
+                }
             } else {
-                echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al cerrar la caja']);
+                echo json_encode(['tipo' => 'error', 'mensaje' => 'No hay caja abierta para cerrar']);
             }
         } else {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'No hay caja abierta para cerrar']);
+            // Los valores no coinciden, devolver el resultado de la consulta
+            echo json_encode([
+                'tipo' => 'success', // Tipo success para que siga el flujo en el JS
+                'mensaje' => 'Los valores no coinciden',
+                'resultado' => $resultadoFinal // Valor de la diferencia de ventas y compras
+            ]);
         }
         break;
+              
 
     case 'abrirCaja':
         if (!isset($_POST['valorApertura']) || !isset($_POST['id_sede'])) {
