@@ -1,135 +1,123 @@
 document.addEventListener('DOMContentLoaded', function () {
-    ventas()
-    clientes()
-    totales()
-})
-function totales() {
-    axios.get(ruta + 'controllers/adminController.php?option=totales')
-        .then(function (response) {
-            const info = response.data;
-            console.log(info);
-            document.querySelector('#totalUsuarios').textContent = info.usuario.total;
-            document.querySelector('#totalClientes').textContent = info.cliente.total;
-            document.querySelector('#totalProductos').textContent = info.producto.total;
-            document.querySelector('#totalVentas').textContent = info.venta.total;
+    // Inicializar las funciones al cargar el DOM
+    verificarCajaAbierta();
+    manejarAperturaCaja();
+    manejarCierreCaja();
+});
+
+// Función para verificar si el usuario tiene una caja abierta hoy
+function verificarCajaAbierta() {
+    fetch(ruta + 'controllers/adminController.php?option=verificarCaja')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.cajaAbierta) {
+                mostrarModalAbrirCaja();
+            }
         })
-        .catch(function (error) {
-            console.log(error);
+        .catch(error => {
+            console.error('Error al verificar la caja:', error);
         });
 }
-function ventas() {
-    const dias = [        
-        'lunes',
-        'martes',
-        'miércoles',
-        'jueves',
-        'viernes',
-        'sábado',
-        'domingo'
-    ];
 
-    const ctx = document.getElementById('ventas');
-
-    axios.get(ruta + 'controllers/adminController.php?option=ventasSemana')
-        .then(function (response) {
-            const info = response.data;
-            let fecha = [];
-            let total = [];
-            for (let i = 0; i < info.length; i++) {                
-                total.push(info[i]['total']);
-                const numeroDia = new Date(info[i]['fecha']).getDay();
-                const nombreDia = dias[numeroDia];
-                fecha.push(nombreDia + ' - ' + info[i]['fecha']);
-            }
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: fecha,
-                    datasets: [{
-                        label: 'Ventas',
-                        data: total,
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
+// Función para mostrar el modal de apertura de caja
+function mostrarModalAbrirCaja() {
+    $('#modalAbrirCaja').modal({
+        backdrop: 'static',  // Evita cerrar el modal al hacer clic fuera
+        keyboard: false      // Evita cerrar el modal con la tecla Esc
+    });
+    $('#modalAbrirCaja').modal('show');
 }
-function clientes() {
-    const ctx = document.getElementById('topClientes');
 
-    axios.get(ruta + 'controllers/adminController.php?option=topClientes')
-        .then(function (response) {
-            const info = response.data;
-            let nombre = [];
-            let total = [];
-            for (let i = 0; i < info.length; i++) {
-                nombre.push(info[i]['nombre']);
-                total.push(info[i]['total']);
-            }
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: nombre,
-                    datasets: [{
-                        label: 'Cliente',
-                        data: total,
-                        borderWidth: 1,
-                        backgroundColor: '#FFB1C1',
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
+// Función para manejar la apertura de caja
+function manejarAperturaCaja() {
+    document.querySelector('#formAperturaCaja').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const valorApertura = document.querySelector('#valorApertura').value;
+        const sede = document.querySelector('#sede').value;
+
+        const formData = new FormData();
+        formData.append('valorApertura', valorApertura);
+        formData.append('id_sede', sede);
+
+        fetch(ruta + 'controllers/adminController.php?option=abrirCaja', {
+            method: 'POST',
+            body: formData
         })
-        .catch(function (error) {
-            console.log(error);
+        .then(response => response.json())
+        .then(data => {
+            if (data.tipo === 'success') {
+                $('#modalAbrirCaja').modal('hide');
+                Swal.fire({
+                    title: '¡Caja abierta!',
+                    text: data.mensaje,
+                    icon: 'success',
+                    confirmButtonText: 'Aceptar'
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Error: ' + data.mensaje,
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error en la solicitud:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Error en la solicitud: ' + error,
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
         });
+    });
+}
 
-        function exportarGraficaPDF() {
-            const ventasCanvas = document.getElementById('ventas');
-            html2canvas(ventasCanvas).then(function (canvas) {
-                const imgData = canvas.toDataURL('image/png');
-                const pdf = new jspdf.jsPDF();
-                pdf.addImage(imgData, 'PNG', 10, 10);
-                pdf.save('grafica_ventas.pdf');
-            }).catch(function (error) {
-                console.error('Error capturando la gráfica:', error);
+// Función para manejar el cierre de caja
+function manejarCierreCaja() {
+    document.querySelector('#formCerrarCaja').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const valorCierre = document.querySelector('#valorCierre').value;
+
+        const formData = new FormData();
+        formData.append('valorCierre', valorCierre);
+
+        fetch(ruta + 'controllers/adminController.php?option=cerrarCaja', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.tipo === 'success') {
+                Swal.fire({
+                    title: '¡Caja cerrada!',
+                    text: data.mensaje,
+                    icon: 'success',
+                    confirmButtonText: 'Aceptar'
+                }).then(() => {
+                    // Limpiar el formulario de cierre de caja
+                    document.querySelector('#formCerrarCaja').reset();
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Error: ' + data.mensaje,
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error en la solicitud:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Error en la solicitud: ' + error,
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
             });
-        }
-        
-        document.querySelector('#exportarPDF').addEventListener('click', exportarGraficaPDF);
-        
-    
-    function exportarGraficaExcel() {
-        axios.get(ruta + 'controllers/adminController.php?option=ventasSemana')
-            .then(function (response) {
-                const info = response.data;
-                const worksheet = XLSX.utils.json_to_sheet(info);
-                const workbook = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(workbook, worksheet, "Ventas Semana");
-                XLSX.writeFile(workbook, 'grafica_ventas.xlsx');
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-    }
-    
-    document.querySelector('#exportarExcel').addEventListener('click', exportarGraficaExcel);
-    
-        
+        });
+    });
 }

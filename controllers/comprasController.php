@@ -39,20 +39,33 @@ switch ($option) {
             move_uploaded_file($_FILES['imagen']['tmp_name'], '../' . $imagen);
         }
 
+        // Obtener el valor de la sede desde cf_usuario
+        $sede = $compras->getSedeUsuario($id_user);
+
         // Guardar la compra
         $total = $precio_compra * $cantidad;
-        $compraId = $compras->saveCompra($id_empresa, $total, $fecha, $id_user, $estado);
+        $compraId = $compras->saveCompra($id_empresa, $total, $fecha, $id_user, $estado, $sede);
 
         if (!$compraId) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al registrar la compra.']);
             break;
         }
 
-        // Insertar nuevo producto
-        $productId = $compras->saveProduct($barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado);
+        // Insertar nuevo producto con el valor de la sede
+        $productId = $compras->saveProduct($barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado, $sede);
+
+        if (!$productId) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al guardar el producto.']);
+            break;
+        }
 
         // Guardar el detalle de la compra
-        $compras->saveDetalle($productId, $compraId, $cantidad, $precio_compra);
+        $result = $compras->saveDetalle($productId, $compraId, $cantidad, $precio_compra);
+
+        if (!$result) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al guardar el detalle de la compra.']);
+            break;
+        }
 
         echo json_encode(['tipo' => 'success', 'mensaje' => 'Compra registrada con éxito.']);
         break;
@@ -76,7 +89,6 @@ switch ($option) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al actualizar el estado del producto.']);
         }
         exit;
-        
 
     default:
         echo json_encode(['tipo' => 'error', 'mensaje' => 'Opción no válida.']);

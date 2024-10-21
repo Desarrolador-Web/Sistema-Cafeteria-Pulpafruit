@@ -1,62 +1,51 @@
 <?php
-require_once __DIR__ . '/../config.php';
-require_once 'conexion.php';
+require_once __DIR__ . '/../config.php';  // Usar __DIR__ para obtener la ruta absoluta al archivo de configuración
+require_once 'conexion.php';   // Incluir la conexión a la base de datos
 
 class AdminModel {
-    private $pdo, $con;
+    private $pdo;
+
     public function __construct() {
-        $this->con = new Conexion();
-        $this->pdo = $this->con->conectar();
+        $this->pdo = new Conexion();
+        $this->pdo = $this->pdo->conectar();
     }
 
-    public function getDatos($table)
-    {
-        if ($table === 'cf_usuario') {
-            $consult = $this->pdo->prepare("SELECT COUNT(*) AS total FROM $table WHERE estado_usuario = ?");
-            $consult->execute([1]);
-        } else {
-            $consult = $this->pdo->prepare("SELECT COUNT(*) AS total FROM $table");
-            $consult->execute();
-        }
-        return $consult->fetch(PDO::FETCH_ASSOC);
+    // Verificar si la caja está abierta para el usuario en la fecha actual
+    public function checkCajaAbierta($id_usuario, $fechaHoy) {
+        $sql = "SELECT * FROM cf_informacion_cajas WHERE id_usuario = ? AND CONVERT(DATE, fecha_apertura) = ? AND valor_cierre IS NULL";
+        $query = $this->pdo->prepare($sql);
+        $query->execute([$id_usuario, $fechaHoy]);
+        return $query->fetch(PDO::FETCH_ASSOC);  // Retorna true si hay una caja abierta y no cerrada
+    }    
+    
+    // Método que verifica si hay una caja sin cerrar
+    public function checkCajaSinCerrar($id_sede) {
+        $sql = "SELECT * FROM cf_informacion_cajas WHERE id_sede = ? AND valor_cierre IS NULL AND fecha_cierre IS NULL";
+        $query = $this->pdo->prepare($sql);
+        $query->execute([$id_sede]);
+        return $query->fetch(PDO::FETCH_ASSOC);  // Retorna true si hay una caja sin cerrar
     }
 
-    public function getVentas($id_user)
-    {
-        $consult = $this->pdo->prepare("SELECT COUNT(*) AS total FROM cf_ventas WHERE id_usuario = ?");
-        $consult->execute([$id_user]);
-        return $consult->fetch(PDO::FETCH_ASSOC);
+    // Abrir caja, incluyendo el id_usuario
+    public function abrirCaja($id_usuario, $valorApertura, $id_sede, $fechaApertura) {
+        $sql = "INSERT INTO cf_informacion_cajas (id_usuario, valor_apertura, id_sede, fecha_apertura) VALUES (?, ?, ?, ?)";
+        $query = $this->pdo->prepare($sql);
+        return $query->execute([$id_usuario, $valorApertura, $id_sede, $fechaApertura]);
     }
 
-    public function ventasSemana($fechaInicio, $fechaFin, $idUsuario) {
-        $consult = $this->pdo->prepare("SELECT * FROM cf_ventas WHERE fecha BETWEEN ? AND ? AND id_usuario = ?");
-        $consult->execute([$fechaInicio, $fechaFin, $idUsuario]);
-        return $consult->fetchAll(PDO::FETCH_ASSOC);
+    public function obtenerCajaAbiertaUsuario($id_usuario) {
+        // Cambia LIMIT por TOP 1, que es compatible con SQL Server
+        $sql = "SELECT TOP 1 * FROM cf_informacion_cajas WHERE id_usuario = ? AND valor_cierre IS NULL AND fecha_cierre IS NULL ORDER BY fecha_apertura DESC";
+        $query = $this->pdo->prepare($sql);
+        $query->execute([$id_usuario]);
+        return $query->fetch(PDO::FETCH_ASSOC);
     }
-
-    public function topClientes($idUsuario) {
-        $consult = $this->pdo->prepare("
-            SELECT TOP 10 id_cliente, SUM(total) as total
-            FROM cf_ventas
-            WHERE id_usuario = ?
-            GROUP BY id_cliente
-            ORDER BY total DESC
-        ");
-        $consult->execute([$idUsuario]);
-        return $consult->fetchAll(PDO::FETCH_ASSOC);
+    
+    
+    public function cerrarCaja($id_info_caja, $valorCierre, $fechaCierre) {
+        $sql = "UPDATE cf_informacion_cajas SET valor_cierre = ?, fecha_cierre = ? WHERE id_info_caja = ?";
+        $query = $this->pdo->prepare($sql);
+        return $query->execute([$valorCierre, $fechaCierre, $id_info_caja]);
     }
-
-    public function getDato()
-    {
-        $consult = $this->pdo->prepare("SELECT * FROM configuracion");
-        $consult->execute();
-        return $consult->fetch(PDO::FETCH_ASSOC);
-    }
-
-    public function saveDatos($nombre, $telefono, $correo, $direccion, $id)
-    {
-        $consult = $this->pdo->prepare("UPDATE configuracion SET nombre=?, telefono=?, email=?, direccion=? WHERE id = ?");
-        return $consult->execute([$nombre, $telefono, $correo, $direccion, $id]);
-    }
+    
 }
-
