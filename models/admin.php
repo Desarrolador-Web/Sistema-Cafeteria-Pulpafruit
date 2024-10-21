@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../config.php';  // Usar __DIR__ para obtener la ruta absoluta al archivo de configuración
-require_once 'conexion.php';   // Incluir la conexión a la base de datos
+require_once __DIR__ . '/../config.php'; 
+require_once 'conexion.php';   
 
 class AdminModel {
     private $pdo;
