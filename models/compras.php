@@ -33,7 +33,7 @@ class Compras {
                 JOIN 
                     cf_empresa e ON c.id_empresa = e.id_empresa
                 WHERE 
-                    c.id_caja = ?
+                    c.id_caja = ? AND c.estado_compra = 2  -- Añadir la condición para estado_compra = 2
             ");
             $consult->execute([$id_caja]);
             return $consult->fetchAll(PDO::FETCH_ASSOC);
@@ -42,6 +42,7 @@ class Compras {
             return [];
         }
     }
+    
     
     
     public function saveCompra($id_empresa, $total, $fecha, $id_user, $estado, $id_caja, $metodo_compra) {
