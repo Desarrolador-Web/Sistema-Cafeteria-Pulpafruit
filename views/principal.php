@@ -5,7 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 $cajaAbierta = $_SESSION['caja_abierta'] ?? false;  // Si no está definida, asumimos que es false
 ?>
-
+ 
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">Cerrar Caja</h1>

@@ -46,8 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
       { data: 'cantidad' },  
       { data: 'precio_venta' },  
       { data: 'subtotal' },  
-      { data: 'fecha' },
-      { data: 'metodo_pago' }
+      { data: 'fecha' }
     ],
     orderCellsTop: true,
     fixedHeader: true,
