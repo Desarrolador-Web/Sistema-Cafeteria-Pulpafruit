@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../config.php';  // Usar __DIR__ para obtener la ruta absoluta al archivo de configuración
-require_once 'conexion.php';   // Incluir la conexión a la base de datos
+require_once __DIR__ . '/../config.php'; 
+require_once 'conexion.php';   
 
 class AdminModel {
     private $pdo;
@@ -32,6 +32,51 @@ class AdminModel {
         $query = $this->pdo->prepare($sql);
         return $query->execute([$id_usuario, $valorApertura, $id_sede, $fechaApertura]);
     }
+
+    public function cerrarCajaConObservacion($id_info_caja, $valorCierre, $fechaCierre, $observacion) {
+        $sql = "UPDATE cf_informacion_cajas 
+                SET valor_cierre = ?, fecha_cierre = ?, observacion = ? 
+                WHERE id_info_caja = ?";
+        $query = $this->pdo->prepare($sql);
+        return $query->execute([$valorCierre, $fechaCierre, $observacion, $id_info_caja]);
+    }
+    
+
+    public function obtenerDiferenciaVentasCompras($id_usuario) {
+        $sql = "
+
+        WITH VentasTotales AS (
+            SELECT SUM(v.total) AS TotalVentas
+            FROM cf_ventas v
+            INNER JOIN cf_informacion_cajas ic
+                ON v.id_usuario = ic.id_usuario
+            WHERE ic.id_usuario = ?
+              AND ic.fecha_cierre IS NULL
+              AND ic.valor_cierre IS NULL
+              AND v.fecha >= ic.fecha_apertura  
+              AND v.fecha <= GETDATE()  
+        ),
+        ComprasTotales AS (
+            SELECT SUM(c.total_compra) AS TotalCompras
+            FROM cf_compras c
+            INNER JOIN cf_informacion_cajas ic
+                ON c.id_usuario = ic.id_usuario
+            WHERE ic.id_usuario = ?
+              AND ic.fecha_cierre IS NULL
+              AND ic.valor_cierre IS NULL
+              AND c.fecha_compra >= ic.fecha_apertura  
+              AND c.fecha_compra <= GETDATE()  
+        )
+        SELECT ISNULL(VentasTotales.TotalVentas, 0) - ISNULL(ComprasTotales.TotalCompras, 0) AS ResultadoFinal
+        FROM VentasTotales, ComprasTotales;
+        
+        ";
+        
+        $query = $this->pdo->prepare($sql);
+        $query->execute([$id_usuario, $id_usuario]);
+        return $query->fetch(PDO::FETCH_ASSOC);
+    }
+    
 
     public function obtenerCajaAbiertaUsuario($id_usuario) {
         // Cambia LIMIT por TOP 1, que es compatible con SQL Server

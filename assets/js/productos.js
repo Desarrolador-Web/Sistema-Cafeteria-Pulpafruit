@@ -12,6 +12,7 @@ $(document).ready(function() {
           {"data": "codigo_producto"},
           {"data": "descripcion"},
           {"data": "precio_compra"},
+          {"data": "precio_venta"},
           {
             "data": "imagen",
             "render": function(data, type, row) {
@@ -27,7 +28,6 @@ $(document).ready(function() {
         
         
           {"data": "existencia"},
-          {"data": "accion"}
       ]
   });
 

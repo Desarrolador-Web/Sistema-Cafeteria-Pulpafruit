@@ -7,8 +7,8 @@ date_default_timezone_set('America/Bogota');
 ##### PERMISOS #####
 
 require_once 'models/permisos.php';
-require_once 'models/admin.php';  // Agregar el modelo admin para verificar la caja abierta
-$id_user = $_SESSION['idusuario'];
+require_once 'models/admin.php';  
+$id_user = $_SESSION['idusuario']; //Se obtiene el id de usuario de la sesión actual
 
 // Verificar los permisos del usuario
 $permisos = new PermisosModel();
@@ -24,8 +24,8 @@ $proveedor = $permisos->getPermiso(9, $id_user);
 
 ##### FIN PERMISOS #####
 
-// Verificar si el usuario tiene una caja abierta hoy
-// Solución correcta
+// Verifica si el usuario tiene una caja abierta hoy
+
 $admin = new AdminModel();
 $fechaHoy = date('Y-m-d');
 $cajaAbierta = $admin->checkCajaAbierta($id_user, $fechaHoy);
@@ -36,6 +36,7 @@ if ($cajaAbierta) {
     $_SESSION['caja_abierta'] = false;
 }
 
+// Carga de la vista principal 
 
 require_once 'views/includes/header.php';
 if (isset($_GET['pagina'])) {
