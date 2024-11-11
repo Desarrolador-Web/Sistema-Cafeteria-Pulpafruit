@@ -79,4 +79,5 @@ $cajaAbierta = $_SESSION['caja_abierta'] ?? false;  // Si no está definida, asu
   </div>
 </div>
 
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

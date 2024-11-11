@@ -76,7 +76,6 @@ class AdminModel {
         $query->execute([$id_usuario, $id_usuario]);
         return $query->fetch(PDO::FETCH_ASSOC);
     }
-    
 
     public function obtenerCajaAbiertaUsuario($id_usuario) {
         // Cambia LIMIT por TOP 1, que es compatible con SQL Server
@@ -85,12 +84,40 @@ class AdminModel {
         $query->execute([$id_usuario]);
         return $query->fetch(PDO::FETCH_ASSOC);
     }
+
+    public function guardarObservacionYCodigo($id_info_caja, $observacion = null, $codigo = null) {
+        $sql = "UPDATE cf_informacion_cajas SET ";
+        $params = [];
     
+        if (!is_null($observacion)) {
+            $sql .= "observacion = ?";
+            $params[] = $observacion;
+        }
+    
+        if (!is_null($codigo)) {
+            $sql .= (count($params) > 0 ? ", " : "") . "codigo = ?";
+            $params[] = $codigo;
+        }
+    
+        $sql .= " WHERE id_info_caja = ?";
+        $params[] = $id_info_caja;
+    
+        $query = $this->pdo->prepare($sql);
+        return $query->execute($params);
+    }
+     
+
+    public function validarCodigo($id_info_caja, $codigoIngresado) {
+        $sql = "SELECT codigo FROM cf_informacion_cajas WHERE id_info_caja = ?";
+        $query = $this->pdo->prepare($sql);
+        $query->execute([$id_info_caja]);
+        $codigoGuardado = $query->fetchColumn();
+        return $codigoGuardado === $codigoIngresado;
+    }    
     
     public function cerrarCaja($id_info_caja, $valorCierre, $fechaCierre) {
         $sql = "UPDATE cf_informacion_cajas SET valor_cierre = ?, fecha_cierre = ? WHERE id_info_caja = ?";
         $query = $this->pdo->prepare($sql);
         return $query->execute([$valorCierre, $fechaCierre, $id_info_caja]);
     }
-    
 }
