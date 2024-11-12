@@ -53,8 +53,7 @@ class Ventas {
         return $consult->execute([$id_producto, $id_venta, $cantidad, $precio, $id_caja]);
     }
     
-
-    // Actualizar el stock de un producto
+    // Método para ctualizar el stock de un producto 
     public function updateStock($stock, $id_producto) {
         $consult = $this->pdo->prepare("UPDATE cf_producto SET existencia = ? WHERE id_producto = ?");
         return $consult->execute([$stock, $id_producto]);

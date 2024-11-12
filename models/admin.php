@@ -100,7 +100,7 @@ class AdminModel {
         }
         
         $sql .= " WHERE id_info_caja = ?";
-        $params[] = (int)$id_info_caja; // Asegúrate de que sea un entero
+        $params[] = (int)$id_info_caja; 
         
         $query = $this->pdo->prepare($sql);
         return $query->execute($params);
@@ -114,7 +114,7 @@ class AdminModel {
         $query->execute([$id_info_caja]);
         $codigoGuardado = $query->fetchColumn();
         
-        // Asegurarse de comparar ambos como cadenas
+        // comparar ambos como cadenas
         return strval($codigoGuardado) === strval($codigoIngresado);
     }
     
@@ -123,5 +123,4 @@ class AdminModel {
         $query = $this->pdo->prepare($sql);
         return $query->execute([$valorCierre, $fechaCierre, $id_info_caja]);
     }
-    
 }

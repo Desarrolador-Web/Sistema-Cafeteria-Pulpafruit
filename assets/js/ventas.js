@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 updateStock();
                 temp(); // Actualiza la tabla temporal y el total
 
-                // Reiniciar los formularios
+                // Reinicia los formularios
                 resetFormularios();
             }
         })
