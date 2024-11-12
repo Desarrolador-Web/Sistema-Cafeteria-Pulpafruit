@@ -18,7 +18,18 @@ document.addEventListener('DOMContentLoaded', function () {
         columns: [
             { data: 'codigo_producto' },
             { data: 'descripcion' },
-            { data: 'cantidad' },
+            {
+                data: 'existencia',
+                render: function (data, type, row) {
+                    let colorClass = 'badge-info'; // Azul por defecto
+                    if (row.porcentajeStock <= 10) {
+                        colorClass = 'badge-danger'; // Rojo
+                    } else if (row.porcentajeStock <= 30) {
+                        colorClass = 'badge-warning'; // Amarillo
+                    }
+                    return `<span class="badge ${colorClass}">${data}</span>`;
+                }
+            },
             { data: 'precio_venta' },
             { data: 'addcart' }
         ],
@@ -26,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
             url: 'https://cdn.datatables.net/plug-ins/1.13.1/i18n/es-ES.json'
         }
     });
-
+    
     temp(); // Inicializa la tabla temporal y el total
 
     table_clientes = $('#table_clientes').DataTable({
