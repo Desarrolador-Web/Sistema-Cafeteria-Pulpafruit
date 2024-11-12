@@ -28,6 +28,46 @@ switch ($option) {
         }
         break;
 
+    case 'validarCodigoAutorizacion':
+        if (!isset($_POST['id_info_caja']) || !isset($_POST['codigoAutorizacion']) || !isset($_POST['valorCierre'])) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Campos faltantes en la solicitud']);
+            exit;
+        }
+    
+        $id_info_caja = $_POST['id_info_caja'];
+        $codigoIngresado = $_POST['codigoAutorizacion'];
+        $valorCierre = $_POST['valorCierre'];
+        $fechaCierre = date('Y-m-d H:i:s');
+    
+        // Validar el código de autorización en la base de datos
+        if ($admin->validarCodigo($id_info_caja, $codigoIngresado)) {
+            // Código correcto: Cerrar caja actualizando valor_cierre y fecha_cierre
+            $resultado = $admin->cerrarCaja($id_info_caja, $valorCierre, $fechaCierre);
+            if ($resultado) {
+                echo json_encode(['tipo' => 'success', 'mensaje' => 'Caja cerrada exitosamente']);
+            } else {
+                echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al cerrar la caja en la base de datos']);
+            }
+        } else {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Código incorrecto']);
+        }
+        break;
+        
+
+    case 'obtenerIdCajaAbierta':
+        $id_usuario = $_SESSION['idusuario'];
+        $fechaHoy = date('Y-m-d');
+        $cajaAbierta = $admin->checkCajaAbierta($id_usuario, $fechaHoy);
+    
+        if ($cajaAbierta) {
+            echo json_encode(['id_info_caja' => $cajaAbierta['id_info_caja']]);
+        } else {
+            echo json_encode(['id_info_caja' => null]);
+        }
+        break;
+    
+        
+
     case 'cerrarCaja':
         if (!isset($_POST['valorCierre'])) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Valor de cierre es requerido']);
@@ -116,47 +156,39 @@ switch ($option) {
         break;
 
     case 'enviarCodigoAutorizacion':
-        if (!class_exists('Postmark\PostmarkClient')) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'La clase PostmarkClient no está disponible. Verifique la instalación de la librería.']);
+        if (!isset($_POST['id_info_caja'])) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'ID de caja no especificado']);
             exit;
         }
     
-        try {
-            $client = new Postmark\PostmarkClient("22ed804a-3ad8-4752-914c-225acb0c5c26");
+        $id_info_caja = $_POST['id_info_caja'];
+        $codigoAutorizacion = rand(100000, 999999);  // Genera un código aleatorio de 6 dígitos
     
-            $codigoAutorizacion = rand(100000, 999999);
+        // Guardar el código de autorización en la base de datos
+        $resultado = $admin->guardarObservacionYCodigo($id_info_caja, null, $codigoAutorizacion);
+    
+        if ($resultado) {
+            // Enviar el código por correo (suponiendo que el envío por correo está configurado aquí)
+            $client = new PostmarkClient("22ed804a-3ad8-4752-914c-225acb0c5c26");
             $emailDestino = "auxdesarrollo@pulpafruit.com";
-    
             $sendResult = $client->sendEmail(
                 "forgotpass@pulpafruit.com",
                 $emailDestino,
-                "Autorización cierre de caja con observación",
+                "Autorización cierre de caja",
                 "<b>¡Código de Autorización!</b><br><p>Este es el código: <strong>$codigoAutorizacion</strong></p>",
                 "¡Código de Autorización!"
             );
     
             if ($sendResult) {
-                $tabla = "cf_informacion_cajas";
-                $data = ["codigo" => $codigoAutorizacion];
-                
-                // Instancia del modelo y actualización del código en la base de datos
-                $admin = new AdminModel();
-                $respuesta = $admin->guardarObservacionYCodigo($_SESSION['id_info_caja'], null, $codigoAutorizacion);
-    
-                if ($respuesta) {
-                    echo json_encode(['tipo' => 'success', 'mensaje' => 'Código enviado exitosamente']);
-                } else {
-                    echo json_encode(['tipo' => 'error', 'mensaje' => 'No se pudo registrar el código en la base de datos.']);
-                }
+                echo json_encode(['tipo' => 'success', 'mensaje' => 'Código enviado exitosamente']);
             } else {
-                echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al enviar el correo.']);
+                echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al enviar el correo']);
             }
-        } catch (Exception $e) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'Ocurrió un error al enviar el correo: ' . $e->getMessage()]);
+        } else {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'No se pudo registrar el código en la base de datos']);
         }
-        exit;
-    
-    
+        break;
+        
 
     default:
         echo json_encode(['tipo' => 'error', 'mensaje' => 'Opción no válida.']);
