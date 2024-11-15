@@ -57,7 +57,7 @@
                                 <th scope="col">Nombre</th>
                                 <th scope="col">Precio</th>
                                 <th scope="col">Cant</th>
-                                <th scope="col">SubTotal</th>
+                                <th scope="col"></th>
                                 <th></th>
                             </tr>
                         </thead>

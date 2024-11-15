@@ -46,22 +46,17 @@ if (!empty($_GET['pagina'])) {
             </a>
 
             <!-- Divider -->
-            <hr class="sidebar-divider my-0">
-
-            <!-- Nav Item - Dashboard -->
-            <!-- <li class="nav-item <?php echo (empty($_GET['pagina'])) ? 'bg-gradient-info' : ''; ?>">
-                <a class="nav-link" href="plantilla.php">
-                    <i class="fas fa-chart-pie"></i>
-                    <span>Panel de control</span></a>
-            </li> -->
-
-            <!-- Divider -->
             <hr class="sidebar-divider">
 
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Contenido
-            </div>
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item <?php echo (empty($_GET['pagina'])) ? 'bg-gradient-info' : ''; ?>">
+                <a class="nav-link" href="plantilla.php">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Cerrar Caja</span></a>
+            </li>
+
+
+
             <?php if (!empty($clientes)) { ?>
                 <!-- Nav Item - Pages Collapse Menu -->
                 <!-- <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'clientes') ? 'bg-gradient-info' : ''; ?>">
@@ -83,8 +78,7 @@ if (!empty($_GET['pagina'])) {
                 </li>
             <?php } ?>
 
-            <?php if (!empty($usuarios)) { ?>
-                <!-- Divider -->
+            <!-- <?php if (!empty($usuarios)) { ?>
                 <hr class="sidebar-divider d-none d-md-block">
                 <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'usuarios') ? 'bg-gradient-info' : ''; ?>">
                     <a class="nav-link" href="?pagina=usuarios">
@@ -92,7 +86,7 @@ if (!empty($_GET['pagina'])) {
                         <span>Usuarios</span>
                     </a>
                 </li>
-            <?php } ?>
+            <?php } ?> -->
 
             <?php if (!empty($productos)) { ?>
                 <!-- Divider -->
@@ -153,8 +147,8 @@ if (!empty($_GET['pagina'])) {
             <?php } ?>
 
 
-            <!-- <?php if (!empty($configuracion)) { ?> -->
-                <!-- Divider -->
+            <?php if (!empty($configuracion)) { ?> 
+
                 <!-- <hr class="sidebar-divider d-none d-md-block">
 
                 <li class="nav-item <?php echo (!empty($_GET['pagina']) && $_GET['pagina'] == 'configuracion') ? 'bg-gradient-info' : ''; ?>">
@@ -162,10 +156,10 @@ if (!empty($_GET['pagina'])) {
                         <i class="fas fa-user-cog"></i>
                         <span>Configuración</span>
                     </a>
-                </li> -->
-            <!-- <?php } ?> -->
-            <!-- Sidebar Toggler (Sidebar) -->
-            <!-- <div class="text-center d-none d-md-inline mt-3">
+                </li>  -->
+            <?php } ?> 
+
+             <!-- <div class="text-center d-none d-md-inline mt-3">
                 <button class="rounded-circle border-0" id="sidebarToggle"><i class="fas fa-chevron-circle-left text-gray-400"></i></button>
             </div> -->
 
