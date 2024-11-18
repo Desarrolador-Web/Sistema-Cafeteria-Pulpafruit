@@ -48,24 +48,26 @@ if (!empty($_GET['pagina'])) {
             <!-- Divider -->
             <hr class="sidebar-divider">
 
+            <?php if (!empty($clientes)) { ?>
+                <!-- Nav Item - Pages Collapse Menu -->
+                <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'clientes') ? 'bg-gradient-info' : ''; ?>">
+                    <a class="nav-link" href="?pagina=clientes">
+                    <i class="fas fa-chart-pie"></i>
+                        <span>Panel de control</span>
+                    </a>
+                </li>
+            <?php } ?>
+
+
             <!-- Nav Item - Dashboard -->
             <li class="nav-item <?php echo (empty($_GET['pagina'])) ? 'bg-gradient-info' : ''; ?>">
                 <a class="nav-link" href="plantilla.php">
-                    <i class="fas fa-chart-pie"></i>
+                <i class="fas fa-cash-register"></i>
                     <span>Cerrar Caja</span></a>
             </li>
 
 
 
-            <?php if (!empty($clientes)) { ?>
-                <!-- Nav Item - Pages Collapse Menu -->
-                <!-- <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'clientes') ? 'bg-gradient-info' : ''; ?>">
-                    <a class="nav-link" href="?pagina=clientes">
-                        <i class="fas fa-fw fa-users"></i>
-                        <span>Clientes</span>
-                    </a>
-                </li> -->
-            <?php } ?>
 
             <?php if (!empty($proveedor)) { ?>
                 <hr class="sidebar-divider d-none d-md-block">
@@ -128,7 +130,7 @@ if (!empty($_GET['pagina'])) {
             <?php if (!empty($nueva_venta) || !empty($ventas)) { ?>
                 <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'ventas' || !empty($_GET['pagina'])  && $_GET['pagina'] == 'historial') ? 'bg-gradient-info' : ''; ?>">
                     <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseVenta" aria-expanded="true" aria-controls="collapseVenta">
-                        <i class="fas fa-cash-register"></i>
+                        <i class="fas fa-solid fa-money-bill"></i>
                         <span>Ventas</span>
                         <i class="fas fa-chevron-right float-right"></i>
                     </a>

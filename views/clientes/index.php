@@ -1,4 +1,4 @@
-<div class="card">
+<!-- <div class="card">
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-striped table-hover" style="width: 100%;" id="table_clientes">
@@ -12,9 +12,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    
                 </tbody>
             </table>
         </div>
     </div>
-</div>
+</div> -->
