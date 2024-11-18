@@ -8,7 +8,12 @@ document.addEventListener('DOMContentLoaded', function () {
 // Función para verificar si el usuario tiene una caja abierta hoy
 function verificarCajaAbierta() {
     fetch(ruta + 'controllers/adminController.php?option=verificarCaja')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor');
+            }
+            return response.json();
+        })
         .then(data => {
             if (!data.cajaAbierta) {
                 mostrarModalAbrirCaja();
@@ -18,6 +23,7 @@ function verificarCajaAbierta() {
             console.error('Error al verificar la caja:', error);
         });
 }
+
 
 // Función para mostrar el modal de apertura de caja
 function mostrarModalAbrirCaja() {
@@ -81,200 +87,241 @@ function manejarCierreCaja() {
         e.preventDefault();
 
         const valorCierre = document.querySelector('#valorCierre').value;
+        const valorCierreNumerico = parseInt(valorCierre);
 
-        // Convertir ambos valores a números con parseFloat
-        const valorCierreNumerico = parseFloat(valorCierre);
-
-        const formData = new FormData();
-        formData.append('valorCierre', valorCierre);
-
-        fetch(ruta + 'controllers/adminController.php?option=cerrarCaja', {
-            method: 'POST',
-            body: formData
+        // Obtener el id_info_caja desde el servidor antes de continuar
+        fetch(ruta + 'controllers/adminController.php?option=obtenerIdCajaAbierta', {
+            method: 'GET'
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor al obtener id_info_caja');
+            }
+            return response.json();
+        })
         .then(data => {
-            // Verificar si el valor de 'resultado' está definido en el JSON
-            if (data.resultado !== undefined) {
-                // Convertir el valor del resultado de la consulta a número
-                const resultadoConsultaNumerico = parseFloat(data.resultado);
+            if (data.id_info_caja) {
+                const idInfoCaja = data.id_info_caja;
 
-                // Agregar console.log para verificar los valores
-                console.log('Valor cierre:', valorCierreNumerico);
-                console.log('Resultado consulta:', resultadoConsultaNumerico);
+                const formData = new FormData();
+                formData.append('valorCierre', valorCierre);
+                formData.append('id_info_caja', idInfoCaja); // Agregar id_info_caja al formData
 
-                // Comparar los valores numéricos para evitar problemas de tipo de datos
-                if (Number(valorCierreNumerico) === Number(resultadoConsultaNumerico)) {
-                    // Los valores coinciden, cerrar caja exitosamente
-                    Swal.fire({
-                        title: 'Caja cerrada exitosamente',
-                        icon: 'success',
-                        confirmButtonText: 'Aceptar'
-                    }).then(() => {
-                        window.location.reload(); // O cualquier otra acción después de cerrar la caja
-                    });
-                } else {
-                    // Los valores no coinciden, mostrar el valor de la consulta y pedir observación
-                    Swal.fire({
-                        title: 'Valores no coinciden',
-                        text: `El valor calculado es ${data.resultado}. Por favor ingresa una observación.`,
-                        input: 'textarea',
-                        inputPlaceholder: 'Escribe tu observación aquí...',
-                        showCancelButton: true,
-                        confirmButtonText: 'Agregar código',
-                        cancelButtonText: 'Cancelar'
-                    }).then((result) => {
-                        if (result.isConfirmed && result.value) {
+                fetch(ruta + 'controllers/adminController.php?option=cerrarCaja', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error en la respuesta del servidor');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.resultado !== undefined) {
+                        const resultadoConsultaNumerico = parseFloat(data.resultado);
+
+                        if (Number(valorCierreNumerico) !== Number(resultadoConsultaNumerico)) {
                             Swal.fire({
-                                title: 'Ingrese un código',
-                                input: 'number',
-                                inputPlaceholder: 'Código numérico',
+                                title: 'Valores no coinciden',
+                                text: `El valor calculado es ${data.resultado}. Por favor ingresa una observación.`,
+                                input: 'textarea',
+                                inputPlaceholder: 'Escribe tu observación aquí...',
                                 showCancelButton: true,
-                                confirmButtonText: 'Validar código',
+                                confirmButtonText: 'Agregar código',
                                 cancelButtonText: 'Cancelar'
-                            }).then((codigoResult) => {
-                                if (codigoResult.isConfirmed && codigoResult.value) {
+                            }).then((result) => {
+                                if (result.isConfirmed && result.value) {
                                     const observacion = result.value;
-                                    const codigo = codigoResult.value;
 
-                                    formData.append('observacion', observacion);
-                                    formData.append('codigo', codigo);
+                                    // Crear FormData para enviar la observación y el id_info_caja
+                                    const formDataObservacion = new FormData();
+                                    formDataObservacion.append('observacion', observacion);
+                                    formDataObservacion.append('id_info_caja', idInfoCaja);
 
-                                    // Enviar los datos para cerrar la caja con la observación y código
-                                    fetch(ruta + 'controllers/adminController.php?option=cerrarCaja', {
+                                    // Guardar observación en la base de datos y enviar el código de autorización
+                                    fetch(ruta + 'controllers/adminController.php?option=guardarObservacion', {
                                         method: 'POST',
-                                        body: formData
+                                        body: formDataObservacion
                                     })
-                                    .then(response => response.json())
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            throw new Error('Error en la respuesta del servidor');
+                                        }
+                                        return response.json();
+                                    })
                                     .then(data => {
-                                        // Verificar si el valor de 'resultado' está definido en el JSON
-                                        if (data.resultado !== undefined) {
-                                            const resultadoConsultaNumerico = parseFloat(data.resultado);
-                                            const valorCierreNumerico = parseFloat(valorCierre);
-                                    
-                                            // Comparar los valores numéricos
-                                            if (Number(valorCierreNumerico) === Number(resultadoConsultaNumerico)) {
-                                                Swal.fire({
-                                                    title: 'Caja cerrada exitosamente',
-                                                    icon: 'success',
-                                                    confirmButtonText: 'Aceptar'
-                                                }).then(() => {
-                                                    window.location.reload(); // O cualquier otra acción después de cerrar la caja
-                                                });
-                                            } else {
-                                                // Mostrar alerta si los valores no coinciden
-                                                Swal.fire({
-                                                    title: 'Valores no coinciden',
-                                                    text: `El valor calculado es ${data.resultado}. Por favor ingresa una observación.`,
-                                                    input: 'textarea',
-                                                    inputPlaceholder: 'Escribe tu observación aquí...',
-                                                    showCancelButton: true,
-                                                    confirmButtonText: 'Agregar código',
-                                                    cancelButtonText: 'Cancelar'
-                                                }).then((result) => {
-                                                    if (result.isConfirmed && result.value) {
-                                                        Swal.fire({
-                                                            title: 'Ingrese un código',
-                                                            input: 'number',
-                                                            inputPlaceholder: 'Código numérico',
-                                                            showCancelButton: true,
-                                                            confirmButtonText: 'Validar código',
-                                                            cancelButtonText: 'Cancelar'
-                                                        }).then((codigoResult) => {
-                                                            if (codigoResult.isConfirmed && codigoResult.value) {
-                                                                const observacion = result.value;
-                                                                const codigo = codigoResult.value;
-                                    
-                                                                formData.append('observacion', observacion);
-                                                                formData.append('codigo', codigo);
-                                    
-                                                                fetch(ruta + 'controllers/adminController.php?option=cerrarCaja', {
-                                                                    method: 'POST',
-                                                                    body: formData
-                                                                })
-                                                                .then(response => response.json())
-                                                                .then(data => {
-                                                                    if (data.tipo === 'success') {
-                                                                        Swal.fire({
-                                                                            title: 'Caja cerrada con observación',
-                                                                            icon: 'success',
-                                                                            confirmButtonText: 'Aceptar'
-                                                                        }).then(() => {
-                                                                            window.location.reload(); // O cualquier otra acción después de cerrar la caja
-                                                                        });
-                                                                    } else {
-                                                                        Swal.fire({
-                                                                            title: 'Error al cerrar caja',
-                                                                            text: data.mensaje,
-                                                                            icon: 'error',
-                                                                            confirmButtonText: 'Aceptar'
-                                                                        });
-                                                                    }
-                                                                })
-                                                                .catch(error => {
-                                                                    console.error('Error en la solicitud:', error);
-                                                                    Swal.fire({
-                                                                        title: 'Error',
-                                                                        text: 'Error en la solicitud: ' + error,
-                                                                        icon: 'error',
-                                                                        confirmButtonText: 'Aceptar'
-                                                                    });
-                                                                });
-                                                            }
-                                                        });
-                                                    }
-                                                });
-                                            }
-                                        } else if (data.tipo === 'success') {
-                                            // Si no hay resultado pero el tipo es 'success', cerrar caja correctamente
-                                            Swal.fire({
-                                                title: 'Caja cerrada exitosamente',
-                                                icon: 'success',
-                                                confirmButtonText: 'Aceptar'
-                                            }).then(() => {
-                                                window.location.reload(); // O cualquier otra acción después de cerrar la caja
-                                            });
+                                        if (data.tipo === 'success') {
+                                            // Enviar el código de autorización cada vez que se presiona "Agregar código"
+                                            enviarCodigoAutorizacion(idInfoCaja);
                                         } else {
                                             Swal.fire({
-                                                title: 'Error',
-                                                text: 'Error: El valor de la consulta no se ha recibido correctamente.',
+                                                title: 'Error al guardar observación',
+                                                text: data.mensaje,
                                                 icon: 'error',
                                                 confirmButtonText: 'Aceptar'
                                             });
                                         }
                                     })
                                     .catch(error => {
-                                        console.error('Error en la solicitud:', error);
+                                        console.error('Error al guardar la observación:', error);
                                         Swal.fire({
                                             title: 'Error',
-                                            text: 'Error en la solicitud: ' + error,
+                                            text: 'Error al guardar la observación: ' + error,
                                             icon: 'error',
                                             confirmButtonText: 'Aceptar'
                                         });
                                     });
                                 }
                             });
+                        } else {
+                            // Cerrar caja exitosamente si los valores coinciden
+                            Swal.fire({
+                                title: 'Caja cerrada exitosamente',
+                                icon: 'success',
+                                confirmButtonText: 'Aceptar'
+                            }).then(() => {
+                                window.location.reload();
+                            });
                         }
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Error: El valor de la consulta no se ha recibido correctamente.',
+                            icon: 'error',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error en la solicitud:', error);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Error en la solicitud: ' + error,
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
                     });
-                }
+                });
             } else {
-                // Si data.resultado no está definido, mostrar error
+                console.error('No se recibió un id_info_caja válido');
                 Swal.fire({
                     title: 'Error',
-                    text: 'Error: El valor de la consulta no se ha recibido correctamente.',
+                    text: 'No se pudo obtener el identificador de caja.',
                     icon: 'error',
                     confirmButtonText: 'Aceptar'
                 });
             }
         })
         .catch(error => {
-            console.error('Error en la solicitud:', error);
+            console.error('Error al obtener id_info_caja:', error);
             Swal.fire({
                 title: 'Error',
-                text: 'Error en la solicitud: ' + error,
+                text: 'Error al obtener el identificador de caja: ' + error,
                 icon: 'error',
                 confirmButtonText: 'Aceptar'
             });
+        });
+    });
+}
+
+// Función para enviar el código de autorización
+function enviarCodigoAutorizacion(idInfoCaja) {
+    fetch(ruta + 'controllers/adminController.php?option=enviarCodigoAutorizacion', {
+        method: 'POST',
+        body: new URLSearchParams({ 'id_info_caja': idInfoCaja })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error en la respuesta del servidor al enviar código');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.tipo === 'success') {
+            Swal.fire({
+                title: 'Código enviado exitosamente',
+                text: data.mensaje,
+                icon: 'success',
+                confirmButtonText: 'Aceptar'
+            }).then(() => {
+                // Solicitar el código de autorización al usuario después de enviarlo
+                Swal.fire({
+                    title: 'Ingresa el código de autorización',
+                    input: 'text',
+                    inputPlaceholder: 'Escribe el código enviado a tu correo',
+                    showCancelButton: true,
+                    confirmButtonText: 'Validar código',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed && result.value) {
+                        validarCodigoAutorizacion(idInfoCaja, result.value);
+                    }
+                });
+            });
+        } else {
+            Swal.fire({
+                title: 'Error al enviar código',
+                text: data.mensaje,
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error en la solicitud:', error);
+        Swal.fire({
+            title: 'Error',
+            text: 'Error en la solicitud: ' + error,
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+        });
+    });
+}
+
+// Función para validar el código de autorización y cerrar la caja si es correcto
+function validarCodigoAutorizacion(idInfoCaja, codigoAutorizacion) {
+    const valorCierre = document.querySelector('#valorCierre').value; // Obtén el valor de cierre
+
+    const formDataValidacion = new FormData();
+    formDataValidacion.append('id_info_caja', idInfoCaja);
+    formDataValidacion.append('codigoAutorizacion', codigoAutorizacion);
+    formDataValidacion.append('valorCierre', valorCierre); // Agrega el valor de cierre
+
+    fetch(ruta + 'controllers/adminController.php?option=validarCodigoAutorizacion', {
+        method: 'POST',
+        body: formDataValidacion
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Error en la respuesta del servidor al validar código');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.tipo === 'success') {
+            Swal.fire({
+                title: 'Caja cerrada exitosamente',
+                icon: 'success',
+                confirmButtonText: 'Aceptar'
+            }).then(() => {
+                window.location.reload();
+            });
+        } else {
+            Swal.fire({
+                title: 'Código incorrecto',
+                text: data.mensaje,
+                icon: 'error',
+                confirmButtonText: 'Intentar nuevamente'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error en la solicitud:', error);
+        Swal.fire({
+            title: 'Error',
+            text: 'Error en la solicitud: ' + error,
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
         });
     });
 }
