@@ -6,7 +6,7 @@ const id_cliente = document.querySelector('#id-cliente');
 const capacidad_cliente = document.querySelector('#capacidad-cliente');
 const search = document.querySelector('#search'); 
 let btn_save;
-let table_clientes;
+let table_clientes; 
 
 document.addEventListener('DOMContentLoaded', function () {
     btn_save = document.querySelector('#btn-guardar');

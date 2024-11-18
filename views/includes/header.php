@@ -78,7 +78,7 @@ if (!empty($_GET['pagina'])) {
                 </li>
             <?php } ?>
 
-            <!-- <?php if (!empty($usuarios)) { ?>
+             <?php if (!empty($usuarios)) { ?>
                 <hr class="sidebar-divider d-none d-md-block">
                 <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'usuarios') ? 'bg-gradient-info' : ''; ?>">
                     <a class="nav-link" href="?pagina=usuarios">
@@ -86,7 +86,7 @@ if (!empty($_GET['pagina'])) {
                         <span>Usuarios</span>
                     </a>
                 </li>
-            <?php } ?> -->
+            <?php } ?> 
 
             <?php if (!empty($productos)) { ?>
                 <!-- Divider -->
