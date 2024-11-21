@@ -148,6 +148,8 @@ switch ($option) {
                 break;
             case 'Credito':
                 $metodo = 3;
+                // $biometrico = 'sales-modal';
+                //  $idBio = 'idBio';
                 break;
             case 'Bancaria':
                 $metodo = 2;
@@ -156,6 +158,7 @@ switch ($option) {
                 echo json_encode(['tipo' => 'error', 'mensaje' => 'Método de pago no válido']);
                 exit;
         }
+
     
         if (!isset($_SESSION['cart'][$id_user])) {
             $_SESSION['cart'][$id_user] = [];

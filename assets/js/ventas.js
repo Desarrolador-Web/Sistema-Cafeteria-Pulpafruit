@@ -5,6 +5,7 @@ const area_cliente = document.querySelector('#area-cliente');
 const id_cliente = document.querySelector('#id-cliente');
 const capacidad_cliente = document.querySelector('#capacidad-cliente');
 const search = document.querySelector('#search'); 
+const idBio = document.querySelector('#idBio');
 let btn_save;
 let table_clientes;
 
@@ -157,6 +158,12 @@ function canva(video, canvas) {
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
     return canvas.toDataURL('image/png');
 }
+let video = document.getElementById('bio');
+let stream;
+const metodo = document.getElementById('metodo');
+
+// Obtén el valor del select
+const metodoSeleccionado = metodo.value;
 
 //funcion para simular biometrico
 function biometric() {
@@ -167,30 +174,33 @@ function biometric() {
     hideElement('refresh');
     hideElement('accept');
 
-    let video = document.getElementById('bio');
-    let stream;
-    const metodo = document.getElementById('metodo');
-
-    // Obtén el valor del select
-    const metodoSeleccionado = metodo.value;
-
     // Verifica si el valor seleccionado es "Credito"
-    if (metodoSeleccionado === 'Credito') {
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(function (mediaStream) {
-                stream = mediaStream
-                video.srcObject = mediaStream;
-                video.play();
-            })
-            .catch(function (err) {
-                console.error('Error al activar biometrico: ', err);
-            });
+    let video = document.getElementById('bio');
+        let stream;
+        const metodo = document.getElementById('metodo');
+
+        // Obtén el valor del select
+        const metodoSeleccionado = metodo.value;
+
+        // Verifica si el valor seleccionado es "Credito"
+        if (metodoSeleccionado === 'Credito') {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (mediaStream) {
+                    stream = mediaStream
+                    video.srcObject = mediaStream;
+                    video.play();
+                })
+                .catch(function (err) {
+                    console.error('Error al activar biometrico: ', err);
+                });
 
         return; // Detén la ejecución aquí para no continuar con el flujo normal
     }
+    credito();
+}
 
+function credito(){
     let canvasVideo = document.getElementById('can');
-
     $("#biometricc").on('click', function (e) {
         e.preventDefault();
 
@@ -272,7 +282,7 @@ function biometric() {
         e.preventDefault();
         axios.post(ruta + 'controllers/ventasController.php?option=saveventa', {
             idCliente: id_cliente.value,
-            metodo: metodo.value,
+            metodo: metodo.value
 
         })
             .then(function (response) {
@@ -293,7 +303,6 @@ function biometric() {
     })
 
 }
-
 
 function resetFormularios() {
     // Reiniciar campos del cliente
