@@ -2,12 +2,12 @@
 require_once 'config.php';
 require_once 'controllers/plantillaController.php';
 $plantilla = new Plantilla();
-date_default_timezone_set('America/Bogota'); 
+date_default_timezone_set('America/Bogota');
 
 ##### PERMISOS #####
 
 require_once 'models/permisos.php';
-require_once 'models/admin.php';  
+require_once 'models/admin.php';
 $id_user = $_SESSION['idusuario']; //Se obtiene el id de usuario de la sesión actual
 
 // Verificar los permisos del usuario
@@ -42,7 +42,7 @@ require_once 'views/includes/header.php';
 if (isset($_GET['pagina'])) {
     if (empty($_GET['pagina'])) {
         $plantilla->index();
-    }else{
+    } else {
         try {
             $archivo = $_GET['pagina'];
             if ($archivo == 'usuarios' && !empty($usuarios)) {
@@ -53,11 +53,11 @@ if (isset($_GET['pagina'])) {
                 $plantilla->clientes();
             } else if ($archivo == 'proveedor' && !empty($proveedor)) {
                 $plantilla->proveedor();
-            }else if ($archivo == 'productos' && !empty($productos)) {
+            } else if ($archivo == 'productos' && !empty($productos)) {
                 $plantilla->productos();
             } else if ($archivo == 'ventas' && !empty($nueva_venta)) {
                 $plantilla->ventas();
-            } else if ($archivo == 'historial' && !empty($ventas)) {                
+            } else if ($archivo == 'historial' && !empty($ventas)) {
                 $plantilla->historial();
             } else if ($archivo == 'reporte' && !empty($ventas)) {
                 $plantilla->reporte();
@@ -67,14 +67,14 @@ if (isset($_GET['pagina'])) {
                 $plantilla->historial_compras();
             } else if ($archivo == 'reporte_compra' && !empty($compras)) {
                 $plantilla->reporte_compra();
-            } else{                
+            } else {
                 $plantilla->notFound();
-            }          
-        } catch (\Throwable $th) {            
+            }
+        } catch (\Throwable $th) {
             $plantilla->notFound();
         }
     }
-}else{
-    $plantilla->index(); 
+} else {
+    $plantilla->index();
 }
 require_once 'views/includes/footer.php';
