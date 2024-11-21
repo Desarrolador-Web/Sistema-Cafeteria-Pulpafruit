@@ -105,7 +105,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return; // Detén la ejecución aquí para no continuar con el flujo normal
         }
 
-
         // Si no es "Crédito", ejecuta el flujo normal
         console.log("Método seleccionado no es crédito. Continuando con el flujo normal...");
         realizarAccionNormal(metodoSeleccionado);
@@ -115,7 +114,6 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log(`Realizando acción para el método: ${metodo}`);
             // Aquí puedes agregar el código que quieras para el flujo normal
         }
-
 
         axios.post(ruta + 'controllers/ventasController.php?option=saveventa', {
             idCliente: id_cliente.value,
@@ -162,37 +160,36 @@ document.addEventListener('DOMContentLoaded', function () {
 
     //funcion para simular biometrico
     function biometric() {
-
         showElement('biometricc');
         showElement('cancel');
         showElement('bio');
         hideElement('can');
         hideElement('refresh');
         hideElement('accept');
-        
+
         let video = document.getElementById('bio');
         let stream;
         const metodo = document.getElementById('metodo');
 
-        // Obtén el valor del selecttttttt
+        // Obtén el valor del select
         const metodoSeleccionado = metodo.value;
 
         // Verifica si el valor seleccionado es "Credito"
         if (metodoSeleccionado === 'Credito') {
             navigator.mediaDevices.getUserMedia({ video: true })
-            .then(function (mediaStream) {
-                stream = mediaStream
-                video.srcObject = mediaStream;
-                video.play();
-            })
-            .catch(function (err) {
-                console.error('Error al activar biometrico: ', err);
-            });
+                .then(function (mediaStream) {
+                    stream = mediaStream
+                    video.srcObject = mediaStream;
+                    video.play();
+                })
+                .catch(function (err) {
+                    console.error('Error al activar biometrico: ', err);
+                });
 
-        let canvasVideo = document.getElementById('can');
             return; // Detén la ejecución aquí para no continuar con el flujo normal
         }
-        
+
+        let canvasVideo = document.getElementById('can');
 
         $("#biometricc").on('click', function (e) {
             e.preventDefault();
@@ -252,18 +249,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
             let video = document.getElementById('bio');
             let stream;
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function (mediaStream) {
-                    stream = mediaStream
-                    video.srcObject = mediaStream;
-                    video.play();
-                })
-                .catch(function (err) {
-                    console.error('Error al activar biometrico: ', err);
-                });
+            const metodo = document.getElementById('metodo');
 
-            let canvasVideo = document.getElementById('can');
+            // Obtén el valor del select
+            const metodoSeleccionado = metodo.value;
 
+            // Verifica si el valor seleccionado es "Credito"
+            if (metodoSeleccionado === 'Credito') {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function (mediaStream) {
+                        stream = mediaStream
+                        video.srcObject = mediaStream;
+                        video.play();
+                    })
+                    .catch(function (err) {
+                        console.error('Error al activar biometrico: ', err);
+                    });
+            }
         })
 
         $("#accept").on("click", function (e) {
@@ -287,7 +289,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 .catch(function (error) {
                     console.log(error);
                 });
-            $('#sales-modal').modal('hide');
+            // $('#sales-modal').modal({backdrop: 'static', keyboard: false});
         })
 
     }

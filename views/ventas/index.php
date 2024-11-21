@@ -93,7 +93,7 @@
     </div>
 
     <!--Modal biometrico -->
-    <div id="sales-modal" class="modal fade" role="dialog">
+    <div id="sales-modal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false" >
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <form role="form" method="post" enctype="multipart/form-data" autocomplete="off">
@@ -108,7 +108,7 @@
                                 <button id="biometricc" name="biometricc" class="btn btn-outline-info">Tomar Biometrico</button>
                                 <button id="accept" name="accept" class="btn btn-outline-success">Aceptar</button>
                                 <button id="refresh" name="refresh" class="btn btn-outline-primary">Refrescar</button>
-                                <button id="cancel" name="cancel" class="btn btn-outline-danger">Cancelar</button>
+                                <button id="cancel" class="close btn btn-outline-danger" data-dismiss="modal">Cancelar</button>
                             </div>
                     </div>
                 </form>
