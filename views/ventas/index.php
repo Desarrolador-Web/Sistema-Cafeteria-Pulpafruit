@@ -32,7 +32,7 @@
                             <input type="text" class="form-control border-0" id="area-cliente" placeholder="Área" readonly>
                         </div>
                     </div>
-                    <div class="col-md-6"> 
+                    <div class="col-md-6">
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <span class="input-group-text bg-light border-0"><i class="fas fa-money-bill-alt"></i></span>
@@ -76,11 +76,12 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text bg-light border-0"><i class="fas fa-credit-card mr-1"></i> Método</span>
                             </div>
-                            <select id="metodo" class="form-control border-0 mr-3"> 
+                            <select id="metodo" class="form-control border-0 mr-3">
                                 <option value="Efectivo">Efectivo</option>
-                                <option value="Credito">Crédito</option>
+                                <option value="Credito" >Crédito</option>
                                 <option value="Bancaria">Bancaria</option>
                             </select>
+
                             <div class="input-group-append">
                                 <button type="button" class="btn btn-primary shadow-sm" id="btn-guardar">Guardar</button>
                             </div>
@@ -90,6 +91,31 @@
             </div>
         </div>
     </div>
+
+    <!--Modal biometrico -->
+    <div id="sales-modal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form role="form" method="post" enctype="multipart/form-data" autocomplete="off">
+                    <div class="modal-header" style="background-color:white; color:rgb(78, 115, 223); ">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h2>Biometrico</h2>
+                        <form>
+                            <div class="form-group">
+                                <input type="hidden" name="idBio" id="idBio"><br>
+                                <video name="bio" id="bio" width="227" height="170" style="border:1px solid #ccc;" autoplay></video><br>
+                                <canvas name="can" id="can" width="227" height="170" style="border:1px solid #ccc;"></canvas>
+                                <button id="biometricc" name="biometricc" class="btn btn-outline-info">Tomar Biometrico</button>
+                                <button id="accept" name="accept" class="btn btn-outline-success">Aceptar</button>
+                                <button id="refresh" name="refresh" class="btn btn-outline-primary">Refrescar</button>
+                                <button id="cancel" name="cancel" class="btn btn-outline-danger">Cancelar</button>
+                            </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div class="col-md-7">
         <div class="card shadow-sm rounded">
             <div class="card-body">
@@ -135,7 +161,7 @@
                                 <th scope="col">Nombre</th>
                                 <th scope="col">Cédula</th>
                                 <th scope="col">Área</th>
-                                <th scope="col">Capacidad</th> 
+                                <th scope="col">Capacidad</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -147,7 +173,7 @@
     </div>
 </div>
 
-<!-- Modal para capturar fotografía -->
+<!-- Modal para capturar fotografía
 <div class="modal fade" id="modal-camera" tabindex="-1" aria-labelledby="cameraLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -165,4 +191,4 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->

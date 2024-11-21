@@ -148,6 +148,7 @@ switch ($option) {
                 break;
             case 'Credito':
                 $metodo = 3;
+                
                 break;
             case 'Bancaria':
                 $metodo = 2;
