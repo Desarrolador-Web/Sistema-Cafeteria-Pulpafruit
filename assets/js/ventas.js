@@ -9,7 +9,7 @@ let btn_save;
 let table_clientes;
 
 document.addEventListener('DOMContentLoaded', function () {
-    const btn_save = document.querySelector('#btn-guardar');
+    btn_save = document.querySelector('#btn-guardar');
     $('#table_venta').DataTable({
         ajax: {
             url: ruta + 'controllers/ventasController.php?option=listar',
@@ -90,48 +90,35 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     btn_save.onclick = function () {
-        // Selecciona los elementos necesarios
         biometric();
-        const metodo = document.getElementById('metodo');
 
-        // Obtén el valor del select
-        const metodoSeleccionado = metodo.value;
+        console.log("Método seleccionado:", metodo.value);
 
-        // Verifica si el valor seleccionado es "Credito"
-        if (metodoSeleccionado === 'Credito') {
-            // Abre el modal si es "Crédito"
+        if (metodo.value === 'Credito') {
+            console.log("Abriendo el modal porque el método es Crédito...");
             const creditModal = new bootstrap.Modal(document.getElementById('sales-modal'));
             creditModal.show();
-            return; // Detén la ejecución aquí para no continuar con el flujo normal
-        }
-
-        // Si no es "Crédito", ejecuta el flujo normal
-        console.log("Método seleccionado no es crédito. Continuando con el flujo normal...");
-        realizarAccionNormal(metodoSeleccionado);
-
-        // Simula una función para las otras opciones
-        function realizarAccionNormal(metodo) {
-            console.log(`Realizando acción para el método: ${metodo}`);
-            // Aquí puedes agregar el código que quieras para el flujo normal
-        }
-
-        axios.post(ruta + 'controllers/ventasController.php?option=saveventa', {
-            idCliente: id_cliente.value,
-            metodo: metodo.value,
-        })
-            .then(function (response) {
-                const info = response.data;
-                message(info.tipo, info.mensaje);
-
-                if (info.tipo === 'success') {
-                    updateStock();
-                    temp();
-                    resetFormularios();
-                }
+            return; // Detener ejecución aquí
+        } else {
+            console.log("No es crédito, ejecutando flujo normal...");
+            axios.post(ruta + 'controllers/ventasController.php?option=saveventa', {
+                idCliente: id_cliente.value,
+                metodo: metodo.value,
             })
-            .catch(function (error) {
-                console.error("Error:", error);
-            });
+                .then(function (response) {
+                    const info = response.data;
+                    message(info.tipo, info.mensaje);
+
+                    if (info.tipo === 'success') {
+                        updateStock();
+                        temp();
+                        resetFormularios();
+                    }
+                })
+                .catch(function (error) {
+                    console.error("Error:", error);
+                });
+        }
     };
 
     // function credito(){
@@ -166,28 +153,17 @@ document.addEventListener('DOMContentLoaded', function () {
         hideElement('can');
         hideElement('refresh');
         hideElement('accept');
-
         let video = document.getElementById('bio');
         let stream;
-        const metodo = document.getElementById('metodo');
-
-        // Obtén el valor del select
-        const metodoSeleccionado = metodo.value;
-
-        // Verifica si el valor seleccionado es "Credito"
-        if (metodoSeleccionado === 'Credito') {
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function (mediaStream) {
-                    stream = mediaStream
-                    video.srcObject = mediaStream;
-                    video.play();
-                })
-                .catch(function (err) {
-                    console.error('Error al activar biometrico: ', err);
-                });
-
-            return; // Detén la ejecución aquí para no continuar con el flujo normal
-        }
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function (mediaStream) {
+                stream = mediaStream
+                video.srcObject = mediaStream;
+                video.play();
+            })
+            .catch(function (err) {
+                console.error('Error al activar biometrico: ', err);
+            });
 
         let canvasVideo = document.getElementById('can');
 
@@ -249,23 +225,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
             let video = document.getElementById('bio');
             let stream;
-            const metodo = document.getElementById('metodo');
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (mediaStream) {
+                    stream = mediaStream
+                    video.srcObject = mediaStream;
+                    video.play();
+                })
+                .catch(function (err) {
+                    console.error('Error al activar biometrico: ', err);
+                });
 
-            // Obtén el valor del select
-            const metodoSeleccionado = metodo.value;
+            let canvasVideo = document.getElementById('can');
 
-            // Verifica si el valor seleccionado es "Credito"
-            if (metodoSeleccionado === 'Credito') {
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(function (mediaStream) {
-                        stream = mediaStream
-                        video.srcObject = mediaStream;
-                        video.play();
-                    })
-                    .catch(function (err) {
-                        console.error('Error al activar biometrico: ', err);
-                    });
-            }
         })
 
         $("#accept").on("click", function (e) {
@@ -273,7 +244,6 @@ document.addEventListener('DOMContentLoaded', function () {
             axios.post(ruta + 'controllers/ventasController.php?option=saveventa', {
                 idCliente: id_cliente.value,
                 metodo: metodo.value,
-
             })
                 .then(function (response) {
                     const info = response.data;
@@ -289,8 +259,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 .catch(function (error) {
                     console.log(error);
                 });
-            // $('#sales-modal').modal({backdrop: 'static', keyboard: false});
+            $('#sales-modal').modal('hide');
         })
+
 
     }
 
