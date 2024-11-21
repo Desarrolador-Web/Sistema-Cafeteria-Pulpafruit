@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let stream;
         const metodo = document.getElementById('metodo');
 
-        // Obtén el valor del select
+        // Obtén el valor del selecttttttt
         const metodoSeleccionado = metodo.value;
 
         // Verifica si el valor seleccionado es "Credito"
