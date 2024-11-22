@@ -8,18 +8,21 @@ $option = (empty($_GET['option'])) ? '' : $_GET['option'];
 $admin = new AdminModel();
 $id_user = $_SESSION['idusuario'];
 
-
-
-
 // Configurar la zona horaria a Bogotá, Colombia
 date_default_timezone_set('America/Bogota');
 
 switch ($option) {
+
     case 'verificarCaja':
         $fechaHoy = date('Y-m-d');
         $cajaAbierta = $admin->checkCajaAbierta($id_user, $fechaHoy);
         
-        if ($cajaAbierta) {
+        // Verificar el rol directamente desde la sesión
+        $rol = $_SESSION['rol'] ?? null;
+    
+        if ($rol === 1 || $rol === 2) {
+            echo json_encode(['cajaAbierta' => true]); // No mostrar el modal para roles 1 y 2
+        } elseif ($cajaAbierta) {
             $_SESSION['id_sede'] = $cajaAbierta['id_sede'];
             echo json_encode(['cajaAbierta' => true, 'id_sede' => $cajaAbierta['id_sede']]);
         } else {
