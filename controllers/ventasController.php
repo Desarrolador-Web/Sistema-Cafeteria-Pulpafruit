@@ -2,7 +2,7 @@
 require_once '../models/ventas.php';
 require_once '../models/clientes.php';
 
-date_default_timezone_set('America/Bogota'); 
+date_default_timezone_set('America/Bogota');
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -15,7 +15,7 @@ $id_user = $_SESSION['idusuario'];
 $option = isset($_GET['option']) ? $_GET['option'] : '';
 
 switch ($option) {
-    
+
     case 'listar':
         // Verifica si el id_sede está en la sesión
         if (isset($_SESSION['id_sede'])) {
@@ -30,7 +30,7 @@ switch ($option) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'No se ha seleccionado ninguna sede.']);
         }
         break;
-    
+
 
     case 'addcart':
         $id_product = $_GET['id'];
@@ -127,21 +127,46 @@ switch ($option) {
         break;
 
     case 'saveventa':
-        $data = json_decode(file_get_contents('php://input'), true);
-    
+
+        if ($metodo === 3) {
+            $data = json_decode(file_get_contents('php://input'), true);
+            $biometrico = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $data['idBio']));
+            if ($biometrico === false) {
+                error_log("Error al descodificar base64");
+            }
+            
+            $file = '../uploads/Biometrico';
+
+            if (!is_dir($file)) {
+                mkdir($file, 0755, true);
+            }
+
+            $archive = uniqid() . '_' . $data['idCliente'] . '.jpg';
+            $urlFile = $file . $archive;
+
+            if (file_put_contents($urlFile, $biometrico)) {
+                $url = '/SISTEMA-CAFETERIA-PULPAFRUIT/uploads/Biometrico/' . $archive;
+                $table = 'cf_detalle_ventas';
+                $datos = array(
+                    'idBio' => $url
+                );
+                return $response;
+            }
+        }
+
         if (is_null($data)) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Datos de entrada inválidos']);
             break;
         }
-    
+
         $id_cliente = isset($data['idCliente']) ? $data['idCliente'] : null;
         $metodo = isset($data['metodo']) ? $data['metodo'] : null;
-    
+
         if (is_null($id_cliente) || is_null($metodo)) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Datos de cliente o método de pago no válidos']);
             break;
         }
-    
+
         switch ($metodo) {
             case 'Efectivo':
                 $metodo = 1;
@@ -159,19 +184,19 @@ switch ($option) {
                 exit;
         }
 
-    
+
         if (!isset($_SESSION['cart'][$id_user])) {
             $_SESSION['cart'][$id_user] = [];
         }
-    
+
         if (empty($_SESSION['cart'][$id_user])) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'CARRITO VACIO']);
             break;
         }
-    
+
         $total = 0;
         $stock_insuficiente = false;
-    
+
         foreach ($_SESSION['cart'][$id_user] as $id_product => $item) {
             $product = $ventas->getProduct($id_product);
             if ($item['cantidad'] > $product['existencia']) {
@@ -180,46 +205,46 @@ switch ($option) {
             }
             $total += $item['precio'] * $item['cantidad'];
         }
-    
+
         if ($stock_insuficiente) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'STOCK INSUFICIENTE']);
             break;
         }
-    
+
         $cliente = $clientes->getClienteById($id_cliente);
         if (!$cliente) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'CLIENTE NO ENCONTRADO']);
             break;
         }
-    
+
         if ($metodo == 3 && $cliente['capacidad'] < $total) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'CAPACIDAD DE CRÉDITO INSUFICIENTE']);
             break;
         }
-    
+
         $fecha = date('Y-m-d'); // Captura la fecha actual en la zona horaria configurada
         $saleId = $ventas->saveVenta($id_cliente, $total, $metodo, $fecha, $id_user);
-    
+
         // Obtener la sede del usuario desde la sesión
         $id_sede = $_SESSION['id_sede'];
-    
+
         foreach ($_SESSION['cart'][$id_user] as $id_product => $item) {
-            $ventas->saveDetalle($id_product, $saleId, $item['cantidad'], $item['precio'], $id_sede);
+            $ventas->saveDetalle($id_product, $saleId, $item['cantidad'], $item['precio'], $id_sede,);
             $product = $ventas->getProduct($id_product);
             $stock = $product['existencia'] - $item['cantidad'];
             $ventas->updateStock($stock, $id_product);
         }
-    
+
         // Solo actualizar la deuda y capacidad del cliente si el método de pago es 3 (Credito)
         if (isset($metodo) && $metodo == 3) {
             $clientes->updateDeudaCapacidad($id_cliente, $total, $metodo);
         }
-    
+
         unset($_SESSION['cart'][$id_user]);
-    
+
         echo json_encode(['tipo' => 'success', 'mensaje' => 'Venta guardada correctamente']);
         break;
-        
+
 
     case 'searchbarcode':
         $barcode = $_GET['barcode'];
@@ -241,16 +266,16 @@ switch ($option) {
         $result = $clientes->getClients();
         echo json_encode($result);
         break;
-    
+
     case 'logout':
         // Destruir la sesión
         session_destroy();
-    
+
         // Redirigir a la página principal
         header("Location: http://localhost/sistema-cafeteria-pulpafruit/");
         exit();
         break;
-        
+
 
     default:
         echo json_encode(['tipo' => 'error', 'mensaje' => 'Opción no válida']);
