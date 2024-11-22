@@ -56,7 +56,6 @@ switch ($option) {
         }
         break;
         
-
     case 'obtenerIdCajaAbierta':
         $id_usuario = $_SESSION['idusuario'];
         $fechaHoy = date('Y-m-d');
@@ -68,8 +67,6 @@ switch ($option) {
             echo json_encode(['id_info_caja' => null]);
         }
         break;
-    
-        
 
     case 'cerrarCaja':
         if (!isset($_POST['valorCierre'])) {
