@@ -16,6 +16,7 @@ switch ($option) {
                 $_SESSION['nombre'] = $result['nombres'] . ' ' . $result['apellidos'];
                 $_SESSION['correo'] = $result['correo'];
                 $_SESSION['idusuario'] = $result['id_usuario']; 
+                $_SESSION['rol'] = $result['rol']; // Guardar el rol en la sesión
                 $res = array('tipo' => 'success', 'mensaje' => 'ok');
             } else {
                 $res = array('tipo' => 'error', 'mensaje' => 'CONTRASEÑA INCORRECTA');
@@ -23,6 +24,7 @@ switch ($option) {
         }
         echo json_encode($res);
         break;
+    
 
     case 'listar':
         $data = $usuarios->getUsers();

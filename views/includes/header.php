@@ -29,6 +29,13 @@ if (!empty($_GET['pagina'])) {
 }
 ?>
 
+<?php
+if (!isset($_SESSION['rol'])) {
+    $_SESSION['rol'] = null; // Establecer un valor predeterminado si no existe
+}
+?>
+
+
 <body id="page-top" class="<?php echo ($mini) ? 'sidebar-toggled' : ''; ?>">
 
     <!-- Page Wrapper -->
@@ -48,8 +55,10 @@ if (!empty($_GET['pagina'])) {
             <!-- Divider -->
             <hr class="sidebar-divider">
 
-            <?php if (!empty($clientes)) { ?>
-                <!-- Nav Item - Pages Collapse Menu -->
+            <?php 
+            // Mostrar la opción "Panel de control" solo si el rol no es 3
+            if (!empty($clientes) && $_SESSION['rol'] != 3) { ?>
+                <!-- Opción panel de control, antes llamada clientes -->
                 <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'clientes') ? 'bg-gradient-info' : ''; ?>">
                     <a class="nav-link" href="?pagina=clientes">
                     <i class="fas fa-chart-pie"></i>
@@ -80,7 +89,9 @@ if (!empty($_GET['pagina'])) {
                 </li>
             <?php } ?>
 
-             <?php if (!empty($usuarios)) { ?>
+            <?php 
+            // Mostrar la opción de usuarios solo si el rol no es 3
+            if (!empty($usuarios) && $_SESSION['rol'] != 3) { ?>
                 <hr class="sidebar-divider d-none d-md-block">
                 <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'usuarios') ? 'bg-gradient-info' : ''; ?>">
                     <a class="nav-link" href="?pagina=usuarios">
@@ -88,7 +99,8 @@ if (!empty($_GET['pagina'])) {
                         <span>Usuarios</span>
                     </a>
                 </li>
-            <?php } ?> 
+            <?php } ?>
+
 
             <?php if (!empty($productos)) { ?>
                 <!-- Divider -->
