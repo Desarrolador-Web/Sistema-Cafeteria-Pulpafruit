@@ -127,15 +127,15 @@ switch ($option) {
         break;
 
     case 'saveventa':
-
-        if ($metodo === 3) {
+        $metodo ="#metodo";
+        if ($metodo === 'Credito') {
             $data = json_decode(file_get_contents('php://input'), true);
             $biometrico = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $data['idBio']));
             if ($biometrico === false) {
                 error_log("Error al descodificar base64");
             }
-            
-            $file = '../uploads/Biometrico';
+
+            $file = '../uploads/Biometrico/';
 
             if (!is_dir($file)) {
                 mkdir($file, 0755, true);
@@ -146,6 +146,7 @@ switch ($option) {
 
             if (file_put_contents($urlFile, $biometrico)) {
                 $url = '/SISTEMA-CAFETERIA-PULPAFRUIT/uploads/Biometrico/' . $archive;
+
                 $table = 'cf_detalle_ventas';
                 $datos = array(
                     'idBio' => $url
