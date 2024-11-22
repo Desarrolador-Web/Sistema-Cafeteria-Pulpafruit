@@ -127,33 +127,8 @@ switch ($option) {
         break;
 
     case 'saveventa':
-        $metodo ="#metodo";
-        if ($metodo === 'Credito') {
-            $data = json_decode(file_get_contents('php://input'), true);
-            $biometrico = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $data['idBio']));
-            if ($biometrico === false) {
-                error_log("Error al descodificar base64");
-            }
 
-            $file = '../uploads/Biometrico/';
-
-            if (!is_dir($file)) {
-                mkdir($file, 0755, true);
-            }
-
-            $archive = uniqid() . '_' . $data['idCliente'] . '.jpg';
-            $urlFile = $file . $archive;
-
-            if (file_put_contents($urlFile, $biometrico)) {
-                $url = '/SISTEMA-CAFETERIA-PULPAFRUIT/uploads/Biometrico/' . $archive;
-
-                $table = 'cf_detalle_ventas';
-                $datos = array(
-                    'idBio' => $url
-                );
-                return $response;
-            }
-        }
+        $data = json_decode(file_get_contents('php://input'), true);
 
         if (is_null($data)) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Datos de entrada inválidos']);
@@ -174,8 +149,7 @@ switch ($option) {
                 break;
             case 'Credito':
                 $metodo = 3;
-                // $biometrico = 'sales-modal';
-                //  $idBio = 'idBio';
+
                 break;
             case 'Bancaria':
                 $metodo = 2;
@@ -185,7 +159,41 @@ switch ($option) {
                 exit;
         }
 
+        $idBio = isset($data['idBio']) ? $data['idBio'] : null;
 
+        if ($metodo === 3) {
+
+            if (is_null(value: $idBio)) {
+                echo json_encode(['tipo' => 'error', 'mensaje' => 'Datos de entrada inválidosss']);
+                break;
+            }
+
+            $idBio = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $data['idBio']));
+            if ($idBio === false) {
+                error_log("Error al descodificar base64");
+            }
+
+            $file = '../uploads/Biometrico/';
+
+            if (!is_dir($file)) {
+                mkdir($file, 0755, true);
+            }
+
+            $archive = uniqid() . '_' . $data['idCliente'] . '.jpg';
+            $urlFile = $file . $archive;
+
+            if (file_put_contents($urlFile, $idBio)) {
+                $url = '/SISTEMA-CAFETERIA-PULPAFRUIT/uploads/Biometrico/' . $archive;
+
+                $table = 'cf_detalle_ventas';
+                $datos = array(
+                    'idBio' => $url
+                );
+                $response = new Ventas;
+                $response->saveDetalle($id_producto, $id_venta, $cantidad, $precio, $id_caja, $idBio);
+                return $response;
+            }
+        }
         if (!isset($_SESSION['cart'][$id_user])) {
             $_SESSION['cart'][$id_user] = [];
         }
@@ -230,7 +238,7 @@ switch ($option) {
         $id_sede = $_SESSION['id_sede'];
 
         foreach ($_SESSION['cart'][$id_user] as $id_product => $item) {
-            $ventas->saveDetalle($id_product, $saleId, $item['cantidad'], $item['precio'], $id_sede,);
+            $ventas->saveDetalle($id_product, $saleId, $item['cantidad'], $item['precio'], $id_sede, $idBio);
             $product = $ventas->getProduct($id_product);
             $stock = $product['existencia'] - $item['cantidad'];
             $ventas->updateStock($stock, $id_product);

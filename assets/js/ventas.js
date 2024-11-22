@@ -1,10 +1,10 @@
 let table_temp = document.querySelector('#table_temp tbody');
-const totalVenta = document.querySelector('#total-venta'); 
+const totalVenta = document.querySelector('#total-venta');
 const nombre_cliente = document.querySelector('#nombre-cliente');
 const area_cliente = document.querySelector('#area-cliente');
 const id_cliente = document.querySelector('#id-cliente');
 const capacidad_cliente = document.querySelector('#capacidad-cliente');
-const search = document.querySelector('#search'); 
+const search = document.querySelector('#search');
 const idBio = document.querySelector('#idBio');
 let btn_save;
 let table_clientes;
@@ -93,10 +93,10 @@ document.addEventListener('DOMContentLoaded', function () {
         // Selecciona los elementos necesarios
         biometric();
         const metodo = document.getElementById('metodo');
-    
+
         // Obtén el valor del select
         const metodoSeleccionado = metodo.value;
-    
+
         // Verifica si el valor seleccionado es "Credito"
         if (metodoSeleccionado === 'Credito') {
             // Abre el modal si es "Crédito"
@@ -104,35 +104,35 @@ document.addEventListener('DOMContentLoaded', function () {
             creditModal.show();
             return; // Detén la ejecución aquí para no continuar con el flujo normal
         }
-    
+
         // Si no es "Crédito", ejecuta el flujo normal
         console.log("Método seleccionado no es crédito. Continuando con el flujo normal...");
         realizarAccionNormal(metodoSeleccionado);
-    
+
         // Simula una función para las otras opciones
         function realizarAccionNormal(metodo) {
             console.log(`Realizando acción para el método: ${metodo}`);
             // Aquí puedes agregar el código que quieras para el flujo normal
         }
-    
+
         axios.post(ruta + 'controllers/ventasController.php?option=saveventa', {
             idCliente: id_cliente.value,
             metodo: metodo.value
         })
-        .then(function (response) {
-            const info = response.data;
-            message(info.tipo, info.mensaje);
-            if (info.tipo === 'success') {
-                updateStock();
-                temp(); // Actualiza la tabla temporal y el total
-    
-                // Reiniciar los formularios
-                resetFormularios();
-            }
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
+            .then(function (response) {
+                const info = response.data;
+                message(info.tipo, info.mensaje);
+                if (info.tipo === 'success') {
+                    updateStock();
+                    temp(); // Actualiza la tabla temporal y el total
+
+                    // Reiniciar los formularios
+                    resetFormularios();
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
     };
 });
 // function credito(){
@@ -167,6 +167,7 @@ const metodoSeleccionado = metodo.value;
 
 //funcion para simular biometrico
 function biometric() {
+    credito();
     showElement('biometricc');
     showElement('cancel');
     showElement('bio');
@@ -176,30 +177,29 @@ function biometric() {
 
     // Verifica si el valor seleccionado es "Credito"
     let video = document.getElementById('bio');
-        let stream;
-        const metodo = document.getElementById('metodo');
+    let stream;
+    const metodo = document.getElementById('metodo');
 
-        // Obtén el valor del select
-        const metodoSeleccionado = metodo.value;
+    // Obtén el valor del select
+    const metodoSeleccionado = metodo.value;
 
-        // Verifica si el valor seleccionado es "Credito"
-        if (metodoSeleccionado === 'Credito') {
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(function (mediaStream) {
-                    stream = mediaStream
-                    video.srcObject = mediaStream;
-                    video.play();
-                })
-                .catch(function (err) {
-                    console.error('Error al activar biometrico: ', err);
-                });
+    // Verifica si el valor seleccionado es "Credito"
+    if (metodoSeleccionado === 'Credito') {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function (mediaStream) {
+                stream = mediaStream
+                video.srcObject = mediaStream;
+                video.play();
+            })
+            .catch(function (err) {
+                console.error('Error al activar biometrico: ', err);
+            });
 
         return; // Detén la ejecución aquí para no continuar con el flujo normal
     }
-    credito();
 }
 
-function credito(){
+function credito() {
     let canvasVideo = document.getElementById('can');
     $("#biometricc").on('click', function (e) {
         e.preventDefault();
@@ -282,8 +282,8 @@ function credito(){
         e.preventDefault();
         axios.post(ruta + 'controllers/ventasController.php?option=saveventa', {
             idCliente: id_cliente.value,
-            metodo: metodo.value
-
+            metodo: metodo.value,
+            idBio: idBio.value
         })
             .then(function (response) {
                 const info = response.data;
@@ -300,6 +300,8 @@ function credito(){
                 console.log(error);
             });
         // $('#sales-modal').modal({backdrop: 'static', keyboard: false});
+        "http://localhost/Sistema-Cafeteria-Pulpafruit/plantilla.php?pagina=ventas#" + window.location.href;
+
     })
 
 }
@@ -366,18 +368,18 @@ function addCantidad(e, idTemp) {
         id: idTemp,
         cantidad: e.target.value
     })
-    .then(function (response) {
-        const info = response.data;
-        if (info.tipo == 'error') {
-            message(info.tipo, info.mensaje);
-            return;
-        }
-        updateStock();
-        temp(); // Actualiza la tabla temporal y el total
-    })
-    .catch(function (error) {
-        console.log(error);
-    });
+        .then(function (response) {
+            const info = response.data;
+            if (info.tipo == 'error') {
+                message(info.tipo, info.mensaje);
+                return;
+            }
+            updateStock();
+            temp(); // Actualiza la tabla temporal y el total
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
 }
 
 function addPrecio(e, idTemp) {
@@ -385,31 +387,31 @@ function addPrecio(e, idTemp) {
         id: idTemp,
         precio: e.target.value
     })
-    .then(function (response) {
-        const info = response.data;
-        if (info.tipo == 'error') {
-            message(info.tipo, info.mensaje);
-            return;
-        }
-        updateStock();
-        temp(); // Actualiza la tabla temporal y el total
-    })
-    .catch(function (error) {
-        console.log(error);
-    });
+        .then(function (response) {
+            const info = response.data;
+            if (info.tipo == 'error') {
+                message(info.tipo, info.mensaje);
+                return;
+            }
+            updateStock();
+            temp(); // Actualiza la tabla temporal y el total
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
 }
 
 function deleteProducto(idTemp) {
     axios.get(ruta + 'controllers/ventasController.php?option=delete&id=' + idTemp)
-    .then(function (response) {
-        const info = response.data;
-        message(info.tipo, info.mensaje);
-        updateStock();
-        temp(); // Actualiza la tabla temporal y el total
-    })
-    .catch(function (error) {
-        console.log(error);
-    });
+        .then(function (response) {
+            const info = response.data;
+            message(info.tipo, info.mensaje);
+            updateStock();
+            temp(); // Actualiza la tabla temporal y el total
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
 }
 
 function updateStock() {
