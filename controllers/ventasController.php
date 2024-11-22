@@ -168,8 +168,8 @@ switch ($option) {
                 break;
             }
 
-            $idBio = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $data['idBio']));
-            if ($idBio === false) {
+            $idBiome = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $data['idBio']));
+            if ($idBiome === false) {
                 error_log("Error al descodificar base64");
             }
 
@@ -182,16 +182,11 @@ switch ($option) {
             $archive = uniqid() . '_' . $data['idCliente'] . '.jpg';
             $urlFile = $file . $archive;
 
-            if (file_put_contents($urlFile, $idBio)) {
+            if (file_put_contents($urlFile, $idBiome) !== false) {
                 $url = '/SISTEMA-CAFETERIA-PULPAFRUIT/uploads/Biometrico/' . $archive;
 
-                $table = 'cf_detalle_ventas';
-                $datos = array(
-                    'idBio' => $url
-                );
-                $response = new Ventas;
-                $response->saveDetalle($id_producto, $id_venta, $cantidad, $precio, $id_caja, $idBio);
-                return $response;
+            }else{
+                echo json_encode(['status' => 'error', 'message' => 'Error al guardar la imagen']);
             }
         }
         if (!isset($_SESSION['cart'][$id_user])) {
@@ -232,7 +227,7 @@ switch ($option) {
         }
 
         $fecha = date('Y-m-d'); // Captura la fecha actual en la zona horaria configurada
-        $saleId = $ventas->saveVenta($id_cliente, $total, $metodo, $fecha, $id_user);
+        $saleId = $ventas->saveVenta($id_cliente, $total, $metodo, $fecha, $id_user, $idBiome);
 
         // Obtener la sede del usuario desde la sesión
         $id_sede = $_SESSION['id_sede'];

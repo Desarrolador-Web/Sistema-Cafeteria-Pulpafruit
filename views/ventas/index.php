@@ -107,7 +107,7 @@
                                 <button id="biometricc" name="biometricc" class="btn btn-outline-info">Tomar Biometrico</button>
                                 <button id="accept" name="accept" class="btn btn-outline-success">Aceptar</button>
                                 <button id="refresh" name="refresh" class="btn btn-outline-primary">Refrescar</button>
-                                <button id="cancel" class="close btn btn-outline-danger" data-dismiss="modal">Cancelar</button>
+                                <button type="button" id="cancel" class="btn btn-outline-danger" data-dismiss="modal">Cancelar</button>
                                 <input type="hidden" name="idBio" id="idBio">
                             </div>
                     </div>

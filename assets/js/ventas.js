@@ -135,13 +135,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     };
 });
-// function credito(){
-//     switch("#metodo"){
-//         case credito:
-
-//         break;
-//     }
-// }
 
 //Funcion para ocultar elementos
 function hideElement(elementId) {
@@ -295,14 +288,14 @@ function credito() {
                     // Reiniciar los formularios
                     resetFormularios();
                 }
+                window.location.reload();
+
             })
             .catch(function (error) {
                 console.log(error);
             });
         // $('#sales-modal').modal({backdrop: 'static', keyboard: false});
-        "http://localhost/Sistema-Cafeteria-Pulpafruit/plantilla.php?pagina=ventas#" + window.location.href;
-
-    })
+    });
 
 }
 
