@@ -13,6 +13,7 @@ $clientes = new ClientesModel();
 $id_user = $_SESSION['idusuario'];
 
 $option = isset($_GET['option']) ? $_GET['option'] : '';
+$idBio = isset($data['idBio']) ? $data['idBio'] : null;
 
 switch ($option) {
 
@@ -149,7 +150,6 @@ switch ($option) {
                 break;
             case 'Credito':
                 $metodo = 3;
-
                 break;
             case 'Bancaria':
                 $metodo = 2;
@@ -159,36 +159,6 @@ switch ($option) {
                 exit;
         }
 
-        $idBio = isset($data['idBio']) ? $data['idBio'] : null;
-
-        if ($metodo === 3) {
-
-            if (is_null(value: $idBio)) {
-                echo json_encode(['tipo' => 'error', 'mensaje' => 'Datos de entrada inválidosss']);
-                break;
-            }
-
-            $idBiome = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $data['idBio']));
-            if ($idBiome === false) {
-                error_log("Error al descodificar base64");
-            }
-
-            $file = '../uploads/Biometrico/';
-
-            if (!is_dir($file)) {
-                mkdir($file, 0755, true);
-            }
-
-            $archive = uniqid() . '_' . $data['idCliente'] . '.jpg';
-            $urlFile = $file . $archive;
-
-            if (file_put_contents($urlFile, $idBiome) !== false) {
-                $url = '/SISTEMA-CAFETERIA-PULPAFRUIT/uploads/Biometrico/' . $archive;
-
-            }else{
-                echo json_encode(['status' => 'error', 'message' => 'Error al guardar la imagen']);
-            }
-        }
         if (!isset($_SESSION['cart'][$id_user])) {
             $_SESSION['cart'][$id_user] = [];
         }
@@ -226,22 +196,59 @@ switch ($option) {
             break;
         }
 
-        $fecha = date('Y-m-d'); // Captura la fecha actual en la zona horaria configurada
-        $saleId = $ventas->saveVenta($id_cliente, $total, $metodo, $fecha, $id_user, $idBiome);
+            $fecha = date('Y-m-d'); // Captura la fecha actual en la zona horaria configurada
+            $saleId = $ventas->saveVenta($id_cliente, $total, $metodo, $fecha, $id_user);
 
-        // Obtener la sede del usuario desde la sesión
-        $id_sede = $_SESSION['id_sede'];
+            // Obtener la sede del usuario desde la sesión
+            $id_sede = $_SESSION['id_sede'];
 
-        foreach ($_SESSION['cart'][$id_user] as $id_product => $item) {
-            $ventas->saveDetalle($id_product, $saleId, $item['cantidad'], $item['precio'], $id_sede, $idBio);
-            $product = $ventas->getProduct($id_product);
-            $stock = $product['existencia'] - $item['cantidad'];
-            $ventas->updateStock($stock, $id_product);
-        }
+            foreach ($_SESSION['cart'][$id_user] as $id_product => $item) {
+                $ventas->saveDetalle($id_product, $saleId, $item['cantidad'], $item['precio'], $id_sede, $idBiome = null);
+                $product = $ventas->getProduct($id_product);
+                $stock = $product['existencia'] - $item['cantidad'];
+                $ventas->updateStock($stock, $id_product);
+            }
 
         // Solo actualizar la deuda y capacidad del cliente si el método de pago es 3 (Credito)
         if (isset($metodo) && $metodo == 3) {
             $clientes->updateDeudaCapacidad($id_cliente, $total, $metodo);
+        }
+
+        if ($metodo === "Credito") {
+
+            if (is_null(value: $idBio)) {
+                echo json_encode(['tipo' => 'error', 'mensaje' => 'Biometrico invalido']);
+                break;
+            }
+
+            $idBiome = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $data['idBio']));
+            if ($idBiome === false) {
+                error_log("Error al descodificar base64");
+            }
+
+            $file = '../uploads/Biometrico/';
+
+            if (!is_dir($file)) {
+                mkdir($file, 0755, true);
+            }
+
+            $archive = uniqid() . '_' . $data['idCliente'] . '.jpg';
+            $urlFile = $file . $archive;
+
+            if (file_put_contents($urlFile, $idBiome) !== false) {
+                $url = '/SISTEMA-CAFETERIA-PULPAFRUIT/uploads/Biometrico/' . $archive;
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Error al guardar la imagen']);
+            }
+
+            $fecha = date('Y-m-d'); // Captura la fecha actual en la zona horaria configurada
+            $saleId = $ventas->saveVenta($id_cliente, $total, $metodo, $fecha, $id_user, $idBiome);
+
+            // Obtener la sede del usuario desde la sesión
+
+            unset($_SESSION['cart'][$id_user]);
+
+            echo json_encode(['tipo' => 'success', 'mensaje' => 'Venta guardada correctamente']);
         }
 
         unset($_SESSION['cart'][$id_user]);
@@ -249,6 +256,50 @@ switch ($option) {
         echo json_encode(['tipo' => 'success', 'mensaje' => 'Venta guardada correctamente']);
         break;
 
+    // case "Credito":
+
+    //     $data = json_decode(file_get_contents('php://input'), true);
+    //     $id_cliente = isset($data['idCliente']) ? $data['idCliente'] : null;
+    //     $metodo = isset($data['metodo']) ? $data['metodo'] : null;
+
+        // if ($metodo === "Credito") {
+
+        //     if (is_null(value: $idBio)) {
+        //         echo json_encode(['tipo' => 'error', 'mensaje' => 'Biometrico invalido']);
+        //         break;
+        //     }
+
+        //     $idBiome = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $data['idBio']));
+        //     if ($idBiome === false) {
+        //         error_log("Error al descodificar base64");
+        //     }
+
+        //     $file = '../uploads/Biometrico/';
+
+        //     if (!is_dir($file)) {
+        //         mkdir($file, 0755, true);
+        //     }
+
+        //     $archive = uniqid() . '_' . $data['idCliente'] . '.jpg';
+        //     $urlFile = $file . $archive;
+
+        //     if (file_put_contents($urlFile, $idBiome) !== false) {
+        //         $url = '/SISTEMA-CAFETERIA-PULPAFRUIT/uploads/Biometrico/' . $archive;
+        //     } else {
+        //         echo json_encode(['status' => 'error', 'message' => 'Error al guardar la imagen']);
+        //     }
+
+        //     $fecha = date('Y-m-d'); // Captura la fecha actual en la zona horaria configurada
+        //     $saleId = $ventas->saveVenta($id_cliente, $total, $metodo, $fecha, $id_user, $idBiome);
+
+        //     // Obtener la sede del usuario desde la sesión
+
+        //     unset($_SESSION['cart'][$id_user]);
+
+        //     echo json_encode(['tipo' => 'success', 'mensaje' => 'Venta guardada correctamente']);
+        // }
+
+        // break;
 
     case 'searchbarcode':
         $barcode = $_GET['barcode'];

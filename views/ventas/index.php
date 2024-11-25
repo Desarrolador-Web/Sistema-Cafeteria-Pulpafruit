@@ -93,22 +93,27 @@
     </div>
 
     <!--Modal biometrico -->
-    <div id="sales-modal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div id="sales-modal" class="modal fade card" role="dialog" data-backdrop="static" data-keyboard="false" style="width: 40rem;">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <form role="form" method="post" enctype="multipart/form-data" autocomplete="off">
-                    <div class="modal-header" style="background-color:white; color:rgb(78, 115, 223); ">
+                    <div class="modal-header " style="background-color:white; color:rgb(78, 115, 223); ">
+
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h2>Biometrico</h2>
+                        <div class="card-header" style="background-color:rgb(78, 115, 223);">
+                            <h2 class="card-title" style="color: #ccc;">Biometrico</h2>
+                        </div>
                         <form>
-                            <div class="form-group">
+                            <div class="form-group card-body">
+                                <input class="card-img-top" type="hidden" name="idBio" id="idBio">
                                 <video name="bio" id="bio" width="227" height="170" style="border:1px solid #ccc;" autoplay></video><br>
                                 <canvas name="can" id="can" width="227" height="170" style="border:1px solid #ccc;"></canvas>
+                            </div>
+                            <div class="form-group card-body">
                                 <button id="biometricc" name="biometricc" class="btn btn-outline-info">Tomar Biometrico</button>
                                 <button id="accept" name="accept" class="btn btn-outline-success">Aceptar</button>
                                 <button id="refresh" name="refresh" class="btn btn-outline-primary">Refrescar</button>
                                 <button type="button" id="cancel" class="btn btn-outline-danger" data-dismiss="modal">Cancelar</button>
-                                <input type="hidden" name="idBio" id="idBio">
                             </div>
                     </div>
                 </form>

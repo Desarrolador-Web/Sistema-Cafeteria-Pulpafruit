@@ -90,29 +90,34 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     btn_save.onclick = function () {
-        // Selecciona los elementos necesarios
-        biometric();
-        const metodo = document.getElementById('metodo');
 
-        // Obtén el valor del select
-        const metodoSeleccionado = metodo.value;
+        let metodo = document.getElementById('metodo');
+        let metodoSeleccionado = metodo.value;
+        let cliente = id_cliente.value;
 
-        // Verifica si el valor seleccionado es "Credito"
-        if (metodoSeleccionado === 'Credito') {
-            // Abre el modal si es "Crédito"
-            const creditModal = new bootstrap.Modal(document.getElementById('sales-modal'));
-            creditModal.show();
-            return; // Detén la ejecución aquí para no continuar con el flujo normal
+        if (cliente) {
+            biometric();
+        } else {
+            console.error("Error debe tener un producto");
+        };
+        
+        if (cliente) {
+            if (metodoSeleccionado === "Credito") {
+                let creditModal = new bootstrap.Modal(document.getElementById('sales-modal'));
+                creditModal.show();
+                return;
+            } else {
+                console.error("undefined");
+            }
+        }else{
+            console.error("aaaaa")
         }
 
-        // Si no es "Crédito", ejecuta el flujo normal
         console.log("Método seleccionado no es crédito. Continuando con el flujo normal...");
         realizarAccionNormal(metodoSeleccionado);
 
-        // Simula una función para las otras opciones
         function realizarAccionNormal(metodo) {
             console.log(`Realizando acción para el método: ${metodo}`);
-            // Aquí puedes agregar el código que quieras para el flujo normal
         }
 
         axios.post(ruta + 'controllers/ventasController.php?option=saveventa', {
@@ -188,7 +193,7 @@ function biometric() {
                 console.error('Error al activar biometrico: ', err);
             });
 
-        return; // Detén la ejecución aquí para no continuar con el flujo normal
+        return;
     }
 }
 
