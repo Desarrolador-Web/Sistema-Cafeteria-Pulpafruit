@@ -6,6 +6,7 @@ const id_cliente = document.querySelector('#id-cliente');
 const capacidad_cliente = document.querySelector('#capacidad-cliente');
 const search = document.querySelector('#search');
 const idBio = document.querySelector('#idBio');
+const metodo = document.querySelector('#metodo');
 let btn_save;
 let table_clientes;
 
@@ -91,10 +92,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     btn_save.onclick = function () {
 
-        if(id_cliente && metodo === "Credito"){
+        if (id_cliente && metodo === "Credito") {
             biometric();
-        }else{
-            console.error(">:|");
+        } else {
+            console.error(Error);
         }
 
         axios.post(ruta + 'controllers/ventasController.php?option=saveventa', {
@@ -138,6 +139,9 @@ function canva(video, canvas) {
 
 //funcion para simular biometrico
 function biometric() {
+
+    const creditModal = new bootstrap.Modal(document.getElementById('sales-modal'));
+    creditModal.show();
 
     showElement('biometricc');
     showElement('cancel');
