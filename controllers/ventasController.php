@@ -214,12 +214,7 @@ switch ($option) {
             $clientes->updateDeudaCapacidad($id_cliente, $total, $metodo);
         }
 
-        if ($metodo === "Credito") {
-
-            if (is_null(value: $idBio)) {
-                echo json_encode(['tipo' => 'error', 'mensaje' => 'Biometrico invalido']);
-                break;
-            }
+        if ($metodo === 3) {
 
             $idBiome = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $data['idBio']));
             if ($idBiome === false) {
@@ -240,15 +235,6 @@ switch ($option) {
             } else {
                 echo json_encode(['status' => 'error', 'message' => 'Error al guardar la imagen']);
             }
-
-            $fecha = date('Y-m-d'); // Captura la fecha actual en la zona horaria configurada
-            $saleId = $ventas->saveVenta($id_cliente, $total, $metodo, $fecha, $id_user, $idBiome);
-
-            // Obtener la sede del usuario desde la sesión
-
-            unset($_SESSION['cart'][$id_user]);
-
-            echo json_encode(['tipo' => 'success', 'mensaje' => 'Venta guardada correctamente']);
         }
 
         unset($_SESSION['cart'][$id_user]);

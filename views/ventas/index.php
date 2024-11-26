@@ -56,7 +56,7 @@
                             <tr>
                                 <th scope="col">Nombre</th>
                                 <th scope="col">Precio</th>
-                                <th scope="col">Cant</th>
+                                <th scope="col">Cantidad</th>
                                 <th scope="col"></th>
                                 <th></th>
                             </tr>
@@ -93,31 +93,29 @@
     </div>
 
     <!--Modal biometrico -->
-    <div id="sales-modal" class="modal fade card" role="dialog" data-backdrop="static" data-keyboard="false" style="width: 40rem;">
+    <div id="sales-modal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <form role="form" method="post" enctype="multipart/form-data" autocomplete="off">
-                    <div class="modal-header " style="background-color:white; color:rgb(78, 115, 223); ">
+            <form role="form" method="post" enctype="multipart/form-data" autocomplete="off">
+                <div class="modal-header " style="background-color:rgb(78, 115, 223); color:#ccc; ">
+                    <h2 class="modal-title">Biometrico</h2>
+                    <button type="button" class="close" data-dismiss="modal" style="cursor: pointer;">&times;</button>                    
+                </div>
+                <div class="modal-content">
 
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <div class="card-header" style="background-color:rgb(78, 115, 223);">
-                            <h2 class="card-title" style="color: #ccc;">Biometrico</h2>
+                    <form>
+                        <div class="form-group card-body" style="display:grid; place-items:center; margin: auto;">
+                            <input class="card-img-top" type="hidden" name="idBio" id="idBio">
+                            <video name="bio" id="bio" width="227" height="170" style="border:1px solid #ccc;" autoplay></video><br>
+                            <canvas name="can" id="can" width="227" height="170" style="border:1px solid #ccc;"></canvas>
                         </div>
-                        <form>
-                            <div class="form-group card-body">
-                                <input class="card-img-top" type="hidden" name="idBio" id="idBio">
-                                <video name="bio" id="bio" width="227" height="170" style="border:1px solid #ccc;" autoplay></video><br>
-                                <canvas name="can" id="can" width="227" height="170" style="border:1px solid #ccc;"></canvas>
-                            </div>
-                            <div class="form-group card-body">
-                                <button id="biometricc" name="biometricc" class="btn btn-outline-info">Tomar Biometrico</button>
-                                <button id="accept" name="accept" class="btn btn-outline-success">Aceptar</button>
-                                <button id="refresh" name="refresh" class="btn btn-outline-primary">Refrescar</button>
-                                <button type="button" id="cancel" class="btn btn-outline-danger" data-dismiss="modal">Cancelar</button>
-                            </div>
-                    </div>
-                </form>
-            </div>
+                        <div class="form-group card-body" style="display:flex; justify-content: center; align-items: center; gap: 10px;">
+                            <button id="biometricc" name="biometricc" class="btn btn-outline-info">Tomar Biometrico</button>
+                            <button id="accept" name="accept" class="btn btn-outline-success">Aceptar</button>
+                            <button id="refresh" name="refresh" class="btn btn-outline-primary">Refrescar</button>
+                            <button type="button" id="cancel" class="btn btn-outline-danger" data-dismiss="modal">Cancelar</button>
+                        </div>  
+                    </form>
+                </div>
         </div>
     </div>
 
@@ -130,9 +128,9 @@
                             <table class="table table-striped table-hover" id="table_venta" style="width: 100%;">
                                 <thead class="thead-dark">
                                     <tr>
-                                        <th scope="col">Barcode</th>
+                                        <th scope="col">Código de barras</th>
                                         <th scope="col">Nombre</th>
-                                        <th scope="col">Stock</th>
+                                        <th scope="col">Cantidad</th>
                                         <th scope="col">Precio</th>
                                         <th>Accion</th>
                                     </tr>
