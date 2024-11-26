@@ -1,29 +1,29 @@
+
 <?php
 require_once '../models/clientes.php';
-$option = (empty($_GET['option'])) ? '' : $_GET['option'];
-$clientes = new ClientesModel();
+
+$option = $_GET['option'] ?? '';
+$clientesModel = new ClientesModel();
+
 switch ($option) {
-
     case 'listar':
-        $data = $clientes->getClients();
-        for ($i = 0; $i < count($data); $i++) {
-            $data[$i]['id_cliente'] = $data[$i]['id_cliente'] ?? '';
-            $data[$i]['nombres'] = $data[$i]['nombres'] ?? '';
-            $data[$i]['apellidos'] = $data[$i]['apellidos'] ?? '';
-            $data[$i]['area'] = $data[$i]['area'] ?? '';
-            $data[$i]['sueldo'] = $data[$i]['sueldo'] ?? '';
-        }
-        echo json_encode($data);
-        break;
+        try {
+            $datos = $clientesModel->listarInformacionCajas();
 
-    case 'listar-clientes':
-        $result = $clientes->getClients();
-        echo json_encode($result);
+            // Procesar datos para manejar valores NULL
+            $datosProcesados = array_map(function($fila) {
+                $fila['fecha_cierre'] = $fila['fecha_cierre'] ?? null; // Convertir NULL a null explícito
+                $fila['valor_cierre'] = $fila['valor_cierre'] ?? null; // Convertir NULL a null explícito
+                return $fila;
+            }, $datos);
+
+            echo json_encode(['tipo' => 'success', 'data' => $datosProcesados]);
+        } catch (Exception $e) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => $e->getMessage()]);
+        }
         break;
 
     default:
-        echo json_encode(['error' => 'Invalid option']);
+        echo json_encode(['tipo' => 'error', 'mensaje' => 'Opción no válida']);
         break;
-    
-} 
-
+}
