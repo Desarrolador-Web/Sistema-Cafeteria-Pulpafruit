@@ -16,6 +16,7 @@ switch ($option) {
                 $_SESSION['nombre'] = $result['nombres'] . ' ' . $result['apellidos'];
                 $_SESSION['correo'] = $result['correo'];
                 $_SESSION['idusuario'] = $result['id_usuario']; 
+                $_SESSION['rol'] = $result['rol']; // Guardar el rol en la sesión
                 $res = array('tipo' => 'success', 'mensaje' => 'ok');
             } else {
                 $res = array('tipo' => 'error', 'mensaje' => 'CONTRASEÑA INCORRECTA');
@@ -23,6 +24,7 @@ switch ($option) {
         }
         echo json_encode($res);
         break;
+    
 
     case 'listar':
         $data = $usuarios->getUsers();
@@ -37,6 +39,7 @@ switch ($option) {
         }
         echo json_encode($data);
         break;
+
         
     case 'save':
         $cedula = $_POST['cedula']; 
@@ -44,13 +47,14 @@ switch ($option) {
         $apellidos = $_POST['apellidos'];
         $correo = $_POST['correo'];
         $clave = $_POST['clave'];
-        $ubicacion = $_POST['ubicacion']; // Capturar el valor del select 'ubicacion'
+        $rol = $_POST['ubicacion']; 
         $id_user = $_POST['id_user'];
+    
         if ($id_user == '') {
             $consult = $usuarios->comprobarCedula($cedula);
             if (empty($consult)) {
                 $hash = password_hash($clave, PASSWORD_DEFAULT);
-                $result = $usuarios->saveUser($cedula, $nombres, $apellidos, $correo, $hash, $ubicacion);
+                $result = $usuarios->saveUser($cedula, $nombres, $apellidos, $correo, $hash, $rol); 
                 if ($result) {
                     $res = array('tipo' => 'success', 'mensaje' => 'USUARIO REGISTRADO');
                 } else {
@@ -60,7 +64,7 @@ switch ($option) {
                 $res = array('tipo' => 'error', 'mensaje' => 'LA CÉDULA YA EXISTE');
             }
         } else {
-            $result = $usuarios->updateUser($nombres, $apellidos, $correo, $ubicacion, $id_user);
+            $result = $usuarios->updateUser($nombres, $apellidos, $correo, $rol, $id_user); // Actualizar 'rol'
             if ($result) {
                 $res = array('tipo' => 'success', 'mensaje' => 'USUARIO MODIFICADO');
             } else {
@@ -69,6 +73,8 @@ switch ($option) {
         }
         echo json_encode($res);
         break;
+
+            
     case 'delete':
         $id = $_GET['id'];
         $data = $usuarios->deleteUser($id);
