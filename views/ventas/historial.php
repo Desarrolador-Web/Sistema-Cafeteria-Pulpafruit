@@ -22,7 +22,7 @@
                 <th scope="col">Productos</th>
                 <th scope="col">Cantidad</th>
                 <th scope="col">Precio Unitario</th>
-                <th scope="col">Subtotal</th>
+                <th scope="col">Total</th>
                 <th scope="col">Fecha</th>
                 <th scope="col">Método de pago</th>
                 </tr>

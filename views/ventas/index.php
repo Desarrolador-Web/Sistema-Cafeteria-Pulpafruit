@@ -1,4 +1,4 @@
-<!-- Page Heading -->
+  <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">Nueva venta</h1>
 </div>
@@ -57,7 +57,7 @@
                                 <th scope="col">Nombre</th>
                                 <th scope="col">Precio</th>
                                 <th scope="col">Cant</th>
-                                <th scope="col">SubTotal</th>
+                                <th scope="col"></th>
                                 <th></th>
                             </tr>
                         </thead>

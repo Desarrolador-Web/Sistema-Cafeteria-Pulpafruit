@@ -17,6 +17,14 @@ class Ventas {
         return $consult->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getProductsBySede($id_sede) {
+        // Solo muestra productos que correspondan a la sede y estén activos (estado_producto = 1)
+        $consult = $this->pdo->prepare("SELECT * FROM cf_producto WHERE estado_producto = 1 AND id_caja = ?");
+        $consult->execute([$id_sede]);
+        return $consult->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+
     // Obtener un producto por su ID
     public function getProduct($id_producto) {
         $query = "SELECT * FROM cf_producto WHERE id_producto = ?";
@@ -40,15 +48,29 @@ class Ventas {
     }
 
     // Guardar los detalles de una venta
-    public function saveDetalle($id_producto, $id_venta, $cantidad, $precio) {
-        $consult = $this->pdo->prepare("INSERT INTO cf_detalle_ventas (id_producto, id_ventas, cantidad, precio) VALUES (?, ?, ?, ?)");
-        return $consult->execute([$id_producto, $id_venta, $cantidad, $precio]);
+    public function saveDetalle($id_producto, $id_venta, $cantidad, $precio, $id_caja) {
+        $consult = $this->pdo->prepare("INSERT INTO cf_detalle_ventas (id_producto, id_ventas, cantidad, precio, id_caja) VALUES (?, ?, ?, ?, ?)");
+        return $consult->execute([$id_producto, $id_venta, $cantidad, $precio, $id_caja]);
     }
-
-    // Actualizar el stock de un producto
+    
+    // Método para ctualizar el stock de un producto 
     public function updateStock($stock, $id_producto) {
         $consult = $this->pdo->prepare("UPDATE cf_producto SET existencia = ? WHERE id_producto = ?");
         return $consult->execute([$stock, $id_producto]);
+    }
+
+    // Obtener la cantidad de compra inicial de un producto
+    public function getCantidadCompraInicial($id_producto) {
+        $consult = $this->pdo->prepare("
+            SELECT TOP 1 dc.cantidad 
+            FROM cf_detalle_compras dc
+            JOIN cf_compras c ON dc.id_compra = c.id_compra
+            WHERE dc.id_producto = ?
+            ORDER BY c.fecha_compra DESC
+        ");
+        $consult->execute([$id_producto]);
+        $result = $consult->fetch(PDO::FETCH_ASSOC);
+        return $result ? $result['cantidad'] : null;
     }
 
     // Actualizar la deuda y capacidad del cliente

@@ -15,14 +15,34 @@ $id_user = $_SESSION['idusuario'];
 $option = isset($_GET['option']) ? $_GET['option'] : '';
 
 switch ($option) {
+    
     case 'listar':
-        $result = $ventas->getProducts();
-        foreach ($result as $i => $item) {
-            $result[$i]['addcart'] = '<a href="#" class="btn btn-primary btn-sm" onclick="addCart(' . $item['id_producto'] . ')"><i class="fas fa-cart-plus"></i></a>';
-            $result[$i]['cantidad'] = '<span class="badge badge-info">' . $item['existencia'] . '</span>';
+        if (isset($_SESSION['id_sede'])) {
+            $id_sede = $_SESSION['id_sede'];
+            $result = $ventas->getProductsBySede($id_sede);
+            
+            foreach ($result as $i => $item) {
+                // Obtener cantidad de compra inicial
+                $cantidadCompraInicial = $ventas->getCantidadCompraInicial($item['id_producto']);
+                
+                if ($cantidadCompraInicial !== null) {
+                    // Calcular porcentaje del stock actual en base a la cantidad de compra inicial
+                    $porcentajeStock = ($item['existencia'] / $cantidadCompraInicial) * 100;
+                    $result[$i]['porcentajeStock'] = $porcentajeStock; // se añade el porcentaje
+                } else {
+                    $result[$i]['porcentajeStock'] = 100; // stock completo si no se encuentra el valor inicial
+                }
+    
+                // Añadir botón de carrito sin modificar `cantidad`
+                $result[$i]['addcart'] = '<a href="#" class="btn btn-primary btn-sm" onclick="addCart(' . $item['id_producto'] . ')"><i class="fas fa-cart-plus"></i></a>';
+            }
+            echo json_encode($result);
+        } else {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'No se ha seleccionado ninguna sede.']);
         }
-        echo json_encode($result);
         break;
+    
+    
 
     case 'addcart':
         $id_product = $_GET['id'];
@@ -120,20 +140,20 @@ switch ($option) {
 
     case 'saveventa':
         $data = json_decode(file_get_contents('php://input'), true);
-
+    
         if (is_null($data)) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Datos de entrada inválidos']);
             break;
         }
-
+    
         $id_cliente = isset($data['idCliente']) ? $data['idCliente'] : null;
         $metodo = isset($data['metodo']) ? $data['metodo'] : null;
-
+    
         if (is_null($id_cliente) || is_null($metodo)) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Datos de cliente o método de pago no válidos']);
             break;
         }
-
+    
         switch ($metodo) {
             case 'Efectivo':
                 $metodo = 1;
@@ -148,19 +168,19 @@ switch ($option) {
                 echo json_encode(['tipo' => 'error', 'mensaje' => 'Método de pago no válido']);
                 exit;
         }
-
+    
         if (!isset($_SESSION['cart'][$id_user])) {
             $_SESSION['cart'][$id_user] = [];
         }
-
+    
         if (empty($_SESSION['cart'][$id_user])) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'CARRITO VACIO']);
             break;
         }
-
+    
         $total = 0;
         $stock_insuficiente = false;
-
+    
         foreach ($_SESSION['cart'][$id_user] as $id_product => $item) {
             $product = $ventas->getProduct($id_product);
             if ($item['cantidad'] > $product['existencia']) {
@@ -169,41 +189,46 @@ switch ($option) {
             }
             $total += $item['precio'] * $item['cantidad'];
         }
-
+    
         if ($stock_insuficiente) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'STOCK INSUFICIENTE']);
             break;
         }
-
+    
         $cliente = $clientes->getClienteById($id_cliente);
         if (!$cliente) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'CLIENTE NO ENCONTRADO']);
             break;
         }
-
+    
         if ($metodo == 3 && $cliente['capacidad'] < $total) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'CAPACIDAD DE CRÉDITO INSUFICIENTE']);
             break;
         }
-
+    
         $fecha = date('Y-m-d'); // Captura la fecha actual en la zona horaria configurada
         $saleId = $ventas->saveVenta($id_cliente, $total, $metodo, $fecha, $id_user);
+    
+        // Obtener la sede del usuario desde la sesión
+        $id_sede = $_SESSION['id_sede'];
+    
         foreach ($_SESSION['cart'][$id_user] as $id_product => $item) {
-            $ventas->saveDetalle($id_product, $saleId, $item['cantidad'], $item['precio']);
+            $ventas->saveDetalle($id_product, $saleId, $item['cantidad'], $item['precio'], $id_sede);
             $product = $ventas->getProduct($id_product);
             $stock = $product['existencia'] - $item['cantidad'];
             $ventas->updateStock($stock, $id_product);
         }
-
+    
         // Solo actualizar la deuda y capacidad del cliente si el método de pago es 3 (Credito)
         if (isset($metodo) && $metodo == 3) {
             $clientes->updateDeudaCapacidad($id_cliente, $total, $metodo);
         }
-
+    
         unset($_SESSION['cart'][$id_user]);
-
+    
         echo json_encode(['tipo' => 'success', 'mensaje' => 'Venta guardada correctamente']);
         break;
+        
 
     case 'searchbarcode':
         $barcode = $_GET['barcode'];

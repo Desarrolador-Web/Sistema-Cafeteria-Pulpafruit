@@ -19,11 +19,9 @@
                         <th scope="col">Productos</th>
                         <th scope="col">Total</th>
                         <th scope="col">Fecha</th>
-                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
-
                 </tbody>
             </table>
         </div>
