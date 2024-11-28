@@ -91,6 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     btn_save.onclick = function () {
+        datos();
 
         if (id_cliente && metodo === "Credito") {
             biometric();
@@ -264,6 +265,28 @@ function biometric() {
                 console.log(error);
             });
     });
+
+}
+
+function datos() {
+    let tabla = document.querySelector("#table_temp");
+    let productos = [];
+    let rows = tabla.querySelectorAll("tr");
+
+    rows.forEach((row) => {
+        let columns = row.querySelectorAll("td");
+        if (columns.length >= 2) {
+            let producto = columns[0].textContent.trim();
+            let precio = columns[1].querySelector("input");
+            let cantidad = columns[2].querySelector("input");
+            let precioProducto = precio ? precio.value.trim() : "0";
+            let cantidadProducto = cantidad ? cantidad.value.trim() : "0";
+            productos.push(`${producto} - Precio: ${precioProducto} - Cantidad: ${cantidadProducto}`);
+        }
+    });
+    
+    alert("Nombre:" + " " + nombre_cliente.value + '\n' + "Productos:" + "\n" + productos.join("\n")
+     + "\n"+"Metodo de pago: "+" "+metodo.value);
 
 }
 
