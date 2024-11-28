@@ -1,6 +1,9 @@
 <?php
 require_once 'config.php';
 require_once 'controllers/plantillaController.php';
+require_once 'models/usuarios.php';
+$usuario= new UsuariosModel();
+$usuario->validateSession();
 $plantilla = new Plantilla();
 date_default_timezone_set('America/Bogota');
 
