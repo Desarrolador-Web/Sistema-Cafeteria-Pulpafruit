@@ -93,31 +93,31 @@ document.addEventListener('DOMContentLoaded', function () {
     btn_save.onclick = function () {
         datos();
 
-        if (id_cliente && metodo === "Credito") {
-            biometric();
-        } else {
-            console.error(Error);
-        }
+        // if (id_cliente && metodo === "Credito") {
+        //     biometric();
+        // } else {
+        //     console.error(Error);
+        // }
 
         axios.post(ruta + 'controllers/ventasController.php?option=saveventa', {
             idCliente: id_cliente.value,
             metodo: metodo.value
 
         })
-            .then(function (response) {
-                const info = response.data;
-                message(info.tipo, info.mensaje);
-                if (info.tipo === 'success') {
-                    updateStock();
-                    temp(); // Actualiza la tabla temporal y el total
+        // .then(function (response) {
+        //     const info = response.data;
+        //     message(info.tipo, info.mensaje);
+        //     if (info.tipo === 'success') {
+        //         updateStock();
+        //         temp(); // Actualiza la tabla temporal y el total
 
-                    // Reiniciar los formularios
-                    resetFormularios();
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+        //         // Reiniciar los formularios
+        //         resetFormularios();
+        //     }
+        // })
+        // .catch(function (error) {
+        //     console.log(error);
+        // });
 
     };
 });
@@ -268,27 +268,60 @@ function biometric() {
 
 }
 
+//Funcionalidad para quemar los datos ingresados por el usuario en una 
 function datos() {
+    //tabla de donde se va a extraer los datos de la venta
     let tabla = document.querySelector("#table_temp");
-    let productos = [];
-    let rows = tabla.querySelectorAll("tr");
+    let productos = [];//array en donde se van a almacenar los productos que desee comprar el cliente
+    let rows = tabla.querySelectorAll("tr");//se seleccionaran todas las filas de la tabla
+    let cantidad = document.querySelector("#cantidad");
 
+    //recorre los elementos que se encuentran en la variable rows
     rows.forEach((row) => {
-        let columns = row.querySelectorAll("td");
+        let columns = row.querySelectorAll("td");//se seleccionan todas las celdas
+        //se asegura que se tenga mas de dos celdas en la fila de la tabla
         if (columns.length >= 2) {
-            let producto = columns[0].textContent.trim();
-            let precio = columns[1].querySelector("input");
-            let cantidad = columns[2].querySelector("input");
-            let precioProducto = precio ? precio.value.trim() : "0";
-            let cantidadProducto = cantidad ? cantidad.value.trim() : "0";
-            productos.push(`${producto} - Precio: ${precioProducto} - Cantidad: ${cantidadProducto}`);
+            let producto = columns[0].textContent.trim();//se obtiene los datos de la primera celda
+            let precio = document.querySelector("#precio");
+
+            // let cantidadProducto = cantidad ? cantidad.value.trim() : "0";//trim me sirve para eliminar espacios en blanco al principio y al final del texto
+            productos.push(producto + '- Precio:' + precio.value + '- Cantidad:' + cantidad.value); //se añade a una cadena los datos que tendra el array
         }
     });
-    
-    alert("Nombre:" + " " + nombre_cliente.value + '\n' + "Productos:" + "\n" + productos.join("\n")
-     + "\n"+"Metodo de pago: "+" "+metodo.value);
 
+    //array para almacenar errores
+    let errores = [];
+
+    let Max = 100;
+
+    //se validan si los campos estan llenos de no ser así me bota un mensaje
+    if (!nombre_cliente.value) errores.push("Nombre del cliente");//push agrega elementos a un array
+    if (!productos || productos.length === 0) errores.push("Productos");
+    if (!metodo.value) errores.push("Método de pago");
+    if (cantidad && cantidad.value > Max) errores.push("La maxima cantidad que puede agregar al carrito es de " + Max);
+    if (cantidad && cantidad.value < 1) errores.push("La minima cantidad que puede agregar al carrito es de 1");
+
+    //valida si existen errores de no ser asi ejecuta el mensaje succes, 
+    //si hay errores me va a salir un mensaje de error indicandome cual es el campo que me falta
+    if (errores.length === 0) {
+        message('success', "Nombre:" + " " + nombre_cliente.value + "\n" + "Productos:" + "\n" + productos.join("\n")
+            + "\n" + "Metodo de pago: " + " " + metodo.value);
+
+        // updateStock();
+
+        // temp(); // Actualiza la tabla temporal y el total
+
+        // // Reiniciar los formularios
+        resetFormularios();
+        // window.location.reload();
+
+    } else {
+
+        message('error', 'ERROR: ' + ' ' + errores.join(', '));
+        return;
+    }
 }
+
 
 function resetFormularios() {
     // Reiniciar campos del cliente
@@ -331,8 +364,8 @@ function temp() {
                 const subtotal = parseFloat(pro.precio_venta) * parseInt(pro.cantidad);
                 tempProductos += `<tr>
                     <td>${pro.descripcion}</td>
-                    <td><input class="form-control" type="number" value="${pro.precio_venta}" onchange="addPrecio(event, ${pro.id_producto})" /></td>
-                    <td><input class="form-control" type="number" value="${pro.cantidad}" onchange="addCantidad(event, ${pro.id_producto})" /></td>
+                    <td><input class="form-control" id="precio" type="number" value="${pro.precio_venta}" readonly onchange="addPrecio(event, ${pro.id_producto})" /></td>
+                    <td><input class="form-control" id="cantidad" type="number" value="${pro.cantidad}" MIN="1" MAX="100" onchange="addCantidad(event, ${pro.id_producto})" /></td>
                     <td>${subtotal.toFixed(2)}</td>
                     <td><i class="fas fa-eraser text-danger" onclick="deleteProducto(${pro.id_producto})"></i></td>
                 </tr>`;

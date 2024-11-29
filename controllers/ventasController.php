@@ -203,7 +203,7 @@ switch ($option) {
         $id_sede = $_SESSION['id_sede'];
 
         foreach ($_SESSION['cart'][$id_user] as $id_product => $item) {
-            $ventas->saveDetalle($id_product, $saleId, $item['cantidad'], $item['precio'], $id_sede, $idBiome);
+            $ventas->saveDetalle($id_product, $saleId, $item['cantidad'], $item['precio'], $id_sede, $idBiome=null);
             $product = $ventas->getProduct($id_product);
             $stock = $product['existencia'] - $item['cantidad'];
             $ventas->updateStock($stock, $id_product);
@@ -285,14 +285,14 @@ switch ($option) {
         echo json_encode($result);
         break;
 
-    // case 'logout':
-    //     // Destruir la sesión
-    //     session_destroy();
+        // case 'logout':
+        //     // Destruir la sesión
+        //     session_destroy();
 
-    //     // Redirigir a la página principal
-    //     header("Location: http://localhost/sistema-cafeteria-pulpafruit/");
-    //     exit();
-    //     break;
+        //     // Redirigir a la página principal
+        //     header("Location: http://localhost/sistema-cafeteria-pulpafruit/");
+        //     exit();
+        //     break;
 
 
     default:
