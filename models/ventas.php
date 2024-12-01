@@ -37,8 +37,12 @@ class Ventas {
     public function getBarcode($barcode) {
         $consult = $this->pdo->prepare("SELECT * FROM cf_producto WHERE codigo_producto = ?");
         $consult->execute([$barcode]);
-        return $consult->fetch(PDO::FETCH_ASSOC);
+        $result = $consult->fetch(PDO::FETCH_ASSOC);
+    
+        var_dump("Producto encontrado: ", $result); // Depuración
+        return $result;
     }
+    
 
     // Guardar una nueva venta
     public function saveVenta($id_cliente, $total, $metodo, $fecha, $id_user) {

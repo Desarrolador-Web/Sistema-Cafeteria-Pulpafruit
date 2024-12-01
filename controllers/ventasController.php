@@ -233,18 +233,24 @@ switch ($option) {
     case 'searchbarcode':
         $barcode = $_GET['barcode'];
         $producto = $ventas->getBarcode($barcode);
+    
         if (!$producto) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'PRODUCTO NO EXISTE']);
         } else {
             if (!isset($_SESSION['cart'][$id_user][$producto['id_producto']])) {
                 $_SESSION['cart'][$id_user][$producto['id_producto']] = ['cantidad' => 0, 'precio' => $producto['precio_venta']];
             }
-
+    
             $_SESSION['cart'][$id_user][$producto['id_producto']]['cantidad']++;
-
-            echo json_encode(['tipo' => 'success', 'mensaje' => 'PRODUCTO AGREGADO AL CARRITO', 'producto' => $producto]);
+    
+            echo json_encode([
+                'tipo' => 'success',
+                'mensaje' => 'Producto agregado correctamente',
+                'producto' => $producto
+            ]);
         }
         break;
+                
 
     case 'listar-clientes':
         $result = $clientes->getClients();

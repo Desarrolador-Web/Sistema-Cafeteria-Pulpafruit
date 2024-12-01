@@ -75,30 +75,32 @@ document.addEventListener('DOMContentLoaded', function () {
         $('#modal-cliente').modal('hide');
     });
 
-    search.onkeyup = function (e) {
+    search.addEventListener('keyup', function (e) {
         if (e.key === "Enter") {
-            if (e.target.value == '') {
+            if (e.target.value.trim() === '') {
                 message('error', 'INGRESE CÓDIGO DE BARRAS');
             } else {
-                axios.get(ruta + 'controllers/ventasController.php?option=searchbarcode&barcode=' + e.target.value)
+                axios.get(ruta + 'controllers/ventasController.php?option=searchbarcode&barcode=' + e.target.value.trim())
                     .then(function (response) {
-                        const info = response.data;
-                        search.value = '';
-                        message(info.tipo, info.mensaje);
-                        if (info.tipo === 'success') {
-                            const producto = info.producto;
-                            addCart(producto.id_producto);
-                        }
-                        updateStock();
-                        temp(); // Actualiza la tabla temporal y el total
+                        // Suponemos que si hay una respuesta, el producto se encontró
+                        console.log("Respuesta del servidor: ", response.data); // Depuración
+                        message('success', 'Producto agregado correctamente al carrito');
+    
+                        // Limpieza y actualizaciones
+                        search.value = ''; // Limpia el campo de búsqueda
+                        updateStock(); // Actualiza stock
+                        temp(); // Actualiza carrito
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        console.error("Error en la solicitud: ", error); // Depuración
+                        message('error', 'Ocurrió un error al procesar la solicitud');
                     });
             }
         }
-    };
-
+    });
+    
+    
+            
     btn_save.onclick = function () {
         axios.post(ruta + 'controllers/ventasController.php?option=saveventa', {
             idCliente: id_cliente.value,
