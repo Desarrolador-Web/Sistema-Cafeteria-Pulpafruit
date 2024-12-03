@@ -32,15 +32,15 @@ if (!empty($_GET['pagina'])) {
 <body id="page-top" class="<?php echo ($mini) ? 'sidebar-toggled' : ''; ?>">
 
     <!-- Page Wrapper -->
-    <div id="wrapper">
+    <div id="wrapper" >
 
         <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion <?php echo ($mini) ? 'toggled' : ''; ?>" id="accordionSidebar">
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion <?php echo ($mini) ? 'toggled' : ''; ?>" id="accordionSidebar" style="position: fixed;z-index: 1;">
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="plantilla.php">
                 <div class="sidebar-brand-icon rotate-n-15">
-                    <img src="assets/img/logo.png" alt="LOGO-PNG" width="50">
+                    <img src="../../assets/img/logo.png" alt="LOGO-PNG" width="50">
                 </div>
                 <div class="sidebar-brand-text mx-3"><sup>1.0</sup></div>
             </a>
@@ -165,7 +165,7 @@ if (!empty($_GET['pagina'])) {
 
         </ul>
         <!-- End of Sidebar -->
-
+            
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
 
@@ -211,5 +211,5 @@ if (!empty($_GET['pagina'])) {
                 </nav>
 
                 <div class="container-fluid">
-
+        
 

@@ -10891,6 +10891,8 @@ a:focus {
 }
 
 #wrapper #content-wrapper {
+    margin-left: 220px;
+    padding: auto;
     background-color: #f8f9fc;
     width: 100%;
     overflow-x: hidden
