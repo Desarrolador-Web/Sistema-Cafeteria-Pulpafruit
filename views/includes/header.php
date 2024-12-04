@@ -21,22 +21,22 @@
     <link rel="stylesheet" type="text/css" href="<?php echo RUTA . 'assets/'; ?>css/datatables.min.css" />
     <link rel="stylesheet" type="text/css" href="<?php echo RUTA . 'assets/'; ?>css/dataTables.dateTime.min.css" />
 </head>
-<?php $mini = false;
-if (!empty($_GET['pagina'])) {
-    if ($_GET['pagina'] == 'ventas' || $_GET['pagina'] == 'compras') {
-        $mini = true;
-    }
-}
-?>
+
 
 <body id="page-top" class="<?php echo ($mini) ? 'sidebar-toggled' : ''; ?>">
 
     <!-- Page Wrapper -->
-    <div id="wrapper" >
+    <div id="wrapper">
 
         <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion <?php echo ($mini) ? 'toggled' : ''; ?>" id="accordionSidebar" style="position: fixed;z-index: 1;">
-
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion <?php echo ($mini) ? 'toggled' : ''; ?>" id="accordionSidebar" style="position: fixed;z-index: 1; width: 200px; height: 100%;">
+            <?php $mini = false;
+            if (!empty($_GET['pagina'])) {
+                if ($_GET['pagina'] == 'ventas' || $_GET['pagina'] == 'compras') {
+                    $mini = true;
+                }
+            }
+            ?>
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="plantilla.php">
                 <div class="sidebar-brand-icon rotate-n-15">
@@ -103,7 +103,7 @@ if (!empty($_GET['pagina'])) {
             <?php if (!empty($nueva_compra) || !empty($compras)) { ?>
                 <!-- Divider -->
                 <hr class="sidebar-divider d-none d-md-block">
-                <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'compras' || !empty($_GET['pagina'])  && $_GET['pagina'] == 'historial_compras') ? 'bg-gradient-info' : ''; ?>">
+                <li class="nav-item  <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'compras' || !empty($_GET['pagina'])  && $_GET['pagina'] == 'historial_compras') ? 'bg-gradient-info' : ''; ?>">
                     <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCompra" aria-expanded="true" aria-controls="collapseCompra">
                         <i class="fas fa-cart-plus"></i>
                         <span>Compras</span>
@@ -147,7 +147,7 @@ if (!empty($_GET['pagina'])) {
             <?php } ?>
 
 
-            <?php if (!empty($configuracion)) { ?> 
+            <?php if (!empty($configuracion)) { ?>
 
                 <!-- <hr class="sidebar-divider d-none d-md-block">
 
@@ -157,15 +157,15 @@ if (!empty($_GET['pagina'])) {
                         <span>Configuración</span>
                     </a>
                 </li>  -->
-            <?php } ?> 
+            <?php } ?>
 
-             <!-- <div class="text-center d-none d-md-inline mt-3">
+            <!-- <div class="text-center d-none d-md-inline mt-3">
                 <button class="rounded-circle border-0" id="sidebarToggle"><i class="fas fa-chevron-circle-left text-gray-400"></i></button>
             </div> -->
 
         </ul>
         <!-- End of Sidebar -->
-            
+
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
 
@@ -211,5 +211,3 @@ if (!empty($_GET['pagina'])) {
                 </nav>
 
                 <div class="container-fluid">
-        
-
