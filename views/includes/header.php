@@ -35,7 +35,7 @@
                 if ($_GET['pagina'] == 'ventas' || $_GET['pagina'] == 'compras') {
                     $mini = true;
                 }
-            }
+            };
             ?>
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="plantilla.php">
