@@ -17,7 +17,7 @@
 <footer class="sticky-footer bg-white">
     <div class="container my-auto">
         <div class="copyright text-center my-auto">
-            <span>Copyright &copy; PulpaFruit S.A.S <?php echo date('Y'); ?></span>
+            <span>Derechos de autor &copy; PulpaFruit S.A.S <?php echo date('Y'); ?></span>
         </div>
     </div>
 </footer>
@@ -46,7 +46,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
-                <a class="btn btn-primary" href="<?php echo RUTA . 'controllers/ventasController.php?option=logout'; ?>">Logout</a>
+                <a class="btn btn-primary" href="<?php echo RUTA . 'controllers/usuariosController.php?option=logout'; ?>">Cerrar sesión</a>
             </div>
         </div>
     </div>
