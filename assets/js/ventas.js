@@ -8,7 +8,7 @@ const search = document.querySelector('#search');
 const idBio = document.querySelector('#idBio');
 const metodo = document.querySelector('#metodo');
 let btn_save;
-let table_clientes;
+let table_clientes; 
 
 document.addEventListener('DOMContentLoaded', function () {
     btn_save = document.querySelector('#btn-guardar');
@@ -20,7 +20,18 @@ document.addEventListener('DOMContentLoaded', function () {
         columns: [
             { data: 'codigo_producto' },
             { data: 'descripcion' },
-            { data: 'cantidad' },
+            {
+                data: 'existencia',
+                render: function (data, type, row) {
+                    let colorClass = 'badge-info'; // Azul por defecto
+                    if (row.porcentajeStock <= 10) {
+                        colorClass = 'badge-danger'; // Rojo
+                    } else if (row.porcentajeStock <= 30) {
+                        colorClass = 'badge-warning'; // Amarillo
+                    }
+                    return `<span class="badge ${colorClass}">${data}</span>`;
+                }
+            },
             { data: 'precio_venta' },
             { data: 'addcart' }
         ],
@@ -28,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
             url: 'https://cdn.datatables.net/plug-ins/1.13.1/i18n/es-ES.json'
         }
     });
-
+    
     temp(); // Inicializa la tabla temporal y el total
 
     table_clientes = $('#table_clientes').DataTable({
@@ -103,6 +114,12 @@ document.addEventListener('DOMContentLoaded', function () {
             idCliente: id_cliente.value,
             metodo: metodo.value
 
+<<<<<<< HEAD
+=======
+                // Reinicia los formularios
+                resetFormularios();
+            }
+>>>>>>> 2b805a3ebe61d2e689b0c73d184ebad9a5bf5fa5
         })
         // .then(function (response) {
         //     const info = response.data;

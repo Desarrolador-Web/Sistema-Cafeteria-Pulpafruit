@@ -28,20 +28,24 @@ $proveedor = $permisos->getPermiso(9, $id_user);
 ##### FIN PERMISOS #####
 
 // Verifica si el usuario tiene una caja abierta hoy
-
 $admin = new AdminModel();
 $fechaHoy = date('Y-m-d');
 $cajaAbierta = $admin->checkCajaAbierta($id_user, $fechaHoy);
 
 if ($cajaAbierta) {
     $_SESSION['caja_abierta'] = true;
+    $_SESSION['id_info_caja'] = $cajaAbierta['id_info_caja']; // Guarda el id_info_caja en la sesión
 } else {
     $_SESSION['caja_abierta'] = false;
+    $_SESSION['id_info_caja'] = null; // Limpia id_info_caja si no hay caja abierta
 }
 
-// Carga de la vista principal 
+// Declaración de idInfoCaja para JavaScript (solo una vez)
+echo "<script>const idInfoCaja = " . json_encode($_SESSION['id_info_caja'] ?? null) . ";</script>";
 
+// Carga de la vista principal 
 require_once 'views/includes/header.php';
+
 if (isset($_GET['pagina'])) {
     if (empty($_GET['pagina'])) {
         $plantilla->index();
@@ -80,4 +84,5 @@ if (isset($_GET['pagina'])) {
 } else {
     $plantilla->index();
 }
+
 require_once 'views/includes/footer.php';

@@ -18,20 +18,36 @@ $idBio = isset($data['idBio']) ? $data['idBio'] : null;
 switch ($option) {
 
     case 'listar':
-        // Verifica si el id_sede está en la sesión
         if (isset($_SESSION['id_sede'])) {
             $id_sede = $_SESSION['id_sede'];
-            $result = $ventas->getProductsBySede($id_sede);  // Filtra los productos por sede
+            $result = $ventas->getProductsBySede($id_sede);
+            
             foreach ($result as $i => $item) {
+                // Obtener cantidad de compra inicial
+                $cantidadCompraInicial = $ventas->getCantidadCompraInicial($item['id_producto']);
+                
+                if ($cantidadCompraInicial !== null) {
+                    // Calcular porcentaje del stock actual en base a la cantidad de compra inicial
+                    $porcentajeStock = ($item['existencia'] / $cantidadCompraInicial) * 100;
+                    $result[$i]['porcentajeStock'] = $porcentajeStock; // se añade el porcentaje
+                } else {
+                    $result[$i]['porcentajeStock'] = 100; // stock completo si no se encuentra el valor inicial
+                }
+    
+                // Añadir botón de carrito sin modificar `cantidad`
                 $result[$i]['addcart'] = '<a href="#" class="btn btn-primary btn-sm" onclick="addCart(' . $item['id_producto'] . ')"><i class="fas fa-cart-plus"></i></a>';
-                $result[$i]['cantidad'] = '<span class="badge badge-info">' . $item['existencia'] . '</span>';
             }
             echo json_encode($result);
         } else {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'No se ha seleccionado ninguna sede.']);
         }
         break;
+<<<<<<< HEAD
 
+=======
+    
+    
+>>>>>>> 2b805a3ebe61d2e689b0c73d184ebad9a5bf5fa5
 
     case 'addcart':
         $id_product = $_GET['id'];
