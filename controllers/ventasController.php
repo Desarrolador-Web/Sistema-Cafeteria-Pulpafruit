@@ -291,7 +291,7 @@ switch ($option) {
         break;
 
     case 'listar-clientes':
-        $result = $clientes->getClient();
+        $result = $clientes->getClients();
         echo json_encode($result);
         break;
 
