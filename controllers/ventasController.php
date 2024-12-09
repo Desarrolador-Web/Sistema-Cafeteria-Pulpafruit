@@ -302,7 +302,7 @@ switch ($option) {
         //     // Redirigir a la página principal
         //     header("Location: http://localhost/sistema-cafeteria-pulpafruit/");
         //     exit();
-        //     break;
+        //     break;nmnm
 
 
     default:
