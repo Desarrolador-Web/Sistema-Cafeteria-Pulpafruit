@@ -42,12 +42,6 @@ switch ($option) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'No se ha seleccionado ninguna sede.']);
         }
         break;
-<<<<<<< HEAD
-
-=======
-    
-    
->>>>>>> 2b805a3ebe61d2e689b0c73d184ebad9a5bf5fa5
 
     case 'addcart':
         $id_product = $_GET['id'];

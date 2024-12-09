@@ -17,12 +17,7 @@ switch ($option) {
             if (password_verify($password, $result['clave'])) {
                 $_SESSION['nombre'] = $result['nombres'] . ' ' . $result['apellidos'];
                 $_SESSION['correo'] = $result['correo'];
-<<<<<<< HEAD
                 $_SESSION['idusuario'] = $result['id_usuario'];
-=======
-                $_SESSION['idusuario'] = $result['id_usuario']; 
-                $_SESSION['rol'] = $result['rol']; // Guardar el rol en la sesión
->>>>>>> 2b805a3ebe61d2e689b0c73d184ebad9a5bf5fa5
                 $res = array('tipo' => 'success', 'mensaje' => 'ok');
             } else {
                 $res = array('tipo' => 'error', 'mensaje' => 'CONTRASEÑA INCORRECTA');
@@ -47,10 +42,6 @@ switch ($option) {
         echo json_encode($data);
         break;
 
-<<<<<<< HEAD
-=======
-        
->>>>>>> 2b805a3ebe61d2e689b0c73d184ebad9a5bf5fa5
     case 'save':
         $cedula = $_POST['cedula'];
         $nombres = $_POST['nombres'];
