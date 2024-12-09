@@ -12,11 +12,19 @@ class AdminModel {
 
     // Verificar si la caja está abierta para el usuario en la fecha actual
     public function checkCajaAbierta($id_usuario, $fechaHoy) {
-        $sql = "SELECT * FROM cf_informacion_cajas WHERE id_usuario = ? AND CONVERT(DATE, fecha_apertura) = ? AND valor_cierre IS NULL";
+        $sql = "
+            SELECT ic.* 
+            FROM cf_informacion_cajas ic
+            INNER JOIN cf_usuario u ON ic.id_usuario = u.id_usuario
+            WHERE ic.id_usuario = ? 
+              AND (CONVERT(DATE, ic.fecha_apertura) = ? AND ic.valor_cierre IS NULL
+                   OR u.rol IN (1, 2))
+        ";
         $query = $this->pdo->prepare($sql);
         $query->execute([$id_usuario, $fechaHoy]);
-        return $query->fetch(PDO::FETCH_ASSOC);  // Retorna true si hay una caja abierta y no cerrada
-    }    
+        return $query->fetch(PDO::FETCH_ASSOC);
+    }
+     
     
     // Método que verifica si hay una caja sin cerrar
     public function checkCajaSinCerrar($id_sede) {
@@ -106,13 +114,11 @@ class AdminModel {
         return $query->execute($params);
     }
     
-    
-
     public function validarCodigo($id_info_caja, $codigoIngresado) {
         $sql = "SELECT codigo FROM cf_informacion_cajas WHERE id_info_caja = ?";
         $query = $this->pdo->prepare($sql);
         $query->execute([$id_info_caja]);
-        $codigoGuardado = $query->fetchColumn();
+        $codigoGuardado = $query->fetchColumn(); 
         
         // comparar ambos como cadenas
         return strval($codigoGuardado) === strval($codigoIngresado);

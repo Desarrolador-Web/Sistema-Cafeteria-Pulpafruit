@@ -21,13 +21,14 @@
     <link rel="stylesheet" type="text/css" href="<?php echo RUTA . 'assets/'; ?>css/datatables.min.css" />
     <link rel="stylesheet" type="text/css" href="<?php echo RUTA . 'assets/'; ?>css/dataTables.dateTime.min.css" />
 </head>
-<?php $mini = false;
-if (!empty($_GET['pagina'])) {
-    if ($_GET['pagina'] == 'ventas' || $_GET['pagina'] == 'compras') {
-        $mini = true;
-    }
+
+
+<?php
+if (!isset($_SESSION['rol'])) {
+    $_SESSION['rol'] = null; // Establecer un valor predeterminado si no existe
 }
 ?>
+
 
 <body id="page-top" class="<?php echo ($mini) ? 'sidebar-toggled' : ''; ?>">
 
@@ -35,12 +36,18 @@ if (!empty($_GET['pagina'])) {
     <div id="wrapper">
 
         <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion <?php echo ($mini) ? 'toggled' : ''; ?>" id="accordionSidebar">
-
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion <?php echo ($mini) ? 'toggled' : ''; ?>" id="accordionSidebar" style="position: fixed;z-index: 1; width: 200px; height: 100%;">
+            <?php $mini = false;
+            if (!empty($_GET['pagina'])) {
+                if ($_GET['pagina'] == 'ventas' || $_GET['pagina'] == 'compras') {
+                    $mini = true;
+                }
+            };
+            ?>
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="plantilla.php">
                 <div class="sidebar-brand-icon rotate-n-15">
-                    <img src="assets/img/logo.png" alt="LOGO-PNG" width="50">
+                    <img src="../../assets/img/logo.png" alt="LOGO-PNG" width="50">
                 </div>
                 <div class="sidebar-brand-text mx-3"><sup>1.0</sup></div>
             </a>
@@ -48,24 +55,28 @@ if (!empty($_GET['pagina'])) {
             <!-- Divider -->
             <hr class="sidebar-divider">
 
+            <?php 
+            // Mostrar la opción "Panel de control" solo si el rol no es 3
+            if (!empty($clientes) && $_SESSION['rol'] != 3) { ?>
+                <!-- Opción panel de control, antes llamada clientes -->
+                <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'clientes') ? 'bg-gradient-info' : ''; ?>">
+                    <a class="nav-link" href="?pagina=clientes">
+                    <i class="fas fa-chart-pie"></i>
+                        <span>Panel de control</span>
+                    </a>
+                </li>
+            <?php } ?>
+
+
             <!-- Nav Item - Dashboard -->
             <li class="nav-item <?php echo (empty($_GET['pagina'])) ? 'bg-gradient-info' : ''; ?>">
                 <a class="nav-link" href="plantilla.php">
-                    <i class="fas fa-chart-pie"></i>
+                <i class="fas fa-cash-register"></i>
                     <span>Cerrar Caja</span></a>
             </li>
 
 
 
-            <?php if (!empty($clientes)) { ?>
-                <!-- Nav Item - Pages Collapse Menu -->
-                <!-- <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'clientes') ? 'bg-gradient-info' : ''; ?>">
-                    <a class="nav-link" href="?pagina=clientes">
-                        <i class="fas fa-fw fa-users"></i>
-                        <span>Clientes</span>
-                    </a>
-                </li> -->
-            <?php } ?>
 
             <?php if (!empty($proveedor)) { ?>
                 <hr class="sidebar-divider d-none d-md-block">
@@ -78,7 +89,9 @@ if (!empty($_GET['pagina'])) {
                 </li>
             <?php } ?>
 
-             <?php if (!empty($usuarios)) { ?>
+            <?php 
+            // Mostrar la opción de usuarios solo si el rol no es 3
+            if (!empty($usuarios) && $_SESSION['rol'] != 3) { ?>
                 <hr class="sidebar-divider d-none d-md-block">
                 <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'usuarios') ? 'bg-gradient-info' : ''; ?>">
                     <a class="nav-link" href="?pagina=usuarios">
@@ -86,7 +99,8 @@ if (!empty($_GET['pagina'])) {
                         <span>Usuarios</span>
                     </a>
                 </li>
-            <?php } ?> 
+            <?php } ?>
+
 
             <?php if (!empty($productos)) { ?>
                 <!-- Divider -->
@@ -103,7 +117,7 @@ if (!empty($_GET['pagina'])) {
             <?php if (!empty($nueva_compra) || !empty($compras)) { ?>
                 <!-- Divider -->
                 <hr class="sidebar-divider d-none d-md-block">
-                <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'compras' || !empty($_GET['pagina'])  && $_GET['pagina'] == 'historial_compras') ? 'bg-gradient-info' : ''; ?>">
+                <li class="nav-item  <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'compras' || !empty($_GET['pagina'])  && $_GET['pagina'] == 'historial_compras') ? 'bg-gradient-info' : ''; ?>">
                     <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCompra" aria-expanded="true" aria-controls="collapseCompra">
                         <i class="fas fa-cart-plus"></i>
                         <span>Compras</span>
@@ -128,7 +142,7 @@ if (!empty($_GET['pagina'])) {
             <?php if (!empty($nueva_venta) || !empty($ventas)) { ?>
                 <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'ventas' || !empty($_GET['pagina'])  && $_GET['pagina'] == 'historial') ? 'bg-gradient-info' : ''; ?>">
                     <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseVenta" aria-expanded="true" aria-controls="collapseVenta">
-                        <i class="fas fa-cash-register"></i>
+                        <i class="fas fa-solid fa-money-bill"></i>
                         <span>Ventas</span>
                         <i class="fas fa-chevron-right float-right"></i>
                     </a>
@@ -147,7 +161,7 @@ if (!empty($_GET['pagina'])) {
             <?php } ?>
 
 
-            <?php if (!empty($configuracion)) { ?> 
+            <?php if (!empty($configuracion)) { ?>
 
                 <!-- <hr class="sidebar-divider d-none d-md-block">
 
@@ -157,9 +171,9 @@ if (!empty($_GET['pagina'])) {
                         <span>Configuración</span>
                     </a>
                 </li>  -->
-            <?php } ?> 
+            <?php } ?>
 
-             <!-- <div class="text-center d-none d-md-inline mt-3">
+            <!-- <div class="text-center d-none d-md-inline mt-3">
                 <button class="rounded-circle border-0" id="sidebarToggle"><i class="fas fa-chevron-circle-left text-gray-400"></i></button>
             </div> -->
 
@@ -183,8 +197,6 @@ if (!empty($_GET['pagina'])) {
 
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
-
-
                         <div class="topbar-divider d-none d-sm-block"></div>
 
                         <!-- Nav Item - User Information -->
@@ -197,7 +209,7 @@ if (!empty($_GET['pagina'])) {
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown" style="z-index: 9999;">
                                 <a class="dropdown-item" href="#">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Profile
+                                    Perfil
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
@@ -211,7 +223,3 @@ if (!empty($_GET['pagina'])) {
                 </nav>
 
                 <div class="container-fluid">
-
-
-
-
