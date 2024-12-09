@@ -6,7 +6,7 @@ const id_cliente = document.querySelector('#id-cliente');
 const capacidad_cliente = document.querySelector('#capacidad-cliente');
 const search = document.querySelector('#search'); 
 let btn_save;
-let table_clientes;
+let table_clientes; 
 
 document.addEventListener('DOMContentLoaded', function () {
     btn_save = document.querySelector('#btn-guardar');
@@ -18,7 +18,18 @@ document.addEventListener('DOMContentLoaded', function () {
         columns: [
             { data: 'codigo_producto' },
             { data: 'descripcion' },
-            { data: 'cantidad' },
+            {
+                data: 'existencia',
+                render: function (data, type, row) {
+                    let colorClass = 'badge-info'; // Azul por defecto
+                    if (row.porcentajeStock <= 10) {
+                        colorClass = 'badge-danger'; // Rojo
+                    } else if (row.porcentajeStock <= 30) {
+                        colorClass = 'badge-warning'; // Amarillo
+                    }
+                    return `<span class="badge ${colorClass}">${data}</span>`;
+                }
+            },
             { data: 'precio_venta' },
             { data: 'addcart' }
         ],
@@ -26,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
             url: 'https://cdn.datatables.net/plug-ins/1.13.1/i18n/es-ES.json'
         }
     });
-
+    
     temp(); // Inicializa la tabla temporal y el total
 
     table_clientes = $('#table_clientes').DataTable({
@@ -100,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 updateStock();
                 temp(); // Actualiza la tabla temporal y el total
 
-                // Reiniciar los formularios
+                // Reinicia los formularios
                 resetFormularios();
             }
         })
