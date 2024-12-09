@@ -5,12 +5,12 @@
                 <thead>
                     <tr>
                         <th scope="col">Id</th>
-                        <th scope="col">Barcode</th>
+                        <th scope="col">Codigo de barras</th>
                         <th scope="col">Producto</th>
                         <th scope="col">Precio Compra</th>
                         <th scope="col">Precio Venta</th>
                         <th scope="col">Imagen</th>
-                        <th scope="col">Stock</th>
+                        <th scope="col">Cantidad</th>
                         <th></th>
                     </tr>
                 </thead>
