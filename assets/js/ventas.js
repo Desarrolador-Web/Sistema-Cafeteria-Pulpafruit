@@ -114,13 +114,10 @@ document.addEventListener('DOMContentLoaded', function () {
             idCliente: id_cliente.value,
             metodo: metodo.value
 
-<<<<<<< HEAD
-=======
                 // Reinicia los formularios
-                resetFormularios();
-            }
->>>>>>> 2b805a3ebe61d2e689b0c73d184ebad9a5bf5fa5
-        })
+                // resetFormularios();
+            })
+        
         // .then(function (response) {
         //     const info = response.data;
         //     message(info.tipo, info.mensaje);
