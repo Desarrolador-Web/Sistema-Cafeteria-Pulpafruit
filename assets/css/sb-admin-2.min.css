@@ -40,6 +40,10 @@
     color: #6c757d; /* Gris intermedio */
     margin-top: 10px;
 }
+.modal-xl {
+    max-width: 72% !important;
+}
+
 
 body {
     margin: 0;

@@ -12,8 +12,8 @@ switch ($option) {
 
             // Procesar datos para manejar valores NULL
             $datosProcesados = array_map(function($fila) {
-                $fila['fecha_cierre'] = $fila['fecha_cierre'] ?? null; // Convertir NULL a null explícito
-                $fila['valor_cierre'] = $fila['valor_cierre'] ?? null; // Convertir NULL a null explícito
+                $fila['fecha_cierre'] = $fila['fecha_cierre'] ?? null; // Convertir NULL a null 
+                $fila['valor_cierre'] = $fila['valor_cierre'] ?? null; // Convertir NULL a null 
                 return $fila;
             }, $datos);
 
@@ -23,6 +23,20 @@ switch ($option) {
         }
         break;
 
+    case 'iniciosSesion':
+        try {
+            $datos = $clientesModel->getIniciosSesion();
+            echo json_encode(['tipo' => 'success', 'data' => $datos]);
+        } catch (Exception $e) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => $e->getMessage()]);
+        }
+        break;
+
+    case 'usuariosRegistrados':
+        $data = $clientesModel->getUsuariosRegistrados();
+        echo json_encode(['tipo' => 'success', 'data' => $data]);
+        break;
+        
     default:
         echo json_encode(['tipo' => 'error', 'mensaje' => 'Opción no válida']);
         break;
