@@ -46,6 +46,24 @@ class ClientesModel {
         $query->execute();
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getProductosAgotados() {
+        $sql = "SELECT 
+                    p.descripcion AS producto,
+                    MAX(c.fecha_compra) AS ultima_fecha_compra,
+                    MAX(v.fecha) AS ultima_fecha_venta
+                FROM cf_producto p
+                LEFT JOIN cf_detalle_compras dc ON p.id_producto = dc.id_producto
+                LEFT JOIN cf_compras c ON dc.id_compra = c.id_compra
+                LEFT JOIN cf_detalle_ventas dv ON p.id_producto = dv.id_producto
+                LEFT JOIN cf_ventas v ON dv.id_ventas = v.id_ventas
+                WHERE p.existencia = 0
+                GROUP BY p.descripcion";
+        $query = $this->pdo->prepare($sql);
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
     
     public function getUsuariosRegistrados() {
         $sql = "SELECT 

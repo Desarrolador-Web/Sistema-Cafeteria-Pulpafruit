@@ -1,4 +1,3 @@
-
 <?php
 require_once '../models/clientes.php';
 
@@ -37,6 +36,16 @@ switch ($option) {
         echo json_encode(['tipo' => 'success', 'data' => $data]);
         break;
         
+    case 'productosAgotados':
+        try {
+            $datos = $clientesModel->getProductosAgotados();
+            echo json_encode(['tipo' => 'success', 'data' => $datos]);
+        } catch (Exception $e) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => $e->getMessage()]);
+        }
+        break;
+        
+    
     default:
         echo json_encode(['tipo' => 'error', 'mensaje' => 'Opción no válida']);
         break;

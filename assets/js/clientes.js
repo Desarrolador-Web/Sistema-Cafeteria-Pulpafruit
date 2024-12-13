@@ -1,7 +1,5 @@
-// Declaración de variables y constantes
 let cliente;
 
-// Definición de la clase Clientes
 class Clientes {
     // Método para inicializar DataTable con datos iniciales
     inicializarTablaClientes() {
@@ -142,6 +140,34 @@ class Clientes {
                 alert('Hubo un error al conectar con el servidor.');
             });
     }
+
+    // Mostrar productos agotados
+    mostrarProductosAgotados() {
+        axios.get('http://localhost/Sistema-Cafeteria-Pulpafruit/controllers/clientesController.php?option=productosAgotados')
+            .then((response) => {
+                if (response.data.tipo === 'success') {
+                    let contenidoTabla = '';
+                    response.data.data.forEach((producto) => {
+                        contenidoTabla += `
+                            <tr>
+                                <td>${producto.producto}</td>
+                                <td>${producto.ultima_fecha_compra || 'N/A'}</td>
+                                <td>${producto.ultima_fecha_venta || 'N/A'}</td>
+                            </tr>
+                        `;
+                    });
+
+                    document.getElementById('tablaProductosAgotadosBody').innerHTML = contenidoTabla;
+                    new bootstrap.Modal(document.getElementById('modalProductosAgotados')).show();
+                } else {
+                    alert('Error al cargar los datos: ' + response.data.mensaje);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Hubo un error al conectar con el servidor.');
+            });
+    }
 }
 
 
@@ -168,6 +194,11 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('closeModal')?.addEventListener('click', () => {
         const modal = bootstrap.Modal.getInstance(document.getElementById('modalIniciosSesion'));
         modal.hide();
+    });
+
+    // Evento para "Productos Agotados"
+    document.getElementById('metric-productos-agotados').addEventListener('click', function () {
+        cliente.mostrarProductosAgotados(); // Llamar a la función para mostrar el modal
     });
 
     document.getElementById('closeModalFooter')?.addEventListener('click', () => {

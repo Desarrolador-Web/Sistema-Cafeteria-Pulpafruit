@@ -18,24 +18,19 @@
             <div class="metric-title">Usuarios Registrados</div>
             <div class="metric-description">Revisa el listado de usuarios y sus roles en el sistema.</div>
         </div>
+
         <!-- Productos Agotados -->
-        <div class="metric-card">
+        <div class="metric-card" id="metric-productos-agotados">
             <i class="fas fa-box-open metric-icon"></i>
             <div class="metric-title">Productos Agotados</div>
             <div class="metric-description">Consulta los productos que están actualmente agotados.</div>
-        </div>
-        <!-- Ventas del Mes -->
-        <div class="metric-card">
-            <i class="fas fa-chart-line metric-icon"></i>
-            <div class="metric-title">Ventas del Mes</div>
-            <div class="metric-description">Visualiza las ventas realizadas en el mes actual.</div>
         </div>
     </div>
 </div>
 
 <!-- Modal inicios de sesión -->
 <div class="modal fade" id="modalIniciosSesion" tabindex="-1" aria-labelledby="modalIniciosSesionLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl"> <!-- Se ajusta el ancho con modal-xl -->
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header bg-success text-white">
                 <h5 class="modal-title" id="modalIniciosSesionLabel">Inicios de Sesión</h5>
@@ -67,15 +62,15 @@
 
 <!-- Modal usuarios registrados -->
 <div class="modal fade" id="modalUsuariosRegistrados" tabindex="-1" aria-labelledby="modalUsuariosRegistradosLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl"> <!-- Se ajusta el ancho con modal-xl -->
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
-            <div class="modal-header bg-success text-white"> <!-- Mismo estilo de encabezado -->
+            <div class="modal-header bg-success text-white">
                 <h5 class="modal-title" id="modalUsuariosRegistradosLabel">Usuarios Registrados</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <table class="table table-striped table-hover">
-                    <thead class="table-success"> <!-- Mismo estilo de encabezado de tabla -->
+                    <thead class="table-success">
                         <tr>
                             <th>Nombre Completo</th>
                             <th>Rol</th>
@@ -92,6 +87,38 @@
         </div>
     </div>
 </div>
+
+<!-- Modal productos agotados -->
+<div class="modal fade" id="modalProductosAgotados" tabindex="-1" aria-labelledby="modalProductosAgotadosLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <!-- Encabezado del modal con el mismo estilo -->
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalProductosAgotadosLabel">Productos Agotados</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Tabla con los mismos estilos -->
+                <table class="table table-striped table-hover">
+                    <thead class="table-success">
+                        <tr>
+                            <th>Producto</th>
+                            <th>Última Fecha Compra</th>
+                            <th>Última Fecha Venta</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaProductosAgotadosBody">
+                        <!-- Los datos se cargarán dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
