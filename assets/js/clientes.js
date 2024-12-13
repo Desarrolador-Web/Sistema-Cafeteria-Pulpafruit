@@ -1,11 +1,9 @@
-let cliente;
-
 class Clientes {
-    // Método para inicializar DataTable con datos iniciales
+    // Método para inicializar la tabla DataTable
     inicializarTablaClientes() {
         $('#table_clientes').DataTable({
             ajax: {
-                url: 'http://localhost/Sistema-Cafeteria-Pulpafruit/controllers/clientesController.php?option=listar',
+                url: ruta + 'controllers/clientesController.php?option=listar',
                 dataSrc: ''
             },
             columns: [
@@ -29,7 +27,7 @@ class Clientes {
                 const datos = response.data;
                 if (datos.tipo === 'success') {
                     $('#tablaClientes').DataTable({
-                        destroy: true, // Permite reinicializar la tabla
+                        destroy: true,
                         data: datos.data,
                         columns: [
                             { data: 'nombre_completo', title: 'Nombre Completo' },
@@ -37,35 +35,16 @@ class Clientes {
                             { data: 'fecha_apertura', title: 'Fecha Apertura' },
                             {
                                 data: 'fecha_cierre',
-                                render: function (data) {
-                                    return data ? data : 'Sesión en curso';
-                                },
+                                render: (data) => data ? data : 'Sesión en curso',
                                 title: 'Fecha Cierre'
                             },
                             {
                                 data: 'valor_cierre',
-                                render: function (data) {
-                                    return data ? data : 'Sesión en curso';
-                                },
+                                render: (data) => data ? data : 'Sesión en curso',
                                 title: 'Valor Cierre'
                             }
                         ],
-                        language: {
-                            sProcessing: "Procesando...",
-                            sLengthMenu: "Mostrar _MENU_ registros",
-                            sZeroRecords: "No se encontraron resultados",
-                            sEmptyTable: "Ningún dato disponible en esta tabla",
-                            sInfo: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                            sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
-                            sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
-                            sSearch: "Buscar:",
-                            oPaginate: {
-                                sFirst: "Primero",
-                                sLast: "Último",
-                                sNext: "Siguiente",
-                                sPrevious: "Anterior"
-                            }
-                        }
+                        language: this.getDataTableLanguage()
                     });
                 } else {
                     console.error('Error al cargar datos:', datos.mensaje);
@@ -82,22 +61,18 @@ class Clientes {
     mostrarIniciosSesion() {
         axios.get('http://localhost/Sistema-Cafeteria-Pulpafruit/controllers/clientesController.php?option=iniciosSesion')
             .then((response) => {
-                const datos = response.data.data;
-
                 if (response.data.tipo === 'success') {
-                    let contenidoTabla = '';
-                    datos.forEach((fila) => {
-                        contenidoTabla += `
-                            <tr>
-                                <td>${fila.nombre_completo}</td>
-                                <td>${fila.nombre_sede}</td>
-                                <td>${fila.fecha_apertura}</td>
-                                <td>${fila.hora_apertura}</td>
-                                <td>${fila.fecha_cierre}</td>
-                                <td>${fila.hora_cierre}</td>
-                            </tr>
-                        `;
-                    });
+                    const datos = response.data.data;
+                    const contenidoTabla = datos.map(fila => `
+                        <tr>
+                            <td>${fila.nombre_completo}</td>
+                            <td>${fila.nombre_sede}</td>
+                            <td>${fila.fecha_apertura}</td>
+                            <td>${fila.hora_apertura}</td>
+                            <td>${fila.fecha_cierre}</td>
+                            <td>${fila.hora_cierre}</td>
+                        </tr>
+                    `).join('');
 
                     document.getElementById('tablaIniciosSesionBody').innerHTML = contenidoTabla;
                     new bootstrap.Modal(document.getElementById('modalIniciosSesion')).show();
@@ -116,20 +91,14 @@ class Clientes {
         axios.get('http://localhost/Sistema-Cafeteria-Pulpafruit/controllers/clientesController.php?option=usuariosRegistrados')
             .then((response) => {
                 if (response.data.tipo === 'success') {
-                    let contenidoTabla = '';
-                    response.data.data.forEach((usuario) => {
-                        contenidoTabla += `
-                            <tr>
-                                <td>${usuario.nombre_completo}</td>
-                                <td>${usuario.rol}</td>
-                            </tr>
-                        `;
-                    });
+                    const contenidoTabla = response.data.data.map(usuario => `
+                        <tr>
+                            <td>${usuario.nombre_completo}</td>
+                            <td>${usuario.rol}</td>
+                        </tr>
+                    `).join('');
 
-                    // Insertar los datos en la tabla
                     document.getElementById('tablaUsuariosBody').innerHTML = contenidoTabla;
-
-                    // Mostrar el modal
                     new bootstrap.Modal(document.getElementById('modalUsuariosRegistrados')).show();
                 } else {
                     alert('Error al cargar los datos: ' + response.data.mensaje);
@@ -141,21 +110,18 @@ class Clientes {
             });
     }
 
-    // Mostrar productos agotados
+    // Método para mostrar el modal de "Productos Agotados"
     mostrarProductosAgotados() {
         axios.get('http://localhost/Sistema-Cafeteria-Pulpafruit/controllers/clientesController.php?option=productosAgotados')
             .then((response) => {
                 if (response.data.tipo === 'success') {
-                    let contenidoTabla = '';
-                    response.data.data.forEach((producto) => {
-                        contenidoTabla += `
-                            <tr>
-                                <td>${producto.producto}</td>
-                                <td>${producto.ultima_fecha_compra || 'N/A'}</td>
-                                <td>${producto.ultima_fecha_venta || 'N/A'}</td>
-                            </tr>
-                        `;
-                    });
+                    const contenidoTabla = response.data.data.map(producto => `
+                        <tr>
+                            <td>${producto.producto}</td>
+                            <td>${producto.ultima_fecha_compra || 'N/A'}</td>
+                            <td>${producto.ultima_fecha_venta || 'N/A'}</td>
+                        </tr>
+                    `).join('');
 
                     document.getElementById('tablaProductosAgotadosBody').innerHTML = contenidoTabla;
                     new bootstrap.Modal(document.getElementById('modalProductosAgotados')).show();
@@ -168,41 +134,37 @@ class Clientes {
                 alert('Hubo un error al conectar con el servidor.');
             });
     }
-}
 
+    // Método auxiliar para los textos de DataTable
+    getDataTableLanguage() {
+        return {
+            sProcessing: "Procesando...",
+            sLengthMenu: "Mostrar _MENU_ registros",
+            sZeroRecords: "No se encontraron resultados",
+            sEmptyTable: "Ningún dato disponible en esta tabla",
+            sInfo: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
+            sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
+            sSearch: "Buscar:",
+            oPaginate: {
+                sFirst: "Primero",
+                sLast: "Último",
+                sNext: "Siguiente",
+                sPrevious: "Anterior"
+            }
+        };
+    }
+}
 
 // Inicialización de cliente y eventos
 document.addEventListener('DOMContentLoaded', function () {
-    // Crear la instancia de Clientes
-    cliente = new Clientes();
+    const cliente = new Clientes();
 
     // Inicializar tabla y cargar datos
     cliente.inicializarTablaClientes();
-    cliente.cargarTablaClientes();
 
-    // Agregar evento para abrir el modal de inicios de sesión
-    document.getElementById('metric-inicios-sesion').addEventListener('click', function () {
-        cliente.mostrarIniciosSesion(); // Solo abre el modal de Inicios de Sesión
-    });
-
-    // Agregar evento para abrir el modal de usuarios registrados
-    document.getElementById('metric-usuarios-registrados').addEventListener('click', function () {
-        cliente.mostrarUsuariosRegistrados(); // Solo abre el modal de Usuarios Registrados
-    });
-
-    // Vincular eventos de cierre manual al modal
-    document.getElementById('closeModal')?.addEventListener('click', () => {
-        const modal = bootstrap.Modal.getInstance(document.getElementById('modalIniciosSesion'));
-        modal.hide();
-    });
-
-    // Evento para "Productos Agotados"
-    document.getElementById('metric-productos-agotados').addEventListener('click', function () {
-        cliente.mostrarProductosAgotados(); // Llamar a la función para mostrar el modal
-    });
-
-    document.getElementById('closeModalFooter')?.addEventListener('click', () => {
-        const modal = bootstrap.Modal.getInstance(document.getElementById('modalIniciosSesion'));
-        modal.hide();
-    });
+    // Eventos para los botones
+    document.getElementById('metric-inicios-sesion').addEventListener('click', () => cliente.mostrarIniciosSesion());
+    document.getElementById('metric-usuarios-registrados').addEventListener('click', () => cliente.mostrarUsuariosRegistrados());
+    document.getElementById('metric-productos-agotados').addEventListener('click', () => cliente.mostrarProductosAgotados());
 });

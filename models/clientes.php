@@ -25,6 +25,15 @@ class ClientesModel {
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function listarClientes() {
+        $sql = "SELECT id_cliente, CONCAT(nombres, ' ', apellidos) AS nombre_completo, area, capacidad 
+                FROM cf_cliente";
+        $query = $this->pdo->prepare($sql);
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+
     public function getIniciosSesion() {
         $sql = "SELECT 
                     CONCAT(u.nombres, ' ', u.apellidos) AS nombre_completo,

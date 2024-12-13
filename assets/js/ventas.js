@@ -40,41 +40,44 @@ document.addEventListener('DOMContentLoaded', function () {
     
     temp(); // Inicializa la tabla temporal y el total
 
-    table_clientes = $('#table_clientes').DataTable({
-        ajax: {
-            url: ruta + 'controllers/ventasController.php?option=listar-clientes',
-            dataSrc: ''
-        },
-        columns: [
-            {
-                data: null, render: function (data, type, row) {
-                    return data.nombres + ' ' + data.apellidos;
-                }
+    document.addEventListener('DOMContentLoaded', function () {
+        let table_clientes = $('#table_clientes').DataTable({
+            ajax: {
+                url: ruta + 'controllers/ventasController.php?option=listar-clientes', // Endpoint correcto
+                dataSrc: ''
             },
-            { data: 'id_cliente' },
-            { data: 'area' },
-            { data: 'capacidad' } // Mostrar capacidad directamente desde la tabla cf_cliente
-        ],
-        language: {
-            url: 'https://cdn.datatables.net/plug-ins/1.13.1/i18n/es-ES.json'
-        },
-        createdRow: function (row, data, dataIndex) {
-            // Verificar si la capacidad es 0 y agregar una clase a la fila
-            if (data.capacidad == 0) {
-                $(row).addClass('table-danger');
+            columns: [
+                {
+                    data: null,
+                    render: function (data) {
+                        return `${data.nombre_completo}`;
+                    }
+                },
+                { data: 'id_cliente' },
+                { data: 'area' },
+                { data: 'capacidad' }
+            ],
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.13.1/i18n/es-ES.json'
+            },
+            createdRow: function (row, data) {
+                if (data.capacidad == 0) {
+                    $(row).addClass('table-danger'); // Resalta filas con capacidad 0
+                }
             }
-        }
+        });
+    
+        // Doble clic en una fila para seleccionar un cliente
+        $('#table_clientes tbody').on('dblclick', 'tr', function () {
+            const datos = table_clientes.row(this).data();
+            document.querySelector('#id-cliente').value = datos.id_cliente;
+            document.querySelector('#nombre-cliente').value = datos.nombre_completo;
+            document.querySelector('#area-cliente').value = datos.area;
+            document.querySelector('#capacidad-cliente').value = datos.capacidad;
+            $('#modal-cliente').modal('hide');
+        });
     });
-
-    $('#table_clientes tbody').on('dblclick', 'tr', function () {
-        let datos = table_clientes.row(this).data();
-        id_cliente.value = datos.id_cliente;
-        nombre_cliente.value = datos.nombres + ' ' + datos.apellidos;
-        area_cliente.value = datos.area;
-        capacidad_cliente.value = datos.capacidad;
-        $('#modal-cliente').modal('hide');
-    });
-
+    
     search.addEventListener('keyup', function (e) {
         if (e.key === "Enter") {
             if (e.target.value.trim() === '') {

@@ -5,6 +5,16 @@ $option = $_GET['option'] ?? '';
 $clientesModel = new ClientesModel();
 
 switch ($option) {
+    case 'listar-clientes':
+        try {
+            // Obtén los datos de los clientes desde el modelo
+            $clientes = $ventasModel->listarClientes();
+            echo json_encode($clientes);
+        } catch (Exception $e) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => $e->getMessage()]);
+        }
+        break;
+    
     case 'listar':
         try {
             $datos = $clientesModel->listarInformacionCajas();
