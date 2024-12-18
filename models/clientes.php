@@ -31,7 +31,6 @@ class ClientesModel {
         $stmt = $this->pdo->prepare($query);
         return $stmt->execute([$id_cliente, $total]);
     }
-
     // Muestra la información de las cajas
     public function getIniciosSesion() {
         $sql = "SELECT 
