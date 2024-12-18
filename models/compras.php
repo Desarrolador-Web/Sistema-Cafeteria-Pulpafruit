@@ -42,26 +42,22 @@ class Compras {
             return [];
         }
     }
-    
-    
-    
+
     public function saveCompra($id_empresa, $total, $fecha, $id_user, $estado, $id_caja, $metodo_compra) {
         $sql = "INSERT INTO cf_compras (id_empresa, total_compra, fecha_compra, id_usuario, estado_compra, id_caja, metodo_compra) 
                 VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$id_empresa, $total, $fecha, $id_user, $estado, $id_caja, $metodo_compra]);
-        return $stmt->errorCode() == '00000' ? $this->pdo->lastInsertId() : false;
-    }
-    
+        return $stmt->execute([$id_empresa, $total, $fecha, $id_user, $estado, $id_caja, $metodo_compra]);
+    } 
     
     public function saveProduct($barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado, $id_caja) {
-        $consult = $this->pdo->prepare("INSERT INTO cf_producto (codigo_producto, descripcion, id_empresa, precio_compra, precio_venta, imagen, existencia, estado_producto, id_caja) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $success = $consult->execute([$barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado, $id_caja]);
-        return $success ? $this->pdo->lastInsertId() : false;
+        $consult = $this->pdo->prepare("
+            INSERT INTO cf_producto (codigo_producto, descripcion, id_empresa, precio_compra, precio_venta, imagen, existencia, estado_producto, id_caja) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+        return $consult->execute([$barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado, $id_caja]);
     }
     
-    
-
     public function saveDetalle($id_producto, $id_compra, $cantidad, $precio) {
         $consult = $this->pdo->prepare("INSERT INTO cf_detalle_compras (id_producto, id_compra, cantidad, precio) VALUES (?,?,?,?)");
         return $consult->execute([$id_producto, $id_compra, $cantidad, $precio]);
@@ -73,14 +69,12 @@ class Compras {
         return $consult->fetchAll(PDO::FETCH_ASSOC);
     }
     
-
     public function getSedeUsuario($id_usuario) {
         $consult = $this->pdo->prepare("SELECT sede FROM cf_usuario WHERE id_usuario = ?");
         $consult->execute([$id_usuario]);
         $result = $consult->fetch(PDO::FETCH_ASSOC);
         return $result ? $result['sede'] : null;
-    }
-    
+    } 
 
     public function updateEstadoProducto($id_producto, $estado, $barcode) {
         try {
@@ -108,8 +102,4 @@ class Compras {
     public function rollBack() {
         $this->pdo->rollBack();
     }
-    
-    
-    
 }
-

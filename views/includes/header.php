@@ -38,10 +38,7 @@ if (!isset($_SESSION['rol'])) {
 
 <body id="page-top" class="<?php echo ($mini) ? 'sidebar-toggled' : ''; ?>">
 
-    <!-- Page Wrapper -->
     <div id="wrapper">
-
-        <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion <?php echo ($mini) ? 'toggled' : ''; ?>" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->

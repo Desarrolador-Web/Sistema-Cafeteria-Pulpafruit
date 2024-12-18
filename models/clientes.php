@@ -9,21 +9,6 @@ class ClientesModel {
         $this->con = new Conexion();
         $this->pdo = $this->con->conectar();
     }
-
-    public function listarInformacionCajas() {
-        $sql = "SELECT 
-                    CONCAT(u.nombres, ' ', u.apellidos) AS nombre_completo,
-                    ca.nombre_caja AS nombre_sede,
-                    c.fecha_apertura,
-                    c.fecha_cierre,
-                    c.valor_cierre
-                FROM cf_informacion_cajas c
-                INNER JOIN cf_usuario u ON c.id_usuario = u.id_usuario
-                INNER JOIN cf_caja ca ON c.id_sede = ca.id_caja";
-        $query = $this->pdo->prepare($sql);
-        $query->execute();
-        return $query->fetchAll(PDO::FETCH_ASSOC);
-    }
     
     // Obtener todos los clientes
     public function getClients() {
@@ -47,6 +32,7 @@ class ClientesModel {
         return $stmt->execute([$id_cliente, $total]);
     }
 
+    // Muestra la información de las cajas
     public function getIniciosSesion() {
         $sql = "SELECT 
                     CONCAT(u.nombres, ' ', u.apellidos) AS nombre_completo,
@@ -69,11 +55,12 @@ class ClientesModel {
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Consulta para los productos agotados
     public function getProductosAgotados() {
         $sql = "SELECT 
                     p.descripcion AS producto,
-                    MAX(c.fecha_compra) AS ultima_fecha_compra,
-                    MAX(v.fecha) AS ultima_fecha_venta
+                    CONVERT(VARCHAR, MAX(c.fecha_compra), 23) AS ultima_fecha_compra, -- Solo fecha YYYY-MM-DD
+                    CONVERT(VARCHAR, MAX(v.fecha), 23) AS ultima_fecha_venta         -- Solo fecha YYYY-MM-DD
                 FROM cf_producto p
                 LEFT JOIN cf_detalle_compras dc ON p.id_producto = dc.id_producto
                 LEFT JOIN cf_compras c ON dc.id_compra = c.id_compra
@@ -87,6 +74,7 @@ class ClientesModel {
     }
     
     
+    // Para la funcionalidad de productos agotados
     public function getUsuariosRegistrados() {
         $sql = "SELECT 
                     CONCAT(nombres, ' ', apellidos) AS nombre_completo,

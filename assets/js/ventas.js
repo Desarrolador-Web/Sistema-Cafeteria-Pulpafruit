@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('DOMContentLoaded', function () {
         let table_clientes = $('#table_clientes').DataTable({
             ajax: {
-                url: ruta + 'controllers/ventasController.php?option=listar-clientes', // Endpoint correcto
+                url: ruta + 'controllers/ventasController.php?option=listar-clientes', 
                 dataSrc: ''
             },
             columns: [

@@ -5,15 +5,6 @@ $option = $_GET['option'] ?? '';
 $clientesModel = new ClientesModel();
 
 switch ($option) {
-    case 'listar-clientes':
-        try {
-            // Obtén los datos de los clientes desde el modelo
-            $clientes = $ventasModel->listarClientes();
-            echo json_encode($clientes);
-        } catch (Exception $e) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => $e->getMessage()]);
-        }
-        break;
     
     case 'listar':
         try {
@@ -21,8 +12,8 @@ switch ($option) {
 
             // Procesar datos para manejar valores NULL
             $datosProcesados = array_map(function($fila) {
-                $fila['fecha_cierre'] = $fila['fecha_cierre'] ?? null; // Convertir NULL a null 
-                $fila['valor_cierre'] = $fila['valor_cierre'] ?? null; // Convertir NULL a null 
+                $fila['fecha_cierre'] = $fila['fecha_cierre'] ?? null; // Convertir NULL a null explícito
+                $fila['valor_cierre'] = $fila['valor_cierre'] ?? null; // Convertir NULL a null explícito
                 return $fila;
             }, $datos);
 
@@ -54,7 +45,6 @@ switch ($option) {
             echo json_encode(['tipo' => 'error', 'mensaje' => $e->getMessage()]);
         }
         break;
-        
     
     default:
         echo json_encode(['tipo' => 'error', 'mensaje' => 'Opción no válida']);
