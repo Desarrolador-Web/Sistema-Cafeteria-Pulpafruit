@@ -42,7 +42,6 @@ class Ventas {
         var_dump("Producto encontrado: ", $result); // Depuración
         return $result;
     }
-    
 
     // Guardar una nueva venta
     public function saveVenta($id_cliente, $total, $metodo, $fecha, $id_user) {
@@ -81,6 +80,22 @@ class Ventas {
     public function updateDeudaCapacidad($id_cliente, $total) {
         $query = "EXEC actualizarDeudaCapacidad ?, ?";
         $stmt = $this->pdo->prepare($query);
-        return $stmt->execute([$id_cliente, $total]);
+        return
+         $stmt->execute([$id_cliente, $total]);
     }
+
+       // Obtener todos los clientes
+       public function getClients() {
+        $consult = $this->pdo->prepare("SELECT * FROM cf_cliente");
+        $consult->execute();
+        return $consult->fetchAll(PDO::FETCH_ASSOC);
+    }
+ 
+    // Obtener un cliente por su ID
+    public function getClienteById($id_cliente) {
+        $query = "SELECT * FROM cf_cliente WHERE id_cliente = ?";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute([$id_cliente]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    } 
 }

@@ -10,7 +10,7 @@ class ClientesModel {
         $this->pdo = $this->con->conectar();
     }
     
-    // Obtener todos los clientes
+    // Obtener todos los clientes 
     public function getClients() {
         $consult = $this->pdo->prepare("SELECT * FROM cf_cliente");
         $consult->execute();

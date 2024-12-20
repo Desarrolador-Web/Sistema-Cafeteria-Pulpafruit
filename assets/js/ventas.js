@@ -8,6 +8,87 @@ const search = document.querySelector('#search');
 let btn_save;
 let table_clientes; 
 
+
+document.addEventListener('DOMContentLoaded', function () {
+    $('#table_clientes').DataTable({
+        ajax: {
+            url: ruta + 'controllers/ventasController.php?option=listarClientes',
+            dataSrc: ''
+        },
+        columns: [
+            { data: 'id_cliente' },
+            { data: 'nombres' },
+            { data: 'apellidos'},
+            { data: 'area' },
+            { data: 'sueldo' }
+        ],
+        language: {
+            url: 'https://cdn.datatables.net/plug-ins/1.13.1/i18n/es-ES.json'
+        },
+        "order": [[0, 'desc']]
+    });
+  });
+   
+  document.addEventListener('DOMContentLoaded', function () {
+      cargarTablaClientes();
+  });
+   
+  // Función para inicializar DataTable y cargar datos
+  function cargarTablaClientes() {
+      axios.get(ruta + 'controllers/clientesController.php?option=listar')
+          .then(function (response) {
+              const datos = response.data;
+              if (datos.tipo === 'success') {
+                  $('#tablaClientes').DataTable({
+                      destroy: true, // Permite reinicializar la tabla
+                      data: datos.data,
+                      columns: [
+                          { data: 'nombre_completo', title: 'Nombre Completo' },
+                          { data: 'nombre_sede', title: 'Sede' },
+                          { data: 'fecha_apertura', title: 'Fecha Apertura' },
+                          {
+                              data: 'fecha_cierre',
+                              render: function (data) {
+                                  return data ? data : 'Sesión en curso';
+                              },
+                              title: 'Fecha Cierre'
+                          },
+                          {
+                              data: 'valor_cierre',
+                              render: function (data) {
+                                  return data ? data : 'Sesión en curso';
+                              },
+                              title: 'Valor Cierre'
+                          }
+                      ],
+                      language: {
+                          sProcessing: "Procesando...",
+                          sLengthMenu: "Mostrar _MENU_ registros",
+                          sZeroRecords: "No se encontraron resultados",
+                          sEmptyTable: "Ningún dato disponible en esta tabla",
+                          sInfo: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                          sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
+                          sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
+                          sSearch: "Buscar:",
+                          oPaginate: {
+                              sFirst: "Primero",
+                              sLast: "Último",
+                              sNext: "Siguiente",
+                              sPrevious: "Anterior"
+                          }
+                      }
+                  });
+              } else {
+                  console.error('Error al cargar datos:', datos.mensaje);
+                  alert('Hubo un error al cargar los datos.');
+              }
+          })
+          .catch(function (error) {
+              console.error('Error:', error);
+              alert('Hubo un error al conectar con el servidor.');
+          });
+  }
+
 document.addEventListener('DOMContentLoaded', function () {
     btn_save = document.querySelector('#btn-guardar');
     $('#table_venta').DataTable({
