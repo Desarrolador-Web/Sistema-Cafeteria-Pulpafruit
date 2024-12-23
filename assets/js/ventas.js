@@ -5,33 +5,60 @@ const area_cliente = document.querySelector('#area-cliente');
 const id_cliente = document.querySelector('#id-cliente');
 const capacidad_cliente = document.querySelector('#capacidad-cliente');
 const search = document.querySelector('#search'); 
-let btn_save;
-let table_clientes; 
-
 
 document.addEventListener('DOMContentLoaded', function () {
-    $('#table_clientes').DataTable({
+
+    let table_personal = $('#table_personal').DataTable({
         ajax: {
-            url: ruta + 'controllers/ventasController.php?option=listarClientes',
+            url: ruta + 'controllers/ventasController.php?option=listarPersonal',
             dataSrc: ''
         },
         columns: [
-            { data: 'id_cliente' },
-            { data: 'nombres' },
-            { data: 'apellidos'},
-            { data: 'area' },
-            { data: 'sueldo' }
+            { data: 'id', title: 'Cédula' },   
+            { data: 'nombre', title: 'Nombre' },
+            { data: 'area', title: 'Área' },
+            { data: 'capacidad', title: 'Capacidad' }
         ],
         language: {
             url: 'https://cdn.datatables.net/plug-ins/1.13.1/i18n/es-ES.json'
         },
-        "order": [[0, 'desc']]
+        createdRow: function (row, data) {
+            if (data.capacidad == 0) {
+                $(row).addClass('table-danger');
+            }
+        }
     });
-  });
-   
-  document.addEventListener('DOMContentLoaded', function () {
-      cargarTablaClientes();
-  });
+
+    // Evento para seleccionar un personal
+    $('#table_personal tbody').on('dblclick', 'tr', function () {
+        const datos = table_personal.row(this).data();
+        document.querySelector('#id-personal').value = datos.id;
+        document.querySelector('#nombre-personal').value = datos.nombre;
+        document.querySelector('#area-personal').value = datos.area;
+        document.querySelector('#capacidad-personal').value = datos.capacidad;
+        $('#modal-personal').modal('hide');
+    });
+
+
+    btn_save.onclick = function () {
+        axios.post(ruta + 'controllers/ventasController.php?option=saveVenta', {
+            idPersonal: document.querySelector('#id-personal').value,
+            metodo: document.querySelector('#metodo').value,
+            total: totalVenta.textContent
+        })
+        .then(function (response) {
+            const info = response.data;
+            message(info.tipo, info.mensaje);
+            if (info.tipo === 'success') {
+                resetFormularios();
+            }
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+    };
+});
+
    
   // Función para inicializar DataTable y cargar datos
   function cargarTablaClientes() {

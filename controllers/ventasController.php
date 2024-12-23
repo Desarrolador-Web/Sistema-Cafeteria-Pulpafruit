@@ -42,22 +42,26 @@ switch ($option) {
         }
         break;
     
-    case 'listarClientes':
-        try {
-            $datos = $clientesModel->listarInformacionCajas();
-    
-            // Procesar datos para manejar valores NULL
-            $datosProcesados = array_map(function($fila) {
-                $fila['fecha_cierre'] = $fila['fecha_cierre'] ?? null; // Convertir NULL a null explícito
-                $fila['valor_cierre'] = $fila['valor_cierre'] ?? null; // Convertir NULL a null explícito
-                return $fila;
-            }, $datos);
-    
-            echo json_encode(['tipo' => 'success', 'data' => $datosProcesados]);
-        } catch (Exception $e) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => $e->getMessage()]);
+    case 'listarPersonal':
+        $personal = $ventas->getPersonal();
+        if ($personal) {
+            echo json_encode($personal);
+        } else {
+            echo json_encode([]);
         }
         break;
+        
+    
+    case 'getPersonalById':
+        $id_personal = $_GET['id'] ?? null;
+        if ($id_personal) {
+            $personal = $ventas->getPersonalById($id_personal);
+            echo json_encode($personal);
+        } else {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'ID de personal no válido']);
+        }
+        break;
+        
 
     case 'addcart':
         $id_product = $_GET['id'];
@@ -161,11 +165,11 @@ switch ($option) {
             break;
         }
     
-        $id_cliente = isset($data['idCliente']) ? $data['idCliente'] : null;
+        $id_personal = isset($data['idCliente']) ? $data['idCliente'] : null; // Cambio a id_personal
         $metodo = isset($data['metodo']) ? $data['metodo'] : null;
     
-        if (is_null($id_cliente) || is_null($metodo)) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'Datos de cliente o método de pago no válidos']);
+        if (is_null($id_personal) || is_null($metodo)) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Datos de personal o método de pago no válidos']);
             break;
         }
     
@@ -189,7 +193,7 @@ switch ($option) {
         }
     
         if (empty($_SESSION['cart'][$id_user])) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'CARRITO VACIO']);
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'CARRITO VACÍO']);
             break;
         }
     
@@ -210,19 +214,20 @@ switch ($option) {
             break;
         }
     
-        $cliente = $clientes->getClienteById($id_cliente);
-        if (!$cliente) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'CLIENTE NO ENCONTRADO']);
+        // Obtener datos de personal en lugar de cliente
+        $personal = $ventas->getPersonalById($id_personal);
+        if (!$personal) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'PERSONAL NO ENCONTRADO']);
             break;
         }
     
-        if ($metodo == 3 && $cliente['capacidad'] < $total) {
+        if ($metodo == 3 && $personal['capacidad'] < $total) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'CAPACIDAD DE CRÉDITO INSUFICIENTE']);
             break;
         }
     
         $fecha = date('Y-m-d'); // Captura la fecha actual en la zona horaria configurada
-        $saleId = $ventas->saveVenta($id_cliente, $total, $metodo, $fecha, $id_user);
+        $saleId = $ventas->saveVenta($id_personal, $total, $metodo, $fecha, $id_user);
     
         // Obtener la sede del usuario desde la sesión
         $id_sede = $_SESSION['id_sede'];
@@ -234,15 +239,16 @@ switch ($option) {
             $ventas->updateStock($stock, $id_product);
         }
     
-        // Solo actualizar la deuda y capacidad del cliente si el método de pago es 3 (Credito)
+        // Solo actualizar la deuda y capacidad si el método de pago es 3 (Crédito)
         if (isset($metodo) && $metodo == 3) {
-            $clientes->updateDeudaCapacidad($id_cliente, $total, $metodo);
+            $ventas->updateDeudaCapacidad($id_personal, $total);
         }
     
         unset($_SESSION['cart'][$id_user]);
     
         echo json_encode(['tipo' => 'success', 'mensaje' => 'Venta guardada correctamente']);
         break;
+    
         
 
     case 'searchbarcode':
