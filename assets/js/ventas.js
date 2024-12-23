@@ -5,6 +5,7 @@ const area_cliente = document.querySelector('#area-cliente');
 const id_cliente = document.querySelector('#id-cliente');
 const capacidad_cliente = document.querySelector('#capacidad-cliente');
 const search = document.querySelector('#search'); 
+let btn_save;
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -38,18 +39,20 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelector('#capacidad-personal').value = datos.capacidad;
         $('#modal-personal').modal('hide');
     });
-
-
+            
     btn_save.onclick = function () {
-        axios.post(ruta + 'controllers/ventasController.php?option=saveVenta', {
-            idPersonal: document.querySelector('#id-personal').value,
-            metodo: document.querySelector('#metodo').value,
-            total: totalVenta.textContent
+        axios.post(ruta + 'controllers/ventasController.php?option=saveventa', {
+            idCliente: id_cliente.value,
+            metodo: metodo.value
         })
         .then(function (response) {
             const info = response.data;
             message(info.tipo, info.mensaje);
             if (info.tipo === 'success') {
+                updateStock();
+                temp(); // Actualiza la tabla temporal y el total
+
+                // Reinicia los formularios
                 resetFormularios();
             }
         })
@@ -58,63 +61,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     };
 });
-
-   
-  // Función para inicializar DataTable y cargar datos
-  function cargarTablaClientes() {
-      axios.get(ruta + 'controllers/clientesController.php?option=listar')
-          .then(function (response) {
-              const datos = response.data;
-              if (datos.tipo === 'success') {
-                  $('#tablaClientes').DataTable({
-                      destroy: true, // Permite reinicializar la tabla
-                      data: datos.data,
-                      columns: [
-                          { data: 'nombre_completo', title: 'Nombre Completo' },
-                          { data: 'nombre_sede', title: 'Sede' },
-                          { data: 'fecha_apertura', title: 'Fecha Apertura' },
-                          {
-                              data: 'fecha_cierre',
-                              render: function (data) {
-                                  return data ? data : 'Sesión en curso';
-                              },
-                              title: 'Fecha Cierre'
-                          },
-                          {
-                              data: 'valor_cierre',
-                              render: function (data) {
-                                  return data ? data : 'Sesión en curso';
-                              },
-                              title: 'Valor Cierre'
-                          }
-                      ],
-                      language: {
-                          sProcessing: "Procesando...",
-                          sLengthMenu: "Mostrar _MENU_ registros",
-                          sZeroRecords: "No se encontraron resultados",
-                          sEmptyTable: "Ningún dato disponible en esta tabla",
-                          sInfo: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                          sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
-                          sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
-                          sSearch: "Buscar:",
-                          oPaginate: {
-                              sFirst: "Primero",
-                              sLast: "Último",
-                              sNext: "Siguiente",
-                              sPrevious: "Anterior"
-                          }
-                      }
-                  });
-              } else {
-                  console.error('Error al cargar datos:', datos.mensaje);
-                  alert('Hubo un error al cargar los datos.');
-              }
-          })
-          .catch(function (error) {
-              console.error('Error:', error);
-              alert('Hubo un error al conectar con el servidor.');
-          });
-  }
 
 document.addEventListener('DOMContentLoaded', function () {
     btn_save = document.querySelector('#btn-guardar');
