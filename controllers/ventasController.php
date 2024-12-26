@@ -98,21 +98,23 @@ switch ($option) {
         if (!isset($_SESSION['cart'][$id_user])) {
             $_SESSION['cart'][$id_user] = [];
         }
-
+    
         $cartItems = $_SESSION['cart'][$id_user];
         $result = [];
-
+    
         foreach ($cartItems as $id_product => $item) {
             $product = $ventas->getProduct($id_product);
             if ($product) {
                 $product['cantidad'] = $item['cantidad'];
-                $product['precio_venta'] = $item['precio'];
+                // Asegurar que precio_venta tenga un valor válido
+                $product['precio_venta'] = isset($item['precio']) ? $item['precio'] : ($product['precio_venta'] ?? 0);
                 $result[] = $product;
             }
         }
-
+    
         echo json_encode($result);
         break;
+        
 
     case 'addcantidad':
         $data = json_decode(file_get_contents('php://input'), true);
@@ -160,19 +162,23 @@ switch ($option) {
     case 'saveventa':
         $data = json_decode(file_get_contents('php://input'), true);
     
-        if (is_null($data)) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'Datos de entrada inválidos']);
-            break;
-        }
+        $cedula = $data['cedula'] ?? null;
+        $metodo = $data['metodo'] ?? null;
     
-        $id_personal = isset($data['idCliente']) ? $data['idCliente'] : null; // Cambio a id_personal
-        $metodo = isset($data['metodo']) ? $data['metodo'] : null;
-    
-        if (is_null($id_personal) || is_null($metodo)) {
+        // Validar parámetros obligatorios
+        if (is_null($cedula) || is_null($metodo)) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Datos de personal o método de pago no válidos']);
             break;
         }
     
+        // Obtener datos del personal
+        $personal = $ventas->getPersonalById($cedula);
+        if (!$personal) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'El personal seleccionado no existe']);
+            break;
+        }
+    
+        // Validar método de pago
         switch ($metodo) {
             case 'Efectivo':
                 $metodo = 1;
@@ -188,6 +194,7 @@ switch ($option) {
                 exit;
         }
     
+        // Validar carrito
         if (!isset($_SESSION['cart'][$id_user])) {
             $_SESSION['cart'][$id_user] = [];
         }
@@ -197,6 +204,7 @@ switch ($option) {
             break;
         }
     
+        // Validar stock y calcular total
         $total = 0;
         $stock_insuficiente = false;
     
@@ -214,24 +222,20 @@ switch ($option) {
             break;
         }
     
-        // Obtener datos de personal en lugar de cliente
-        $personal = $ventas->getPersonalById($id_personal);
-        if (!$personal) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'PERSONAL NO ENCONTRADO']);
-            break;
-        }
-    
+        // Validar capacidad de crédito si el método es Crédito
         if ($metodo == 3 && $personal['capacidad'] < $total) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'CAPACIDAD DE CRÉDITO INSUFICIENTE']);
             break;
         }
     
-        $fecha = date('Y-m-d'); // Captura la fecha actual en la zona horaria configurada
-        $saleId = $ventas->saveVenta($id_personal, $total, $metodo, $fecha, $id_user);
+        // Guardar la venta
+        $fecha = date('Y-m-d'); 
+        $saleId = $ventas->saveVenta($cedula, $total, $metodo, $fecha, $id_user);
     
         // Obtener la sede del usuario desde la sesión
         $id_sede = $_SESSION['id_sede'];
     
+        // Guardar detalles de venta y actualizar stock
         foreach ($_SESSION['cart'][$id_user] as $id_product => $item) {
             $ventas->saveDetalle($id_product, $saleId, $item['cantidad'], $item['precio'], $id_sede);
             $product = $ventas->getProduct($id_product);
@@ -239,16 +243,16 @@ switch ($option) {
             $ventas->updateStock($stock, $id_product);
         }
     
-        // Solo actualizar la deuda y capacidad si el método de pago es 3 (Crédito)
-        if (isset($metodo) && $metodo == 3) {
-            $ventas->updateDeudaCapacidad($id_personal, $total);
+        // Actualizar deuda y capacidad si el método es Crédito
+        if ($metodo == 3) {
+            $ventas->updateDeudaCapacidad($cedula, $total);
         }
     
         unset($_SESSION['cart'][$id_user]);
     
         echo json_encode(['tipo' => 'success', 'mensaje' => 'Venta guardada correctamente']);
         break;
-    
+        
         
 
     case 'searchbarcode':
@@ -272,12 +276,6 @@ switch ($option) {
         }
         break;
                 
-
-    case 'listar-clientes':
-        $result = $clientes->getClients();
-        echo json_encode($result);
-        break;
-    
     case 'logout':
         // Destruir la sesión
         session_destroy();
@@ -287,7 +285,6 @@ switch ($option) {
         exit();
         break;
         
-
     default:
         echo json_encode(['tipo' => 'error', 'mensaje' => 'Opción no válida']);
         break;

@@ -44,11 +44,15 @@ class Ventas {
     }
 
     // Guardar una nueva venta
-    public function saveVenta($id_cliente, $total, $metodo, $fecha, $id_user) {
-        $consult = $this->pdo->prepare("INSERT INTO cf_ventas (id_cliente, total, metodo, fecha, id_usuario) VALUES (?, ?, ?, ?, ?)");
-        $consult->execute([$id_cliente, $total, $metodo, $fecha, $id_user]);
+    public function saveVenta($id_personal, $total, $metodo, $fecha, $id_user) {
+        $consult = $this->pdo->prepare("
+            INSERT INTO cf_ventas (id_personal, total, metodo, fecha, id_usuario) 
+            VALUES (?, ?, ?, ?, ?)
+        ");
+        $consult->execute([$id_personal, $total, $metodo, $fecha, $id_user]);
         return $this->pdo->lastInsertId();
     }
+     
 
     // Guardar los detalles de una venta
     public function saveDetalle($id_producto, $id_venta, $cantidad, $precio, $id_caja) {

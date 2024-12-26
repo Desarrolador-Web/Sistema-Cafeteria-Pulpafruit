@@ -1,16 +1,16 @@
 let table_temp = document.querySelector('#table_temp tbody');
 const totalVenta = document.querySelector('#total-venta'); 
-const nombre_cliente = document.querySelector('#nombre-cliente');
-const area_cliente = document.querySelector('#area-cliente');
-const id_cliente = document.querySelector('#id-cliente');
-const capacidad_cliente = document.querySelector('#capacidad-cliente');
+const nombre_personal = document.querySelector('#nombre-personal');
+const area_personal = document.querySelector('#area-personal');
+const id_personal = document.querySelector('#id-personal');
+const capacidad_personal = document.querySelector('#capacidad-personal');
 const search = document.querySelector('#search'); 
 let btn_save;
 
 document.addEventListener('DOMContentLoaded', function () {
-
+    // Inicializar tabla de personal
     let table_personal = $('#table_personal').DataTable({
-        ajax: {
+        ajax: { 
             url: ruta + 'controllers/ventasController.php?option=listarPersonal',
             dataSrc: ''
         },
@@ -32,38 +32,56 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Evento para seleccionar un personal
     $('#table_personal tbody').on('dblclick', 'tr', function () {
-        const datos = table_personal.row(this).data();
-        document.querySelector('#id-personal').value = datos.id;
-        document.querySelector('#nombre-personal').value = datos.nombre;
-        document.querySelector('#area-personal').value = datos.area;
-        document.querySelector('#capacidad-personal').value = datos.capacidad;
-        $('#modal-personal').modal('hide');
-    });
+        const datos = table_personal.row(this).data(); // Obtener datos de la fila seleccionada
+
+        if (datos) {
+            console.log("Datos seleccionados:", datos); // Depuración
             
-    btn_save.onclick = function () {
-        axios.post(ruta + 'controllers/ventasController.php?option=saveventa', {
-            idCliente: id_cliente.value,
-            metodo: metodo.value
-        })
-        .then(function (response) {
-            const info = response.data;
-            message(info.tipo, info.mensaje);
-            if (info.tipo === 'success') {
-                updateStock();
-                temp(); // Actualiza la tabla temporal y el total
+            if (id_personal) id_personal.value = datos.id || '';
+            if (nombre_personal) nombre_personal.value = datos.nombre || '';
+            if (area_personal) area_personal.value = datos.area || '';
+            if (capacidad_personal) capacidad_personal.value = datos.capacidad || '';
+            
+            $('#modal-personal').modal('hide'); // Cerrar modal después de seleccionar
+        } else {
+            console.error('No se pudieron obtener los datos del personal seleccionado.');
+            message('error', 'Error al seleccionar el personal. Intente nuevamente.');
+        }
+    });
 
-                // Reinicia los formularios
-                resetFormularios();
+    // Inicializar el botón de guardar
+    btn_save = document.querySelector('#btn-guardar'); 
+
+    if (btn_save) {
+        btn_save.onclick = function () {
+            if (!id_personal.value || !metodo.value) {
+                message('error', 'Debe seleccionar un personal y un método de pago');
+                return;
             }
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
-    };
-});
+        
+            axios.post(ruta + 'controllers/ventasController.php?option=saveventa', {
+                cedula: id_personal.value, // Enviar el ID del personal
+                metodo: metodo.value
+            })
+            .then(function (response) {
+                const info = response.data;
+                message(info.tipo, info.mensaje);
+                if (info.tipo === 'success') {
+                    updateStock();
+                    temp();
+                    resetFormularios();
+                }
+            })
+            .catch(function (error) {
+                console.error("Error al guardar la venta:", error);
+                message('error', 'Ocurrió un error al guardar la venta');
+            });
+        };
+    } else {
+        console.error('El botón #btn-guardar no se encontró en el DOM.');
+    }
 
-document.addEventListener('DOMContentLoaded', function () {
-    btn_save = document.querySelector('#btn-guardar');
+    // Configuración de la tabla de ventas
     $('#table_venta').DataTable({
         ajax: {
             url: ruta + 'controllers/ventasController.php?option=listar',
@@ -91,110 +109,19 @@ document.addEventListener('DOMContentLoaded', function () {
             url: 'https://cdn.datatables.net/plug-ins/1.13.1/i18n/es-ES.json'
         }
     });
-    
+
     temp(); // Inicializa la tabla temporal y el total
-
-    document.addEventListener('DOMContentLoaded', function () {
-        let table_clientes = $('#table_clientes').DataTable({
-            ajax: {
-                url: ruta + 'controllers/ventasController.php?option=listar-clientes', 
-                dataSrc: ''
-            },
-            columns: [
-                {
-                    data: null,
-                    render: function (data) {
-                        return `${data.nombre_completo}`;
-                    }
-                },
-                { data: 'id_cliente' },
-                { data: 'area' },
-                { data: 'capacidad' }
-            ],
-            language: {
-                url: 'https://cdn.datatables.net/plug-ins/1.13.1/i18n/es-ES.json'
-            },
-            createdRow: function (row, data) {
-                if (data.capacidad == 0) {
-                    $(row).addClass('table-danger'); // Resalta filas con capacidad 0
-                }
-            }
-        });
-    
-        // Doble clic en una fila para seleccionar un cliente
-        $('#table_clientes tbody').on('dblclick', 'tr', function () {
-            const datos = table_clientes.row(this).data();
-            document.querySelector('#id-cliente').value = datos.id_cliente;
-            document.querySelector('#nombre-cliente').value = datos.nombre_completo;
-            document.querySelector('#area-cliente').value = datos.area;
-            document.querySelector('#capacidad-cliente').value = datos.capacidad;
-            $('#modal-cliente').modal('hide');
-        });
-    });
-    
-    search.addEventListener('keyup', function (e) {
-        if (e.key === "Enter") {
-            if (e.target.value.trim() === '') {
-                message('error', 'INGRESE CÓDIGO DE BARRAS');
-            } else {
-                axios.get(ruta + 'controllers/ventasController.php?option=searchbarcode&barcode=' + e.target.value.trim())
-                    .then(function (response) {
-                        // Suponemos que si hay una respuesta, el producto se encontró
-                        console.log("Respuesta del servidor: ", response.data); // Depuración
-                        message('success', 'Producto agregado correctamente al carrito');
-    
-                        // Limpieza y actualizaciones
-                        search.value = ''; // Limpia el campo de búsqueda
-                        updateStock(); // Actualiza stock
-                        temp(); // Actualiza carrito
-                    })
-                    .catch(function (error) {
-                        console.error("Error en la solicitud: ", error); // Depuración
-                        message('error', 'Ocurrió un error al procesar la solicitud');
-                    });
-            }
-        }
-    });
-    
-    
-            
-    btn_save.onclick = function () {
-        axios.post(ruta + 'controllers/ventasController.php?option=saveventa', {
-            idCliente: id_cliente.value,
-            metodo: metodo.value
-        })
-        .then(function (response) {
-            const info = response.data;
-            message(info.tipo, info.mensaje);
-            if (info.tipo === 'success') {
-                updateStock();
-                temp(); // Actualiza la tabla temporal y el total
-
-                // Reinicia los formularios
-                resetFormularios();
-            }
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
-    };
 });
 
+// Reiniciar formularios después de guardar la venta
 function resetFormularios() {
-    // Reiniciar campos del cliente
-    id_cliente.value = '';
-    nombre_cliente.value = '';
-    area_cliente.value = '';
-    capacidad_cliente.value = '';
-
-    // Reiniciar el método de pago al valor predeterminado
-    metodo.value = 'Efectivo';
-
-    // Vaciar la tabla temporal
-    table_temp.innerHTML = '';
-
-    // Reiniciar el total a 0
-    totalVenta.textContent = '0';
+    if (id_personal) id_personal.value = '';
+    if (nombre_personal) nombre_personal.value = '';
+    if (area_personal) area_personal.value = '';
+    if (capacidad_personal) capacidad_personal.value = '';
+    if (metodo) metodo.value = 'Efectivo';
+    if (table_temp) table_temp.innerHTML = '';
+    if (totalVenta) totalVenta.textContent = '0';
 }
 
 function addCart(codProducto) {
@@ -203,56 +130,58 @@ function addCart(codProducto) {
             const info = response.data;
             message(info.tipo, info.mensaje);
             updateStock();
-            temp(); // Actualiza la tabla temporal y el total
+            temp();
         })
         .catch(function (error) {
             console.log(error);
         });
 }
 
+// Función para actualizar la tabla temporal
 function temp() {
     axios.get(ruta + 'controllers/ventasController.php?option=listarTemp')
         .then(function (response) {
-            const info = response.data;
-            let tempProductos = '';
-            let total = 0; // Inicializa el total
+            if (!Array.isArray(response.data)) {
+                console.error('Error: response.data no es un array', response.data);
+                message('error', 'Error al cargar la tabla temporal. Datos no válidos.');
+                return;
+            }
 
-            info.forEach(pro => {
-                const subtotal = parseFloat(pro.precio_venta) * parseInt(pro.cantidad);
+            let tempProductos = '';
+            let total = 0;
+
+            response.data.forEach(pro => {
+                const precio = parseFloat(pro.precio_venta) || 0; // Asegura que precio_venta tenga un valor válido
+                const cantidad = parseInt(pro.cantidad) || 0; // Asegura que cantidad sea válida
+                const subtotal = precio * cantidad;
+
                 tempProductos += `<tr>
                     <td>${pro.descripcion}</td>
-                    <td><input class="form-control" type="number" value="${pro.precio_venta}" onchange="addPrecio(event, ${pro.id_producto})" /></td>
-                    <td><input class="form-control" type="number" value="${pro.cantidad}" onchange="addCantidad(event, ${pro.id_producto})" /></td>
+                    <td><input class="form-control" type="number" value="${precio}" onchange="addPrecio(event, ${pro.id_producto})" /></td>
+                    <td><input class="form-control" type="number" value="${cantidad}" onchange="addCantidad(event, ${pro.id_producto})" /></td>
                     <td>${subtotal.toFixed(2)}</td>
                     <td><i class="fas fa-eraser text-danger" onclick="deleteProducto(${pro.id_producto})"></i></td>
                 </tr>`;
-                total += subtotal; // Suma el subtotal al total
+                total += subtotal;
             });
 
             table_temp.innerHTML = tempProductos;
-            totalVenta.textContent = total.toFixed(2); // Actualiza el total en la vista
+            totalVenta.textContent = total.toFixed(2);
         })
         .catch(function (error) {
-            console.log(error);
+            console.error("Error al cargar la tabla temporal:", error);
         });
 }
+
 
 function addCantidad(e, idTemp) {
     axios.post(ruta + 'controllers/ventasController.php?option=addcantidad', {
         id: idTemp,
         cantidad: e.target.value
     })
-    .then(function (response) {
-        const info = response.data;
-        if (info.tipo == 'error') {
-            message(info.tipo, info.mensaje);
-            return;
-        }
+    .then(() => {
         updateStock();
-        temp(); // Actualiza la tabla temporal y el total
-    })
-    .catch(function (error) {
-        console.log(error);
+        temp();
     });
 }
 
@@ -261,30 +190,17 @@ function addPrecio(e, idTemp) {
         id: idTemp,
         precio: e.target.value
     })
-    .then(function (response) {
-        const info = response.data;
-        if (info.tipo == 'error') {
-            message(info.tipo, info.mensaje);
-            return;
-        }
+    .then(() => {
         updateStock();
-        temp(); // Actualiza la tabla temporal y el total
-    })
-    .catch(function (error) {
-        console.log(error);
+        temp();
     });
 }
 
 function deleteProducto(idTemp) {
     axios.get(ruta + 'controllers/ventasController.php?option=delete&id=' + idTemp)
-    .then(function (response) {
-        const info = response.data;
-        message(info.tipo, info.mensaje);
+    .then(() => {
         updateStock();
-        temp(); // Actualiza la tabla temporal y el total
-    })
-    .catch(function (error) {
-        console.log(error);
+        temp();
     });
 }
 

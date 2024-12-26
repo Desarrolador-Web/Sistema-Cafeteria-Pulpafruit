@@ -114,6 +114,7 @@
                             <option value="">Seleccione una opción</option>
                             <option value="2">Caja</option>
                             <option value="1">Socio</option>
+                            <option value="3">Bancaria</option> <!-- Nueva opción -->
                         </select>
                     </div>
                     <div class="mb-3">
