@@ -2,6 +2,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnRecibido = document.querySelector('#btn-Recibido');
     const btnPendiente = document.querySelector('#btn-pendiente');
     const btnGuardarMetodo = document.querySelector('#btnGuardarMetodo');
+    const modal = document.getElementById('modalMetodoPago');
+    const closeModal = document.getElementById('closeModal');
+    const cancelModal = document.getElementById('cancelModal');
     const table_productos = document.querySelector('#table_productos tbody');
     const formProductos = document.querySelector('#frmProductos');
     let estadoCompra; // Variable para el estado actual (Recibido o Pendiente)
@@ -22,11 +25,19 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
-    // Abre el modal para seleccionar método de pago y sede
+    // Abre el modal
     function abrirModalMetodoPago() {
-        const modal = new bootstrap.Modal(document.getElementById('modalMetodoPago'));
-        modal.show();
+        modal.style.display = "block";
     }
+
+    // Cierra el modal
+    function cerrarModal() {
+        modal.style.display = "none";
+    }
+
+    // Evento para cerrar el modal
+    closeModal.onclick = cerrarModal;
+    cancelModal.onclick = cerrarModal;
 
     // Evento para guardar método de pago y sede desde el modal
     btnGuardarMetodo.onclick = function () {
@@ -39,8 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Cierra el modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('modalMetodoPago'));
-        modal.hide();
+        cerrarModal();
 
         // Envía los datos al servidor
         registrarCompra(estadoCompra, metodo_compra, id_caja);

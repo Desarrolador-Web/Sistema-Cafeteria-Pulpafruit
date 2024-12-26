@@ -47,15 +47,17 @@ class Compras {
         $sql = "INSERT INTO cf_compras (id_empresa, total_compra, fecha_compra, id_usuario, estado_compra, id_caja, metodo_compra) 
                 VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([$id_empresa, $total, $fecha, $id_user, $estado, $id_caja, $metodo_compra]);
-    } 
+        $stmt->execute([$id_empresa, $total, $fecha, $id_user, $estado, $id_caja, $metodo_compra]);
+        return $this->pdo->lastInsertId(); // Devuelve el id_compra generado
+    }
     
     public function saveProduct($barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado, $id_caja) {
         $consult = $this->pdo->prepare("
             INSERT INTO cf_producto (codigo_producto, descripcion, id_empresa, precio_compra, precio_venta, imagen, existencia, estado_producto, id_caja) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
-        return $consult->execute([$barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado, $id_caja]);
+        $consult->execute([$barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado, $id_caja]);
+        return $this->pdo->lastInsertId(); // Devuelve el id_producto generado
     }
     
     public function saveDetalle($id_producto, $id_compra, $cantidad, $precio) {

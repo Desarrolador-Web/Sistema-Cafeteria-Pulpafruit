@@ -99,39 +99,74 @@
 </div>
 
 <!-- Modal para método de pago y sede -->
-<div class="modal fade" id="modalMetodoPago" tabindex="-1" aria-labelledby="modalMetodoPagoLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalMetodoPagoLabel">Información de la compra</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="formMetodoPago">
-                    <div class="mb-3">
-                        <label for="metodo_compra" class="form-label">¿De dónde viene el dinero de la compra?</label>
-                        <select class="form-control" id="metodo_compra" name="metodo_compra" required>
-                            <option value="">Seleccione una opción</option>
-                            <option value="2">Caja</option>
-                            <option value="1">Socio</option>
-                            <option value="3">Bancaria</option> <!-- Nueva opción -->
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_caja" class="form-label">¿Para qué sede desea realizar la compra?</label>
-                        <select class="form-control" id="id_caja" name="id_caja" required>
-                            <option value="">Seleccione una sede</option>
-                            <option value="1">Principal</option>
-                            <option value="2">Planta 2</option>
-                            <option value="3">CEDI</option>
-                        </select>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-success" id="btnGuardarMetodo">Guardar</button>
-            </div>
+<div id="modalMetodoPago" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close" id="closeModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="formMetodoPago">
+                <div class="mb-3">
+                    <label for="metodo_compra" class="form-label">¿De dónde viene el dinero de la compra?</label>
+                    <select class="form-control" id="metodo_compra" name="metodo_compra" required>
+                        <option value="">Seleccione una opción</option>
+                        <option value="2">Caja</option>
+                        <option value="1">Socio</option>
+                        <option value="3">Bancaria</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="id_caja" class="form-label">¿Para qué sede desea realizar la compra?</label>
+                    <select class="form-control" id="id_caja" name="id_caja" required>
+                        <option value="">Seleccione una sede</option>
+                        <option value="1">Principal</option>
+                        <option value="2">Planta 2</option>
+                        <option value="3">CEDI</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelModal">Cancelar</button>
+            <button type="button" class="btn btn-success" id="btnGuardarMetodo">Guardar</button>
         </div>
     </div>
 </div>
+
+<style>
+    /* Estilos para el modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+</style>
