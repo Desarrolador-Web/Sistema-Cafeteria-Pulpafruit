@@ -81,6 +81,32 @@ document.addEventListener('DOMContentLoaded', function () {
         console.error('El botón #btn-guardar no se encontró en el DOM.');
     }
 
+    search.addEventListener('keyup', function (e) {
+        if (e.key === "Enter") {
+            if (e.target.value.trim() === '') {
+                message('error', 'INGRESE CÓDIGO DE BARRAS');
+            } else {
+                axios.get(ruta + 'controllers/ventasController.php?option=searchbarcode&barcode=' + e.target.value.trim())
+                    .then(function (response) {
+                        // Suponemos que si hay una respuesta, el producto se encontró
+                        console.log("Respuesta del servidor: ", response.data); // Depuración
+                        message('success', 'Producto agregado correctamente al carrito');
+    
+                        // Limpieza y actualizaciones
+                        search.value = ''; // Limpia el campo de búsqueda
+                        updateStock(); // Actualiza stock
+                        temp(); // Actualiza carrito
+                    })
+                    .catch(function (error) {
+                        console.error("Error en la solicitud: ", error); // Depuración
+                        message('error', 'Ocurrió un error al procesar la solicitud');
+                    });
+            }
+        }
+    });
+    
+    
+
     // Configuración de la tabla de ventas
     $('#table_venta').DataTable({
         ajax: {
