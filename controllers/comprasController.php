@@ -40,7 +40,7 @@ switch ($option) {
         $estado = isset($_POST['estado']) ? (int) $_POST['estado'] : 1; // Recibido o Pendiente
         $descripcion = isset($_POST['descripcion']) ? $_POST['descripcion'] : '';
         $barcode = isset($_POST['barcode']) ? $_POST['barcode'] : '';
-        $fecha = date('Y-m-d');
+        $fecha = date('Y-m-d H:i:s'); // Captura la fecha y hora actual
         $imagen = '';
         $id_user = $_SESSION['idusuario'] ?? 0;
     
