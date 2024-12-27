@@ -21,6 +21,34 @@
     <link rel="stylesheet" type="text/css" href="<?php echo RUTA . 'assets/'; ?>css/datatables.min.css" />
     <link rel="stylesheet" type="text/css" href="<?php echo RUTA . 'assets/'; ?>css/dataTables.dateTime.min.css" />
 </head>
+
+<?php
+// Asegurar que la sesión esté iniciada
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Variables de sesión
+$_SESSION['rol'] = $_SESSION['rol'] ?? null;
+$rol_usuario = $_SESSION['rol'];
+$id_user = $_SESSION['idusuario'] ?? null;
+
+// Validar si la vista está minimizada
+$mini = !empty($_GET['pagina']) && in_array($_GET['pagina'], ['ventas', 'compras']);
+
+// Instanciar AdminModel
+require_once __DIR__ . '/../../models/admin.php';
+$admin = new AdminModel();
+
+// Inicializar estadoCaja para evitar el Warning
+$estadoCaja = 0;
+
+// Determinar estado de la caja para roles 1 y 2
+if (in_array($rol_usuario, [1, 2]) && $id_user) {
+    $estadoCaja = $admin->getEstadoCaja($id_user);
+}
+?>
+
 <?php $mini = false;
 if (!empty($_GET['pagina'])) {
     if ($_GET['pagina'] == 'ventas' || $_GET['pagina'] == 'compras') {
@@ -65,13 +93,45 @@ if (!isset($_SESSION['rol'])) {
             <?php } ?>
 
 
-            <!-- Nav Item - Dashboard -->
+        <!-- Validar para roles 1 y 2 -->
+        <?php if (in_array($rol_usuario, [1, 2])): ?>
+            <?php if ($estadoCaja == 1): ?>
+                <!-- Caja Abierta: Mostrar opción para Cerrar Caja -->
+                <li class="nav-item <?php echo (empty($_GET['pagina'])) ? 'bg-gradient-info' : ''; ?>">
+                    <a class="nav-link" href="plantilla.php">
+                        <i class="fas fa-cash-register"></i>
+                        <span>Cerrar Caja</span>
+                    </a>
+                </li>
+            <?php elseif ($estadoCaja == 2 && !empty($configuracion)): ?>
+                <!-- Caja Cerrada: Mostrar opción para Abrir Caja -->
+                <hr class="sidebar-divider d-none d-md-block">
+                <li class="nav-item <?php echo (!empty($_GET['pagina']) && $_GET['pagina'] == 'configuracion') ? 'bg-gradient-info' : ''; ?>">
+                    <a class="nav-link" href="?pagina=configuracion">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Abrir Caja</span>
+                    </a>
+                </li>
+            <?php elseif ($estadoCaja == 0): ?>
+                <!-- Sin Registro: Mostrar opción para Abrir Caja -->
+                <hr class="sidebar-divider d-none d-md-block">
+                <li class="nav-item <?php echo (!empty($_GET['pagina']) && $_GET['pagina'] == 'configuracion') ? 'bg-gradient-info' : ''; ?>">
+                    <a class="nav-link" href="?pagina=configuracion">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Abrir Caja</span>
+                    </a>
+                </li>
+            <?php endif; ?>
+        <?php else: ?>
+            <!-- Otros Roles: Mostrar siempre Cerrar Caja -->
             <li class="nav-item <?php echo (empty($_GET['pagina'])) ? 'bg-gradient-info' : ''; ?>">
                 <a class="nav-link" href="plantilla.php">
-                <i class="fas fa-cash-register"></i>
-                    <span>Cerrar Caja</span></a>
+                    <i class="fas fa-cash-register"></i>
+                    <span>Cerrar Caja</span>
+                </a>
             </li>
-
+        <?php endif; ?>
+    
 
 
 
@@ -156,23 +216,6 @@ if (!isset($_SESSION['rol'])) {
                     </div>
                 </li>
             <?php } ?>
-
-
-            <?php if (!empty($configuracion)) { ?> 
-
-                <!-- <hr class="sidebar-divider d-none d-md-block">
-
-                <li class="nav-item <?php echo (!empty($_GET['pagina']) && $_GET['pagina'] == 'configuracion') ? 'bg-gradient-info' : ''; ?>">
-                    <a class="nav-link" href="?pagina=configuracion">
-                        <i class="fas fa-user-cog"></i>
-                        <span>Configuración</span>
-                    </a>
-                </li>  -->
-            <?php } ?> 
-
-             <!-- <div class="text-center d-none d-md-inline mt-3">
-                <button class="rounded-circle border-0" id="sidebarToggle"><i class="fas fa-chevron-circle-left text-gray-400"></i></button>
-            </div> -->
 
         </ul>
         <!-- End of Sidebar -->

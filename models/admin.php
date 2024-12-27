@@ -48,6 +48,30 @@ class AdminModel {
         return $query->execute([$valorCierre, $fechaCierre, $observacion, $id_info_caja]);
     }
     
+    public function getEstadoCaja($id_user) {
+        $sql = "SELECT 
+                    CASE 
+                        WHEN valor_cierre IS NULL AND fecha_cierre IS NULL THEN 1 -- Caja abierta
+                        WHEN valor_cierre IS NOT NULL AND fecha_cierre IS NOT NULL THEN 2 -- Caja cerrada
+                        ELSE 0 -- Sin estado definido
+                    END AS estado
+                FROM cf_informacion_cajas 
+                WHERE id_usuario = ? 
+                  AND CONVERT(DATE, fecha_apertura) = CONVERT(DATE, GETDATE())";
+    
+        $query = $this->pdo->prepare($sql);
+        $query->execute([$id_user]);
+        $result = $query->fetch(PDO::FETCH_ASSOC);
+    
+        if ($result) {
+            return (int)$result['estado']; // 1 = Abierta, 2 = Cerrada, 0 = Sin estado
+        }
+        return 0; // Sin registros de caja para hoy
+    }
+    
+    
+    
+    
 
     public function obtenerDiferenciaVentasCompras($id_usuario) {
         $sql = "
