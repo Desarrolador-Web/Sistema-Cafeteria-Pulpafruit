@@ -169,6 +169,67 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     };
 
+    function cargarCompras() {
+        let endpoint = mostrarTodosRegistros 
+            ? ruta + 'controllers/comprasController.php?option=listarCompras'
+            : ruta + 'controllers/comprasController.php?option=listarCompras';
+    
+        axios.get(endpoint)
+            .then(response => {
+                if (Array.isArray(response.data)) {
+                    actualizarTablaCompras(response.data);
+                } else {
+                    message('error', response.data.mensaje);
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar compras:', error);
+                message('error', 'Error al cargar compras');
+            });
+    }
+    
+    function cargarComprasPendientes() {
+        axios.get(ruta + 'controllers/comprasController.php?option=listarComprasPendientes')
+            .then(response => {
+                if (Array.isArray(response.data)) {
+                    actualizarTablaCompras(response.data);
+                } else {
+                    console.error('La respuesta no es un arreglo:', response.data);
+                    Swal.fire('Error', response.data.mensaje || 'No se pudieron cargar las compras pendientes.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar compras pendientes:', error);
+                Swal.fire('Error', 'Ocurrió un error al cargar las compras pendientes.', 'error');
+            });
+    }
+    
+    function actualizarTablaCompras(compras) {
+        const tbody = document.querySelector('#table_compras tbody');
+        tbody.innerHTML = '';
+    
+        compras.forEach(compra => {
+            const row = `
+                <tr>
+                    <td>${compra.idcompra}</td>
+                    <td>${compra.fecha_compra}</td>
+                    <td>${compra.total_compra}</td>
+                    <td>${compra.metodo_compra}</td>
+                    <td>${compra.estado_compra === 0 ? 'Pendiente' : 'Otro'}</td>
+                    <td>${compra.usuario}</td>
+                    <td>${compra.empresa}</td>
+                    <td>${compra.id_caja}</td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+    
+        $('#table_compras').DataTable({
+            destroy: true,
+            language: { url: 'https://cdn.datatables.net/plug-ins/1.13.1/i18n/es-ES.json' }
+        });
+    }
+    
     // Cargar empresas en el select
     function cargarEmpresas() {
         axios.get('controllers/comprasController.php?option=listarEmpresas')
