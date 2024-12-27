@@ -1,4 +1,4 @@
-  <!-- Page Heading -->
+<!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">Nueva venta</h1>
 </div>
@@ -8,20 +8,22 @@
         <div class="card shadow-sm rounded">
             <div class="card-body">
 
-
+                <!-- Datos del Personal -->
                 <div class="d-flex justify-content-between mt-3">
-                    <h5>Datos del cliente</h5>
-                    <button class="btn btn-outline-info" data-toggle="modal" data-target="#modal-cliente"><i class="fas fa-search"></i> Seleccionar cliente</button>
+                    <h5>Datos del Personal</h5>
+                    <button class="btn btn-outline-info" data-toggle="modal" data-target="#modal-personal">
+                        <i class="fas fa-search"></i> Seleccionar Personal
+                    </button>
                 </div>
                 <hr>
                 <div class="row">
-                    <input type="hidden" id="id-cliente" value="1">
+                    <input type="hidden" id="id-personal" value="1">
                     <div class="col-md-6">
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <span class="input-group-text bg-light border-0"><i class="fas fa-users"></i></span>
                             </div>
-                            <input type="text" class="form-control border-0" id="nombre-cliente" placeholder="Nombre" readonly>
+                            <input type="text" class="form-control border-0" id="nombre-personal" placeholder="Nombre" readonly>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -29,7 +31,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text bg-light border-0"><i class="fas fa-home"></i></span>
                             </div>
-                            <input type="text" class="form-control border-0" id="area-cliente" placeholder="Área" readonly>
+                            <input type="text" class="form-control border-0" id="area-personal" placeholder="Área" readonly>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -37,40 +39,47 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text bg-light border-0"><i class="fas fa-money-bill-alt"></i></span>
                             </div>
-                            <input type="text" class="form-control border-0" id="capacidad-cliente" placeholder="Capacidad" readonly>
+                            <input type="text" class="form-control border-0" id="capacidad-personal" placeholder="Capacidad" readonly>
                         </div>
                     </div>
                 </div>
 
-                <hr> <!-- Agregué un separador para mejor organización visual -->
+                <hr> <!-- Separador visual -->
 
+                <!-- Tabla temporal de productos -->
                 <div class="table-responsive">
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text bg-light border-0"><i class="fas fa-search"></i></span>
                         </div>
-                        <input type="text" class="form-control border-0" placeholder="Barcode" id="search">
+                        <input type="text" class="form-control border-0" placeholder="Código de Barras" id="search">
                     </div>
                     <table class="table table-striped table-hover" id="table_temp" style="width: 100%;">
                         <thead>
                             <tr>
                                 <th scope="col">Nombre</th>
                                 <th scope="col">Precio</th>
+<<<<<<< HEAD
+                                <th scope="col">Cant</th>
+                                <th scope="col">Subtotal</th>
+                                <th scope="col">Acción</th>
+=======
                                 <th scope="col">Cantidad</th>
                                 <th scope="col"></th>
                                 <th></th>
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
                             </tr>
                         </thead>
-                        <tbody>
-                        </tbody>
+                        <tbody></tbody>
                     </table>
 
                     <!-- Campo de Total -->
                     <div class="d-flex justify-content-between align-items-center mt-3">
                         <h5>Total:</h5>
-                        <h5 id="total-venta">0</h5> <!-- Este valor se actualizará automáticamente -->
+                        <h5 id="total-venta">0</h5>
                     </div>
 
+                    <!-- Método de Pago -->
                     <div class="col-md-12 mt-3">
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
@@ -92,6 +101,12 @@
         </div>
     </div>
 
+<<<<<<< HEAD
+    <!-- Tabla de Productos Disponibles -->
+    <div class="col-md-7">
+        <div class="card shadow-sm rounded">
+            <div class="card-body">
+=======
     <!--Modal biometrico -->
     <div id="sales-modal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog modal-lg">
@@ -157,18 +172,25 @@
                 </button>
             </div>
             <div class="modal-body">
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover" id="table_clientes" style="width: 100%;">
+                    <table class="table table-striped table-hover" id="table_venta" style="width: 100%;">
                         <thead class="thead-dark">
                             <tr>
+                                <th scope="col">Código</th>
                                 <th scope="col">Nombre</th>
+<<<<<<< HEAD
+                                <th scope="col">Stock</th>
+                                <th scope="col">Precio</th>
+                                <th scope="col">Acción</th>
+=======
                                 <th scope="col">Cédula</th>
                                 <th scope="col">Área</th>
                                 <th scope="col">Capacidad</th>
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
                             </tr>
                         </thead>
-                        <tbody>
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
@@ -176,21 +198,35 @@
     </div>
 </div>
 
+<<<<<<< HEAD
+<!-- Modal de Selección de Personal -->
+<div class="modal fade" id="modal-personal" tabindex="-1" aria-labelledby="modalPersonalLabel" aria-hidden="true">
+=======
 <!-- Modal para capturar fotografía
 <div class="modal fade" id="modal-camera" tabindex="-1" aria-labelledby="cameraLabel" aria-hidden="true">
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-dark text-white">
-                <h5 class="modal-title" id="cameraLabel">Capturar Fotografía</h5>
+                <h5 class="modal-title">Seleccionar Personal</h5>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <video id="video" width="100%" height="480" autoplay></video>
-                <button id="snap" class="btn btn-primary btn-block shadow-sm">Capturar</button>
-                <canvas id="canvas" style="display:none;"></canvas>
-                <img id="photo" src="" style="display:none;" />
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover" id="table_personal" style="width: 100%;">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Área</th>
+                                <th scope="col">Capacidad</th> 
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

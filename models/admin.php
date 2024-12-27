@@ -24,7 +24,6 @@ class AdminModel {
         $query->execute([$id_usuario, $fechaHoy]);
         return $query->fetch(PDO::FETCH_ASSOC);
     }
-     
     
     // Método que verifica si hay una caja sin cerrar
     public function checkCajaSinCerrar($id_sede) {
@@ -49,7 +48,28 @@ class AdminModel {
         return $query->execute([$valorCierre, $fechaCierre, $observacion, $id_info_caja]);
     }
     
-
+    public function getEstadoCaja($id_user) {
+        $sql = "SELECT 
+                    CASE 
+                        WHEN EXISTS (
+                            SELECT 1 
+                            FROM cf_informacion_cajas 
+                            WHERE id_usuario = ? AND sesion = 2
+                        ) THEN 1 -- Existe sesión con valor 2
+                        ELSE 2 -- No existe sesión con valor 2
+                    END AS estado";
+        
+        $query = $this->pdo->prepare($sql);
+        $query->execute([$id_user]);
+        $result = $query->fetch(PDO::FETCH_ASSOC);
+    
+        if ($result) {
+            return (int)$result['estado']; // 1 = Tiene sesión 2, 2 = No tiene sesión 2
+        }
+        return 0; // Sin registros para el usuario
+    }
+    
+    
     public function obtenerDiferenciaVentasCompras($id_usuario) {
         $sql = "
 

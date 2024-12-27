@@ -5,6 +5,7 @@ $option = $_GET['option'] ?? '';
 $clientesModel = new ClientesModel();
 
 switch ($option) {
+    
     case 'listar':
         try {
             $datos = $clientesModel->listarInformacionCajas();
@@ -22,6 +23,29 @@ switch ($option) {
         }
         break;
 
+    case 'iniciosSesion':
+        try {
+            $datos = $clientesModel->getIniciosSesion();
+            echo json_encode(['tipo' => 'success', 'data' => $datos]);
+        } catch (Exception $e) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => $e->getMessage()]);
+        }
+        break;
+
+    case 'usuariosRegistrados':
+        $data = $clientesModel->getUsuariosRegistrados();
+        echo json_encode(['tipo' => 'success', 'data' => $data]);
+        break;
+        
+    case 'productosAgotados':
+        try {
+            $datos = $clientesModel->getProductosAgotados();
+            echo json_encode(['tipo' => 'success', 'data' => $datos]);
+        } catch (Exception $e) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => $e->getMessage()]);
+        }
+        break;
+    
     default:
         echo json_encode(['tipo' => 'error', 'mensaje' => 'Opción no válida']);
         break;

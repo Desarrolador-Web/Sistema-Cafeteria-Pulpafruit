@@ -1,6 +1,5 @@
 <?php
 require_once '../models/ventas.php';
-require_once '../models/clientes.php';
 
 date_default_timezone_set('America/Bogota');
 
@@ -9,8 +8,9 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 $ventas = new Ventas();
-$clientes = new ClientesModel();
 $id_user = $_SESSION['idusuario'];
+$rol_usuario = $_SESSION['rol'] ?? null;
+$mostrar_todos = in_array($rol_usuario, [1, 2]);
 
 $option = isset($_GET['option']) ? $_GET['option'] : '';
 $idBio = isset($data['idBio']) ? $data['idBio'] : null;
@@ -18,36 +18,58 @@ $idBio = isset($data['idBio']) ? $data['idBio'] : null;
 switch ($option) {
 
     case 'listar':
-        if (isset($_SESSION['id_sede'])) {
-            $id_sede = $_SESSION['id_sede'];
-            $result = $ventas->getProductsBySede($id_sede);
-            
-            foreach ($result as $i => $item) {
-                // Obtener cantidad de compra inicial
-                $cantidadCompraInicial = $ventas->getCantidadCompraInicial($item['id_producto']);
-                
-                if ($cantidadCompraInicial !== null) {
-                    // Calcular porcentaje del stock actual en base a la cantidad de compra inicial
-                    $porcentajeStock = ($item['existencia'] / $cantidadCompraInicial) * 100;
-                    $result[$i]['porcentajeStock'] = $porcentajeStock; // se añade el porcentaje
-                } else {
-                    $result[$i]['porcentajeStock'] = 100; // stock completo si no se encuentra el valor inicial
-                }
-    
-                // Añadir botón de carrito sin modificar `cantidad`
-                $result[$i]['addcart'] = '<a href="#" class="btn btn-primary btn-sm" onclick="addCart(' . $item['id_producto'] . ')"><i class="fas fa-cart-plus"></i></a>';
-            }
-            echo json_encode($result);
+        if ($mostrar_todos) {
+            // Mostrar todos los productos sin importar la sede
+            $result = $ventas->getAllProducts();
         } else {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'No se ha seleccionado ninguna sede.']);
+            // Mostrar productos filtrados por sede
+            $id_sede = $_SESSION['id_sede'] ?? null;
+            if ($id_sede) {
+                $result = $ventas->getProductsBySede($id_sede);
+            } else {
+                echo json_encode(['tipo' => 'error', 'mensaje' => 'No se ha seleccionado ninguna sede.']);
+                exit;
+            }
         }
+    
+        foreach ($result as $i => $item) {
+            // Añadir botón de carrito a cada fila
+            $result[$i]['addcart'] = '<a href="#" class="btn btn-primary btn-sm" onclick="addCart(' . $item['id_producto'] . ')">
+                                        <i class="fas fa-cart-plus"></i>
+                                      </a>';
+        }
+    
+        echo json_encode($result);
         break;
 <<<<<<< HEAD
 
 =======
     
+
+    case 'listarPersonal':
+        $personal = $ventas->getPersonal();
+        if ($personal) {
+            echo json_encode($personal);
+        } else {
+            echo json_encode([]);
+        }
+        break;
+        
     
+<<<<<<< HEAD
+    case 'getPersonalById':
+        $id_personal = $_GET['id'] ?? null;
+        if ($id_personal) {
+            $personal = $ventas->getPersonalById($id_personal);
+            echo json_encode($personal);
+        } else {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'ID de personal no válido']);
+        }
+        break;
+        
+=======
 >>>>>>> 2b805a3ebe61d2e689b0c73d184ebad9a5bf5fa5
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
 
     case 'addcart':
         $id_product = $_GET['id'];
@@ -92,13 +114,13 @@ switch ($option) {
             $product = $ventas->getProduct($id_product);
             if ($product) {
                 $product['cantidad'] = $item['cantidad'];
-                $product['precio_venta'] = $item['precio'];
+                $product['precio_venta'] = $item['precio'] ?? $product['precio_venta'] ?? 0;
                 $result[] = $product;
             }
         }
-
         echo json_encode($result);
         break;
+        
 
     case 'addcantidad':
         $data = json_decode(file_get_contents('php://input'), true);
@@ -146,6 +168,26 @@ switch ($option) {
     case 'saveventa':
 
         $data = json_decode(file_get_contents('php://input'), true);
+<<<<<<< HEAD
+    
+        $cedula = $data['cedula'] ?? null;
+        $metodo = $data['metodo'] ?? null;
+    
+        // Validar parámetros obligatorios
+        if (is_null($cedula) || is_null($metodo)) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Datos de personal o método de pago no válidos']);
+            break;
+        }
+    
+        // Obtener datos del personal
+        $personal = $ventas->getPersonalById($cedula);
+        if (!$personal) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'El personal seleccionado no existe']);
+            break;
+        }
+    
+        // Validar método de pago
+=======
 
         if (is_null($data)) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Datos de entrada inválidos']);
@@ -160,6 +202,7 @@ switch ($option) {
             break;
         }
 
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
         switch ($metodo) {
             case 'Efectivo':
                 $metodo = 1;
@@ -174,16 +217,26 @@ switch ($option) {
                 echo json_encode(['tipo' => 'error', 'mensaje' => 'Método de pago no válido']);
                 exit;
         }
+<<<<<<< HEAD
+    
+        // Validar carrito
+=======
 
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
         if (!isset($_SESSION['cart'][$id_user])) {
             $_SESSION['cart'][$id_user] = [];
         }
 
         if (empty($_SESSION['cart'][$id_user])) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'CARRITO VACIO']);
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'CARRITO VACÍO']);
             break;
         }
+<<<<<<< HEAD
+    
+        // Validar stock y calcular total
+=======
 
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
         $total = 0;
         $stock_insuficiente = false;
 
@@ -200,6 +253,23 @@ switch ($option) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'STOCK INSUFICIENTE']);
             break;
         }
+<<<<<<< HEAD
+    
+        // Validar capacidad de crédito si el método es Crédito
+        if ($metodo == 3 && $personal['capacidad'] < $total) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'CAPACIDAD DE CRÉDITO INSUFICIENTE']);
+            break;
+        }
+    
+        // Guardar la venta
+        $fecha = date('Y-m-d'); 
+        $saleId = $ventas->saveVenta($cedula, $total, $metodo, $fecha, $id_user);
+    
+        // Obtener la sede del usuario desde la sesión
+        $id_sede = $_SESSION['id_sede'];
+    
+        // Guardar detalles de venta y actualizar stock
+=======
 
         $cliente = $clientes->getClienteById($id_cliente);
         if (!$cliente) {
@@ -218,22 +288,34 @@ switch ($option) {
         // Obtener la sede del usuario desde la sesión
         $id_sede = $_SESSION['id_sede'];
 
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
         foreach ($_SESSION['cart'][$id_user] as $id_product => $item) {
             $ventas->saveDetalle($id_product, $saleId, $item['cantidad'], $item['precio'], $id_sede, $idBiome=null);
             $product = $ventas->getProduct($id_product);
             $stock = $product['existencia'] - $item['cantidad'];
             $ventas->updateStock($stock, $id_product);
         }
+<<<<<<< HEAD
+    
+        // Actualizar deuda y capacidad si el método es Crédito
+        if ($metodo == 3) {
+            $ventas->updateDeudaCapacidad($cedula, $total);
+=======
 
         // Solo actualizar la deuda y capacidad del cliente si el método de pago es 3 (Credito)
         if (isset($metodo) && $metodo == 3) {
             $clientes->updateDeudaCapacidad($id_cliente, $total, $metodo);
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
         }
 
         unset($_SESSION['cart'][$id_user]);
 
         echo json_encode(['tipo' => 'success', 'mensaje' => 'Venta guardada correctamente']);
         break;
+<<<<<<< HEAD
+        
+        
+=======
 
         // case "Credito":
 
@@ -279,22 +361,40 @@ switch ($option) {
         // }
 
         // break;
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
 
     case 'searchbarcode':
         $barcode = $_GET['barcode'];
         $producto = $ventas->getBarcode($barcode);
+    
         if (!$producto) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'PRODUCTO NO EXISTE']);
         } else {
             if (!isset($_SESSION['cart'][$id_user][$producto['id_producto']])) {
                 $_SESSION['cart'][$id_user][$producto['id_producto']] = ['cantidad' => 0, 'precio' => $producto['precio_venta']];
             }
-
+    
             $_SESSION['cart'][$id_user][$producto['id_producto']]['cantidad']++;
-
-            echo json_encode(['tipo' => 'success', 'mensaje' => 'PRODUCTO AGREGADO AL CARRITO', 'producto' => $producto]);
+    
+            echo json_encode([
+                'tipo' => 'success',
+                'mensaje' => 'Producto agregado correctamente',
+                'producto' => $producto
+            ]);
         }
         break;
+<<<<<<< HEAD
+                
+    case 'logout':
+        // Destruir la sesión
+        session_destroy();
+    
+        // Redirigir a la página principal
+        header("Location: http://localhost/sistema-cafeteria-pulpafruit/");
+        exit();
+        break;
+        
+=======
 
     case 'listar-clientes':
         $result = $clientes->getClients();
@@ -311,6 +411,7 @@ switch ($option) {
         //     break;
 
 
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
     default:
         echo json_encode(['tipo' => 'error', 'mensaje' => 'Opción no válida']);
         break;

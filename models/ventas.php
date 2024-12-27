@@ -23,6 +23,13 @@ class Ventas {
         $consult->execute([$id_sede]);
         return $consult->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getAllProducts() {
+        $query = "SELECT * FROM cf_producto WHERE estado_producto = 1";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
     
 
     // Obtener un producto por su ID
@@ -37,15 +44,22 @@ class Ventas {
     public function getBarcode($barcode) {
         $consult = $this->pdo->prepare("SELECT * FROM cf_producto WHERE codigo_producto = ?");
         $consult->execute([$barcode]);
-        return $consult->fetch(PDO::FETCH_ASSOC);
+        $result = $consult->fetch(PDO::FETCH_ASSOC);
+    
+        var_dump("Producto encontrado: ", $result); // Depuración
+        return $result;
     }
 
     // Guardar una nueva venta
-    public function saveVenta($id_cliente, $total, $metodo, $fecha, $id_user) {
-        $consult = $this->pdo->prepare("INSERT INTO cf_ventas (id_cliente, total, metodo, fecha, id_usuario) VALUES (?, ?, ?, ?, ?)");
-        $consult->execute([$id_cliente, $total, $metodo, $fecha, $id_user]);
+    public function saveVenta($id_personal, $total, $metodo, $fecha, $id_user) {
+        $consult = $this->pdo->prepare("
+            INSERT INTO cf_ventas (id_personal, total, metodo, fecha, id_usuario) 
+            VALUES (?, ?, ?, ?, ?)
+        ");
+        $consult->execute([$id_personal, $total, $metodo, $fecha, $id_user]);
         return $this->pdo->lastInsertId();
     }
+     
 
     // Guardar los detalles de una venta
     public function saveDetalle($id_producto, $id_venta, $cantidad, $precio, $id_caja,$idBiome) {
@@ -73,10 +87,28 @@ class Ventas {
         return $result ? $result['cantidad'] : null;
     }
 
-    // Actualizar la deuda y capacidad del cliente
-    public function updateDeudaCapacidad($id_cliente, $total) {
+    // Obtener datos desde cf_personal para listar como personal
+    public function getPersonal() {
+        $query = "SELECT cedula AS id, nombre, area, capacidad FROM cf_personal WHERE estado = 2";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    // Obtener datos de un personal específico por ID
+    public function getPersonalById($id_personal) {
+        $query = "SELECT cedula AS id, nombre, area, capacidad FROM cf_personal WHERE cedula = ?";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute([$id_personal]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    
+
+    // Actualizar deuda y capacidad del personal
+    public function updateDeudaCapacidad($id_personal, $total) {
         $query = "EXEC actualizarDeudaCapacidad ?, ?";
         $stmt = $this->pdo->prepare($query);
-        return $stmt->execute([$id_cliente, $total]);
+        return $stmt->execute([$id_personal, $total]);
     }
+
 }
