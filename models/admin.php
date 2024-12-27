@@ -24,7 +24,6 @@ class AdminModel {
         $query->execute([$id_usuario, $fechaHoy]);
         return $query->fetch(PDO::FETCH_ASSOC);
     }
-     
     
     // Método que verifica si hay una caja sin cerrar
     public function checkCajaSinCerrar($id_sede) {
