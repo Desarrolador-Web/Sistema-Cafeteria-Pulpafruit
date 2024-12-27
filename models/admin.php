@@ -51,28 +51,25 @@ class AdminModel {
     public function getEstadoCaja($id_user) {
         $sql = "SELECT 
                     CASE 
-                        WHEN valor_cierre IS NULL AND fecha_cierre IS NULL THEN 1 -- Caja abierta
-                        WHEN valor_cierre IS NOT NULL AND fecha_cierre IS NOT NULL THEN 2 -- Caja cerrada
-                        ELSE 0 -- Sin estado definido
-                    END AS estado
-                FROM cf_informacion_cajas 
-                WHERE id_usuario = ? 
-                  AND CONVERT(DATE, fecha_apertura) = CONVERT(DATE, GETDATE())";
-    
+                        WHEN EXISTS (
+                            SELECT 1 
+                            FROM cf_informacion_cajas 
+                            WHERE id_usuario = ? AND sesion = 2
+                        ) THEN 1 -- Existe sesión con valor 2
+                        ELSE 2 -- No existe sesión con valor 2
+                    END AS estado";
+        
         $query = $this->pdo->prepare($sql);
         $query->execute([$id_user]);
         $result = $query->fetch(PDO::FETCH_ASSOC);
     
         if ($result) {
-            return (int)$result['estado']; // 1 = Abierta, 2 = Cerrada, 0 = Sin estado
+            return (int)$result['estado']; // 1 = Tiene sesión 2, 2 = No tiene sesión 2
         }
-        return 0; // Sin registros de caja para hoy
+        return 0; // Sin registros para el usuario
     }
     
     
-    
-    
-
     public function obtenerDiferenciaVentasCompras($id_usuario) {
         $sql = "
 
