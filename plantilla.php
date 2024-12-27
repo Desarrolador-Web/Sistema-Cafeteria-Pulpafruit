@@ -1,49 +1,18 @@
 <?php
 require_once 'config.php';
 require_once 'controllers/plantillaController.php';
-<<<<<<< HEAD
-require 'vendor/autoload.php';
- 
-$plantilla = new Plantilla();
-date_default_timezone_set('America/Bogota');
- 
-##### SESIÓN Y ROL #####
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
- 
-// Variables de sesión
-$rol_usuario = $_SESSION['rol'] ?? null;
-$id_user = $_SESSION['idusuario'] ?? null;
-$id_sede = $_SESSION['id_sede'] ?? null;
- 
-// Determinar si el usuario puede ver todos los registros (rol 1 o 2)
-$mostrar_todos = in_array($rol_usuario, [1, 2]);
- 
-// Exponer las variables al frontend evitando duplicación
-echo "<script>const rolUsuario = " . json_encode($rol_usuario) . ";</script>";
-echo "<script>const cajaAbierta = " . json_encode($_SESSION['caja_abierta'] ?? false) . ";</script>";
- 
-=======
 require_once 'models/usuarios.php';
 $usuario= new UsuariosModel();
 $usuario->validateSession();
 $plantilla = new Plantilla();
 date_default_timezone_set('America/Bogota');
 
->>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
 ##### PERMISOS #####
 require_once 'models/permisos.php';
-<<<<<<< HEAD
-require_once 'models/admin.php';  
- 
-// Verificar permisos
-=======
 require_once 'models/admin.php';
 $id_user = $_SESSION['idusuario']; //Se obtiene el id de usuario de la sesión actual
 
 // Verificar los permisos del usuario
->>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
 $permisos = new PermisosModel();
 $configuracion = $permisos->getPermiso(1, $id_user);
 $usuarios = $permisos->getPermiso(2, $id_user);
@@ -81,70 +50,6 @@ if (isset($_GET['pagina'])) {
     } else {
         try {
             $archivo = $_GET['pagina'];
-<<<<<<< HEAD
-           
-            switch ($archivo) {
-                case 'usuarios':
-                    if (!empty($usuarios)) $plantilla->usuarios();
-                    else $plantilla->notFound();
-                    break;
- 
-                case 'configuracion':
-                    if (!empty($configuracion)) $plantilla->configuracion();
-                    else $plantilla->notFound();
-                    break;
- 
-                case 'clientes':
-                    if (!empty($clientes)) $plantilla->clientes();
-                    else $plantilla->notFound();
-                    break;
- 
-                case 'proveedor':
-                    if (!empty($proveedor)) $plantilla->proveedor();
-                    else $plantilla->notFound();
-                    break;
- 
-                case 'productos':
-                    if (!empty($productos)) $plantilla->productos();
-                    else $plantilla->notFound();
-                    break;
- 
-                case 'ventas':
-                    if (!empty($nueva_venta)) $plantilla->ventas();
-                    else $plantilla->notFound();
-                    break;
- 
-                case 'historial':
-                    if (!empty($ventas)) $plantilla->historial();
-                    else $plantilla->notFound();
-                    break;
- 
-                case 'reporte':
-                    if (!empty($ventas)) $plantilla->reporte();
-                    else $plantilla->notFound();
-                    break;
- 
-                case 'compras':
-                    if (!empty($nueva_compra)) $plantilla->compras();
-                    else $plantilla->notFound();
-                    break;
- 
-                case 'historial_compras':
-                    if (!empty($ventas)) $plantilla->historial_compras();
-                    else $plantilla->notFound();
-                    break;
- 
-                case 'reporte_compra':
-                    if (!empty($compras)) $plantilla->reporte_compra();
-                    else $plantilla->notFound();
-                    break;
- 
-                default:
-                    $plantilla->notFound();
-                    break;
-            }
-        } catch (\Throwable $th) {            
-=======
             if ($archivo == 'usuarios' && !empty($usuarios)) {
                 $plantilla->usuarios();
             } else if ($archivo == 'configuracion' && !empty($configuracion)) {
@@ -171,7 +76,6 @@ if (isset($_GET['pagina'])) {
                 $plantilla->notFound();
             }
         } catch (\Throwable $th) {
->>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
             $plantilla->notFound();
         }
     }
