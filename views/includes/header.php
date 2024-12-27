@@ -22,43 +22,6 @@
     <link rel="stylesheet" type="text/css" href="<?php echo RUTA . 'assets/'; ?>css/dataTables.dateTime.min.css" />
 </head>
 
-<<<<<<< HEAD
-<?php
-// Asegurar que la sesión esté iniciada
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Variables de sesión
-$_SESSION['rol'] = $_SESSION['rol'] ?? null;
-$rol_usuario = $_SESSION['rol'];
-$id_user = $_SESSION['idusuario'] ?? null;
-
-// Validar si la vista está minimizada
-$mini = !empty($_GET['pagina']) && in_array($_GET['pagina'], ['ventas', 'compras']);
-
-// Instanciar AdminModel
-require_once __DIR__ . '/../../models/admin.php';
-$admin = new AdminModel();
-
-// Inicializar estadoCaja para evitar el Warning
-$estadoCaja = 0;
-
-// Determinar estado de la caja para roles 1 y 2
-if (in_array($rol_usuario, [1, 2]) && $id_user) {
-    $estadoCaja = $admin->getEstadoCaja($id_user);
-}
-?>
-
-<?php $mini = false;
-if (!empty($_GET['pagina'])) {
-    if ($_GET['pagina'] == 'ventas' || $_GET['pagina'] == 'compras') {
-        $mini = true;
-    }
-}
-?>
-=======
->>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
 
 <?php
 if (!isset($_SESSION['rol'])) {
@@ -70,10 +33,6 @@ if (!isset($_SESSION['rol'])) {
 <body id="page-top" class="<?php echo ($mini) ? 'sidebar-toggled' : ''; ?>">
 
     <div id="wrapper">
-<<<<<<< HEAD
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion <?php echo ($mini) ? 'toggled' : ''; ?>" id="accordionSidebar">
-
-=======
 
         <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion <?php echo ($mini) ? 'toggled' : ''; ?>" id="accordionSidebar" style="position: fixed;z-index: 1; width: 200px; height: 100%;">
@@ -84,7 +43,6 @@ if (!isset($_SESSION['rol'])) {
                 }
             };
             ?>
->>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="plantilla.php">
                 <div class="sidebar-brand-icon rotate-n-15">
@@ -233,8 +191,6 @@ if (!isset($_SESSION['rol'])) {
                 </li>
             <?php } ?>
 
-<<<<<<< HEAD
-=======
 
             <?php if (!empty($configuracion)) { ?>
 
@@ -252,7 +208,6 @@ if (!isset($_SESSION['rol'])) {
                 <button class="rounded-circle border-0" id="sidebarToggle"><i class="fas fa-chevron-circle-left text-gray-400"></i></button>
             </div> -->
 
->>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
         </ul>
         <!-- End of Sidebar -->
 
