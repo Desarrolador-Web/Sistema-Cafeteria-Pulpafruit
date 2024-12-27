@@ -191,6 +191,8 @@ if (!isset($_SESSION['rol'])) {
                 </li>
             <?php } ?>
 
+<<<<<<< HEAD
+=======
 
             <?php if (!empty($configuracion)) { ?>
 
@@ -208,6 +210,7 @@ if (!isset($_SESSION['rol'])) {
                 <button class="rounded-circle border-0" id="sidebarToggle"><i class="fas fa-chevron-circle-left text-gray-400"></i></button>
             </div> -->
 
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
         </ul>
         <!-- End of Sidebar -->
 
