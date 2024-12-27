@@ -1,6 +1,31 @@
+// Al cargar el DOM, inicializamos las funciones
 document.addEventListener('DOMContentLoaded', function () {
-    // Inicializar las funciones al cargar el DOM
-    verificarCajaAbierta();
+    console.log('Rol del usuario:', rolUsuario);
+    console.log('Caja abierta:', cajaAbierta);
+ 
+    // Validación para mostrar el modal solo si el rol es 3 y cajaAbierta es false
+    if (parseInt(rolUsuario) === 3) {
+        fetch(`${ruta}controllers/adminController.php?option=verificarCaja`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al verificar el estado de la caja');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Respuesta de verificación de caja:', data);
+                if (data.cajaAbierta === false) {
+                    console.log('Rol 3 detectado y caja no abierta. Mostrando modal de apertura de caja.');
+                    mostrarModalAbrirCaja();
+                } else {
+                    console.log('Rol 3 detectado y caja abierta. No se mostrará el modal.');
+                }
+            })
+            .catch(error => {
+                console.error('Error al verificar caja:', error);
+            });
+    }
+ 
     manejarAperturaCaja();
     manejarCierreCaja();
 });
