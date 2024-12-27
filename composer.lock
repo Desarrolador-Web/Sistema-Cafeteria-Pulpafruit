@@ -4,6 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
+<<<<<<< HEAD
     "content-hash": "8ea993088131e89ca4e8cff953f7baee",
     "packages": [
         {
@@ -643,6 +644,10 @@
             "time": "2024-10-15T16:40:23+00:00"
         }
     ],
+=======
+    "content-hash": "9b7e305528022d6f07a1a1596a96fe37",
+    "packages": [],
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
     "packages-dev": [
         {
             "name": "myclabs/deep-copy",
@@ -1205,6 +1210,7 @@
         },
         {
             "name": "phpunit/phpunit",
+<<<<<<< HEAD
             "version": "11.5.2",
             "source": {
                 "type": "git",
@@ -1215,6 +1221,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/153d0531b9f7e883c5053160cad6dd5ac28140b3",
                 "reference": "153d0531b9f7e883c5053160cad6dd5ac28140b3",
+=======
+            "version": "11.2.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/phpunit.git",
+                "reference": "15c7e69dec4a8f246840859e6b430bd2abeb5039"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/15c7e69dec4a8f246840859e6b430bd2abeb5039",
+                "reference": "15c7e69dec4a8f246840859e6b430bd2abeb5039",
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
                 "shasum": ""
             },
             "require": {
@@ -1234,8 +1252,13 @@
                 "phpunit/php-text-template": "^4.0.1",
                 "phpunit/php-timer": "^7.0.1",
                 "sebastian/cli-parser": "^3.0.2",
+<<<<<<< HEAD
                 "sebastian/code-unit": "^3.0.2",
                 "sebastian/comparator": "^6.2.1",
+=======
+                "sebastian/code-unit": "^3.0.1",
+                "sebastian/comparator": "^6.0.1",
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
                 "sebastian/diff": "^6.0.2",
                 "sebastian/environment": "^7.2.0",
                 "sebastian/exporter": "^6.3.0",
@@ -1254,7 +1277,11 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
+<<<<<<< HEAD
                     "dev-main": "11.5-dev"
+=======
+                    "dev-main": "11.2-dev"
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
                 }
             },
             "autoload": {
@@ -1286,7 +1313,11 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
+<<<<<<< HEAD
                 "source": "https://github.com/sebastianbergmann/phpunit/tree/11.5.2"
+=======
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/11.2.7"
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
             },
             "funding": [
                 {
@@ -1302,7 +1333,11 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
             "time": "2024-12-21T05:51:08+00:00"
+=======
+            "time": "2024-07-10T11:50:09+00:00"
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
         },
         {
             "name": "sebastian/cli-parser",
@@ -1476,16 +1511,16 @@
         },
         {
             "name": "sebastian/comparator",
-            "version": "6.2.1",
+            "version": "6.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/comparator.git",
-                "reference": "43d129d6a0f81c78bee378b46688293eb7ea3739"
+                "reference": "131942b86d3587291067a94f295498ab6ac79c20"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/43d129d6a0f81c78bee378b46688293eb7ea3739",
-                "reference": "43d129d6a0f81c78bee378b46688293eb7ea3739",
+                "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/131942b86d3587291067a94f295498ab6ac79c20",
+                "reference": "131942b86d3587291067a94f295498ab6ac79c20",
                 "shasum": ""
             },
             "require": {
@@ -1541,7 +1576,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/comparator/issues",
                 "security": "https://github.com/sebastianbergmann/comparator/security/policy",
-                "source": "https://github.com/sebastianbergmann/comparator/tree/6.2.1"
+                "source": "https://github.com/sebastianbergmann/comparator/tree/6.0.1"
             },
             "funding": [
                 {
@@ -1549,7 +1584,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-10-31T05:30:08+00:00"
+            "time": "2024-07-03T04:48:07+00:00"
         },
         {
             "name": "sebastian/complexity",
@@ -2337,5 +2372,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }

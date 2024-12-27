@@ -30,7 +30,7 @@
             <input type="hidden" id="id_product" name="id_product" required>
             <div class="row">
                 <div class="col-md-3">
-                    <label for="barcode">Barcode <span class="text-danger">*</span></label>
+                    <label for="barcode">Código de barras <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="barcode" name="barcode" placeholder="Barcode"
                         pattern="\d+" required>
                 </div>
@@ -81,7 +81,7 @@
                 <thead>
                     <tr>
                         <th scope="col">Id</th> 
-                        <th scope="col">Barcode</th>
+                        <th scope="col">Código de barras</th>
                         <th scope="col">Descripción</th>
                         <th scope="col">Precio de Compra</th>
                         <th scope="col">Precio de Venta</th>

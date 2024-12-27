@@ -62,9 +62,9 @@ class Ventas {
      
 
     // Guardar los detalles de una venta
-    public function saveDetalle($id_producto, $id_venta, $cantidad, $precio, $id_caja) {
-        $consult = $this->pdo->prepare("INSERT INTO cf_detalle_ventas (id_producto, id_ventas, cantidad, precio, id_caja) VALUES (?, ?, ?, ?, ?)");
-        return $consult->execute([$id_producto, $id_venta, $cantidad, $precio, $id_caja]);
+    public function saveDetalle($id_producto, $id_venta, $cantidad, $precio, $id_caja,$idBiome) {
+        $consult = $this->pdo->prepare("INSERT INTO cf_detalle_ventas (id_producto, id_ventas, cantidad, precio, id_caja, firma) VALUES (?, ?, ?, ?, ?, ?)");
+        return $consult->execute([$id_producto, $id_venta, $cantidad, $precio, $id_caja, $idBiome]);
     }
     
     // Método para ctualizar el stock de un producto 

@@ -22,6 +22,7 @@
     <link rel="stylesheet" type="text/css" href="<?php echo RUTA . 'assets/'; ?>css/dataTables.dateTime.min.css" />
 </head>
 
+<<<<<<< HEAD
 <?php
 // Asegurar que la sesión esté iniciada
 if (session_status() === PHP_SESSION_NONE) {
@@ -56,6 +57,8 @@ if (!empty($_GET['pagina'])) {
     }
 }
 ?>
+=======
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
 
 <?php
 if (!isset($_SESSION['rol'])) {
@@ -67,12 +70,25 @@ if (!isset($_SESSION['rol'])) {
 <body id="page-top" class="<?php echo ($mini) ? 'sidebar-toggled' : ''; ?>">
 
     <div id="wrapper">
+<<<<<<< HEAD
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion <?php echo ($mini) ? 'toggled' : ''; ?>" id="accordionSidebar">
 
+=======
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion <?php echo ($mini) ? 'toggled' : ''; ?>" id="accordionSidebar" style="position: fixed;z-index: 1; width: 200px; height: 100%;">
+            <?php $mini = false;
+            if (!empty($_GET['pagina'])) {
+                if ($_GET['pagina'] == 'ventas' || $_GET['pagina'] == 'compras') {
+                    $mini = true;
+                }
+            };
+            ?>
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="plantilla.php">
                 <div class="sidebar-brand-icon rotate-n-15">
-                    <img src="assets/img/logo.png" alt="LOGO-PNG" width="50">
+                    <img src="../../assets/img/logo.png" alt="LOGO-PNG" width="50">
                 </div>
                 <div class="sidebar-brand-text mx-3"><sup>1.0</sup></div>
             </a>
@@ -174,7 +190,7 @@ if (!isset($_SESSION['rol'])) {
             <?php if (!empty($nueva_compra) || !empty($compras)) { ?>
                 <!-- Divider -->
                 <hr class="sidebar-divider d-none d-md-block">
-                <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'compras' || !empty($_GET['pagina'])  && $_GET['pagina'] == 'historial_compras') ? 'bg-gradient-info' : ''; ?>">
+                <li class="nav-item  <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'compras' || !empty($_GET['pagina'])  && $_GET['pagina'] == 'historial_compras') ? 'bg-gradient-info' : ''; ?>">
                     <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCompra" aria-expanded="true" aria-controls="collapseCompra">
                         <i class="fas fa-cart-plus"></i>
                         <span>Compras</span>
@@ -217,6 +233,26 @@ if (!isset($_SESSION['rol'])) {
                 </li>
             <?php } ?>
 
+<<<<<<< HEAD
+=======
+
+            <?php if (!empty($configuracion)) { ?>
+
+                <!-- <hr class="sidebar-divider d-none d-md-block">
+
+                <li class="nav-item <?php echo (!empty($_GET['pagina']) && $_GET['pagina'] == 'configuracion') ? 'bg-gradient-info' : ''; ?>">
+                    <a class="nav-link" href="?pagina=configuracion">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Configuración</span>
+                    </a>
+                </li>  -->
+            <?php } ?>
+
+            <!-- <div class="text-center d-none d-md-inline mt-3">
+                <button class="rounded-circle border-0" id="sidebarToggle"><i class="fas fa-chevron-circle-left text-gray-400"></i></button>
+            </div> -->
+
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
         </ul>
         <!-- End of Sidebar -->
 
@@ -249,7 +285,7 @@ if (!isset($_SESSION['rol'])) {
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown" style="z-index: 9999;">
                                 <a class="dropdown-item" href="#">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Profile
+                                    Perfil
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
@@ -263,7 +299,3 @@ if (!isset($_SESSION['rol'])) {
                 </nav>
 
                 <div class="container-fluid">
-
-
-
-

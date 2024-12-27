@@ -1,6 +1,7 @@
 <?php
 require_once 'config.php';
 require_once 'controllers/plantillaController.php';
+<<<<<<< HEAD
 require 'vendor/autoload.php';
  
 $plantilla = new Plantilla();
@@ -23,11 +24,26 @@ $mostrar_todos = in_array($rol_usuario, [1, 2]);
 echo "<script>const rolUsuario = " . json_encode($rol_usuario) . ";</script>";
 echo "<script>const cajaAbierta = " . json_encode($_SESSION['caja_abierta'] ?? false) . ";</script>";
  
+=======
+require_once 'models/usuarios.php';
+$usuario= new UsuariosModel();
+$usuario->validateSession();
+$plantilla = new Plantilla();
+date_default_timezone_set('America/Bogota');
+
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
 ##### PERMISOS #####
 require_once 'models/permisos.php';
+<<<<<<< HEAD
 require_once 'models/admin.php';  
  
 // Verificar permisos
+=======
+require_once 'models/admin.php';
+$id_user = $_SESSION['idusuario']; //Se obtiene el id de usuario de la sesión actual
+
+// Verificar los permisos del usuario
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
 $permisos = new PermisosModel();
 $configuracion = $permisos->getPermiso(1, $id_user);
 $usuarios = $permisos->getPermiso(2, $id_user);
@@ -65,6 +81,7 @@ if (isset($_GET['pagina'])) {
     } else {
         try {
             $archivo = $_GET['pagina'];
+<<<<<<< HEAD
            
             switch ($archivo) {
                 case 'usuarios':
@@ -127,6 +144,34 @@ if (isset($_GET['pagina'])) {
                     break;
             }
         } catch (\Throwable $th) {            
+=======
+            if ($archivo == 'usuarios' && !empty($usuarios)) {
+                $plantilla->usuarios();
+            } else if ($archivo == 'configuracion' && !empty($configuracion)) {
+                $plantilla->configuracion();
+            } else if ($archivo == 'clientes' && !empty($clientes)) {
+                $plantilla->clientes();
+            } else if ($archivo == 'proveedor' && !empty($proveedor)) {
+                $plantilla->proveedor();
+            } else if ($archivo == 'productos' && !empty($productos)) {
+                $plantilla->productos();
+            } else if ($archivo == 'ventas' && !empty($nueva_venta)) {
+                $plantilla->ventas();
+            } else if ($archivo == 'historial' && !empty($ventas)) {
+                $plantilla->historial();
+            } else if ($archivo == 'reporte' && !empty($ventas)) {
+                $plantilla->reporte();
+            } else if ($archivo == 'compras' && !empty($nueva_compra)) {
+                $plantilla->compras();
+            } else if ($archivo == 'historial_compras' && !empty($ventas)) {
+                $plantilla->historial_compras();
+            } else if ($archivo == 'reporte_compra' && !empty($compras)) {
+                $plantilla->reporte_compra();
+            } else {
+                $plantilla->notFound();
+            }
+        } catch (\Throwable $th) {
+>>>>>>> eae77a48f863dceaf7a9bfa932cd8e5b7113d14f
             $plantilla->notFound();
         }
     }
