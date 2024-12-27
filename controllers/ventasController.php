@@ -1,6 +1,5 @@
 <?php
 require_once '../models/ventas.php';
-require_once '../models/clientes.php';
 
 date_default_timezone_set('America/Bogota'); 
 
@@ -9,39 +8,40 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 $ventas = new Ventas();
-$clientes = new ClientesModel();
 $id_user = $_SESSION['idusuario'];
+$rol_usuario = $_SESSION['rol'] ?? null;
+$mostrar_todos = in_array($rol_usuario, [1, 2]);
 
 $option = isset($_GET['option']) ? $_GET['option'] : '';
 
 switch ($option) {
-    
+
     case 'listar':
-        if (isset($_SESSION['id_sede'])) {
-            $id_sede = $_SESSION['id_sede'];
-            $result = $ventas->getProductsBySede($id_sede);
-            
-            foreach ($result as $i => $item) {
-                // Obtener cantidad de compra inicial
-                $cantidadCompraInicial = $ventas->getCantidadCompraInicial($item['id_producto']);
-                
-                if ($cantidadCompraInicial !== null) {
-                    // Calcular porcentaje del stock actual en base a la cantidad de compra inicial
-                    $porcentajeStock = ($item['existencia'] / $cantidadCompraInicial) * 100;
-                    $result[$i]['porcentajeStock'] = $porcentajeStock; // se añade el porcentaje
-                } else {
-                    $result[$i]['porcentajeStock'] = 100; // stock completo si no se encuentra el valor inicial
-                }
-    
-                // Añadir botón de carrito sin modificar `cantidad`
-                $result[$i]['addcart'] = '<a href="#" class="btn btn-primary btn-sm" onclick="addCart(' . $item['id_producto'] . ')"><i class="fas fa-cart-plus"></i></a>';
-            }
-            echo json_encode($result);
+        if ($mostrar_todos) {
+            // Mostrar todos los productos sin importar la sede
+            $result = $ventas->getAllProducts();
         } else {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'No se ha seleccionado ninguna sede.']);
+            // Mostrar productos filtrados por sede
+            $id_sede = $_SESSION['id_sede'] ?? null;
+            if ($id_sede) {
+                $result = $ventas->getProductsBySede($id_sede);
+            } else {
+                echo json_encode(['tipo' => 'error', 'mensaje' => 'No se ha seleccionado ninguna sede.']);
+                exit;
+            }
         }
+    
+        foreach ($result as $i => $item) {
+            // Añadir botón de carrito a cada fila
+            $result[$i]['addcart'] = '<a href="#" class="btn btn-primary btn-sm" onclick="addCart(' . $item['id_producto'] . ')">
+                                        <i class="fas fa-cart-plus"></i>
+                                      </a>';
+        }
+    
+        echo json_encode($result);
         break;
     
+
     case 'listarPersonal':
         $personal = $ventas->getPersonal();
         if ($personal) {
@@ -98,20 +98,18 @@ switch ($option) {
         if (!isset($_SESSION['cart'][$id_user])) {
             $_SESSION['cart'][$id_user] = [];
         }
-    
+
         $cartItems = $_SESSION['cart'][$id_user];
         $result = [];
-    
+
         foreach ($cartItems as $id_product => $item) {
             $product = $ventas->getProduct($id_product);
             if ($product) {
                 $product['cantidad'] = $item['cantidad'];
-                // Asegurar que precio_venta tenga un valor válido
-                $product['precio_venta'] = isset($item['precio']) ? $item['precio'] : ($product['precio_venta'] ?? 0);
+                $product['precio_venta'] = $item['precio'] ?? $product['precio_venta'] ?? 0;
                 $result[] = $product;
             }
         }
-    
         echo json_encode($result);
         break;
         

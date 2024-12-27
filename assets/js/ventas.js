@@ -114,10 +114,11 @@ document.addEventListener('DOMContentLoaded', function () {
             dataSrc: ''
         },
         columns: [
-            { data: 'codigo_producto' },
-            { data: 'descripcion' },
+            { data: 'codigo_producto', title: 'Código' },
+            { data: 'descripcion', title: 'Descripción' },
             {
                 data: 'existencia',
+                title: 'Existencia',
                 render: function (data, type, row) {
                     let colorClass = 'badge-info'; // Azul por defecto
                     if (row.porcentajeStock <= 10) {
@@ -128,13 +129,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     return `<span class="badge ${colorClass}">${data}</span>`;
                 }
             },
-            { data: 'precio_venta' },
-            { data: 'addcart' }
+            { data: 'precio_venta', title: 'Precio' },
+            { data: 'addcart', title: 'Acción', orderable: false, searchable: false }
         ],
         language: {
             url: 'https://cdn.datatables.net/plug-ins/1.13.1/i18n/es-ES.json'
         }
-    });
+    });    
 
     temp(); // Inicializa la tabla temporal y el total
 });
@@ -198,6 +199,26 @@ function temp() {
             console.error("Error al cargar la tabla temporal:", error);
         });
 }
+
+function cargarProductos() {
+    let endpoint = mostrarTodosRegistros 
+        ? ruta + 'controllers/ventasController.php?option=listar'
+        : ruta + 'controllers/ventasController.php?option=listar';
+
+    axios.get(endpoint)
+        .then(response => {
+            if (Array.isArray(response.data)) {
+                actualizarTablaProductos(response.data);
+            } else {
+                message('error', response.data.mensaje);
+            }
+        })
+        .catch(error => {
+            console.error('Error al cargar productos:', error);
+            message('error', 'Error al cargar productos');
+        });
+}
+
 
 
 function addCantidad(e, idTemp) {

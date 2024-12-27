@@ -23,6 +23,13 @@ class Ventas {
         $consult->execute([$id_sede]);
         return $consult->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getAllProducts() {
+        $query = "SELECT * FROM cf_producto WHERE estado_producto = 1";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
     
 
     // Obtener un producto por su ID

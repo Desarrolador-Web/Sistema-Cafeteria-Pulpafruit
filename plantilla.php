@@ -6,13 +6,27 @@ require 'vendor/autoload.php';
 $plantilla = new Plantilla();
 date_default_timezone_set('America/Bogota'); 
 
-##### PERMISOS #####
+##### SESIÓN Y ROL #####
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
+// Validar rol del usuario
+$rol_usuario = $_SESSION['rol'] ?? null;
+$id_user = $_SESSION['idusuario'] ?? null;
+$id_sede = $_SESSION['id_sede'] ?? null;
+
+// Determinar si el usuario puede ver todos los registros (rol 1 o 2)
+$mostrar_todos = in_array($rol_usuario, [1, 2]);
+
+// Exponer la variable al frontend
+echo "<script>const mostrarTodosRegistros = " . json_encode($mostrar_todos) . ";</script>";
+
+##### PERMISOS #####
 require_once 'models/permisos.php';
 require_once 'models/admin.php';  
-$id_user = $_SESSION['idusuario']; // Se obtiene el id de usuario de la sesión actual
 
-// Verificar los permisos del usuario
+// Verificar permisos
 $permisos = new PermisosModel();
 $configuracion = $permisos->getPermiso(1, $id_user);
 $usuarios = $permisos->getPermiso(2, $id_user);
@@ -24,9 +38,7 @@ $compras = $permisos->getPermiso(7, $id_user);
 $nueva_compra = $permisos->getPermiso(8, $id_user);
 $proveedor = $permisos->getPermiso(9, $id_user);
 
-##### FIN PERMISOS #####
-
-// Verifica si el usuario tiene una caja abierta hoy
+##### CAJA ABIERTA #####
 $admin = new AdminModel();
 $fechaHoy = date('Y-m-d');
 $cajaAbierta = $admin->checkCajaAbierta($id_user, $fechaHoy);
@@ -39,10 +51,10 @@ if ($cajaAbierta) {
     $_SESSION['id_info_caja'] = null; // Limpia id_info_caja si no hay caja abierta
 }
 
-// Declaración de idInfoCaja para JavaScript (solo una vez)
+// Exponer id_info_caja al frontend
 echo "<script>const idInfoCaja = " . json_encode($_SESSION['id_info_caja'] ?? null) . ";</script>";
 
-// Carga de la vista principal 
+##### CARGA DE VISTAS #####
 require_once 'views/includes/header.php';
 
 if (isset($_GET['pagina'])) {
@@ -51,31 +63,67 @@ if (isset($_GET['pagina'])) {
     } else {
         try {
             $archivo = $_GET['pagina'];
-            if ($archivo == 'usuarios' && !empty($usuarios)) {
-                $plantilla->usuarios();
-            } else if ($archivo == 'configuracion' && !empty($configuracion)) {
-                $plantilla->configuracion();
-            } else if ($archivo == 'clientes' && !empty($clientes)) {
-                $plantilla->clientes();
-            } else if ($archivo == 'proveedor' && !empty($proveedor)) {
-                $plantilla->proveedor();
-            } else if ($archivo == 'productos' && !empty($productos)) {
-                $plantilla->productos();
-            } else if ($archivo == 'ventas' && !empty($nueva_venta)) {
-                $plantilla->ventas();
-            } else if ($archivo == 'historial' && !empty($ventas)) {                
-                $plantilla->historial();
-            } else if ($archivo == 'reporte' && !empty($ventas)) {
-                $plantilla->reporte();
-            } else if ($archivo == 'compras' && !empty($nueva_compra)) {
-                $plantilla->compras();
-            } else if ($archivo == 'historial_compras' && !empty($ventas)) {
-                $plantilla->historial_compras();
-            } else if ($archivo == 'reporte_compra' && !empty($compras)) {
-                $plantilla->reporte_compra();
-            } else {                
-                $plantilla->notFound();
-            }          
+            
+            switch ($archivo) {
+                case 'usuarios':
+                    if (!empty($usuarios)) $plantilla->usuarios();
+                    else $plantilla->notFound();
+                    break;
+
+                case 'configuracion':
+                    if (!empty($configuracion)) $plantilla->configuracion();
+                    else $plantilla->notFound();
+                    break;
+
+                case 'clientes':
+                    if (!empty($clientes)) $plantilla->clientes();
+                    else $plantilla->notFound();
+                    break;
+
+                case 'proveedor':
+                    if (!empty($proveedor)) $plantilla->proveedor();
+                    else $plantilla->notFound();
+                    break;
+
+                case 'productos':
+                    if (!empty($productos)) $plantilla->productos();
+                    else $plantilla->notFound();
+                    break;
+
+                case 'ventas':
+                    if (!empty($nueva_venta)) $plantilla->ventas();
+                    else $plantilla->notFound();
+                    break;
+
+                case 'historial':
+                    if (!empty($ventas)) $plantilla->historial();
+                    else $plantilla->notFound();
+                    break;
+
+                case 'reporte':
+                    if (!empty($ventas)) $plantilla->reporte();
+                    else $plantilla->notFound();
+                    break;
+
+                case 'compras':
+                    if (!empty($nueva_compra)) $plantilla->compras();
+                    else $plantilla->notFound();
+                    break;
+
+                case 'historial_compras':
+                    if (!empty($ventas)) $plantilla->historial_compras();
+                    else $plantilla->notFound();
+                    break;
+
+                case 'reporte_compra':
+                    if (!empty($compras)) $plantilla->reporte_compra();
+                    else $plantilla->notFound();
+                    break;
+
+                default:
+                    $plantilla->notFound();
+                    break;
+            }
         } catch (\Throwable $th) {            
             $plantilla->notFound();
         }
