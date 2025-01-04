@@ -136,7 +136,6 @@ switch ($option) {
         break;
 
     case 'guardarObservacion':
-        // Asegúrate de que el campo 'observacion' e 'id_info_caja' se reciban correctamente
         if (!isset($_POST['observacion']) || !isset($_POST['id_info_caja'])) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Campos faltantes en la solicitud']);
             exit;
@@ -168,7 +167,6 @@ switch ($option) {
         $resultado = $admin->guardarObservacionYCodigo($id_info_caja, null, $codigoAutorizacion);
     
         if ($resultado) {
-            // Enviar el código por correo (suponiendo que el envío por correo está configurado aquí)
             $client = new PostmarkClient("22ed804a-3ad8-4752-914c-225acb0c5c26");
             $emailDestino = "auxdesarrollo@pulpafruit.com";
             $sendResult = $client->sendEmail(
