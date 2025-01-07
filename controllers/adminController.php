@@ -70,43 +70,51 @@ switch ($option) {
 
     case 'cerrarCaja':
         if (!isset($_POST['valorCierre'])) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'Valor de cierre es requerido']);
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Datos incompletos para cerrar caja']);
             exit;
         }
     
         $id_usuario = $_SESSION['idusuario'];
         $valorCierre = $_POST['valorCierre'];
         $fechaCierre = date('Y-m-d H:i:s');
+        $observacion = $_POST['observacion'] ?? null;
     
+        // Depuración
+        error_log("ID Usuario: $id_usuario");
+        error_log("Valor de Cierre: $valorCierre");
+        error_log("Observación: $observacion");
+    
+        // Obtener diferencia calculada
         $diferencia = $admin->obtenerDiferenciaVentasCompras($id_usuario);
-        $resultadoFinal = $diferencia['ResultadoFinal'];
+        $resultadoFinal = $diferencia['ResultadoFinal'] ?? 0;
     
         if (floatval($valorCierre) === floatval($resultadoFinal)) {
-            $cajaAbierta = $admin->obtenerCajaAbiertaUsuario($id_usuario);
-    
-            if ($cajaAbierta) {
-                $resultado = $admin->cerrarCaja($cajaAbierta['id_info_caja'], $valorCierre, $fechaCierre);
-                if ($resultado) {
-                    $_SESSION['id_sede'] = null;
-                    echo json_encode([
-                        'tipo' => 'success',
-                        'mensaje' => 'Caja cerrada exitosamente',
-                        'resultado' => $resultadoFinal
-                    ]);
-                } else {
-                    echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al cerrar la caja']);
-                }
+            // Valores coinciden, cerrar caja
+            $resultado = $admin->cerrarCaja($id_info_caja, $valorCierre, $fechaCierre);
+            if ($resultado) {
+                echo json_encode(['tipo' => 'success', 'mensaje' => 'Caja cerrada exitosamente']);
             } else {
-                echo json_encode(['tipo' => 'error', 'mensaje' => 'No hay caja abierta para cerrar']);
+                echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al cerrar la caja']);
             }
         } else {
-            echo json_encode([
-                'tipo' => 'success',
-                'mensaje' => 'Los valores no coinciden',
-                'resultado' => $resultadoFinal
-            ]);
+            // Valores no coinciden, manejar observación
+            if (!empty($observacion)) {
+                $resultado = $admin->cerrarCajaConObservacion($id_usuario, $valorCierre, $fechaCierre, $observacion);
+                if ($resultado) {
+                    echo json_encode(['tipo' => 'success', 'mensaje' => 'Caja cerrada con observación']);
+                } else {
+                    echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al cerrar caja con observación']);
+                }
+            } else {
+                echo json_encode([
+                    'tipo' => 'error',
+                    'mensaje' => 'Los valores no coinciden y no se recibió una observación válida',
+                    'resultado' => $resultadoFinal
+                ]);
+            }
         }
         break;
+        
 
     case 'abrirCaja':
         if (!isset($_POST['valorApertura']) || !isset($_POST['id_sede'])) {

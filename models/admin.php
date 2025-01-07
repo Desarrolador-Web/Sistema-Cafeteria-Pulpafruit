@@ -40,12 +40,18 @@ class AdminModel {
         return $query->execute([$id_usuario, $valorApertura, $id_sede, $fechaApertura]);
     }
 
-    public function cerrarCajaConObservacion($id_info_caja, $valorCierre, $fechaCierre, $observacion) {
+    public function cerrarCajaConObservacion($id_usuario, $valorCierre, $fechaCierre, $observacion) {
+        // Seleccionar el último registro del usuario donde la sesión sea 2
         $sql = "UPDATE cf_informacion_cajas 
                 SET valor_cierre = ?, fecha_cierre = ?, observacion = ? 
-                WHERE id_info_caja = ?";
+                WHERE id_info_caja = (
+                    SELECT TOP 1 id_info_caja 
+                    FROM cf_informacion_cajas 
+                    WHERE id_usuario = ? AND sesion = 2 
+                    ORDER BY fecha_apertura DESC
+                )";
         $query = $this->pdo->prepare($sql);
-        return $query->execute([$valorCierre, $fechaCierre, $observacion, $id_info_caja]);
+        return $query->execute([$valorCierre, $fechaCierre, $observacion, $id_usuario]);
     }
     
     public function getEstadoCaja($id_user) {

@@ -114,6 +114,8 @@ function manejarCierreCaja() {
         const valorCierre = document.querySelector('#valorCierre').value;
         const valorCierreNumerico = parseFloat(valorCierre);
 
+        console.log('Valor de cierre capturado:', valorCierre); 
+
         fetch(ruta + 'controllers/adminController.php?option=obtenerIdCajaAbierta', {
             method: 'GET'
         })
@@ -127,9 +129,11 @@ function manejarCierreCaja() {
             if (data.id_info_caja) {
                 const idInfoCaja = data.id_info_caja;
 
+                console.log('ID de caja abierta:', idInfoCaja); 
+
                 const formData = new FormData();
-                formData.append('valorCierre', valorCierre);
                 formData.append('id_info_caja', idInfoCaja);
+                formData.append('valorCierre', valorCierre);
 
                 fetch(ruta + 'controllers/adminController.php?option=cerrarCaja', {
                     method: 'POST',
@@ -142,106 +146,35 @@ function manejarCierreCaja() {
                     return response.json();
                 })
                 .then(data => {
-                    if (data.resultado !== undefined) {
-                        const resultadoConsultaNumerico = parseFloat(data.resultado);
-
-                        if (Number(valorCierreNumerico) !== Number(resultadoConsultaNumerico)) {
-                            // Flujo para roles 1 y 2
-                            if ([1, 2].includes(parseInt(rolUsuario))) {
-                                Swal.fire({
-                                    title: 'Valores no coinciden',
-                                    text: `El valor calculado es ${data.resultado}. Por favor ingresa una observación.`,
-                                    input: 'textarea',
-                                    inputPlaceholder: 'Escribe tu observación aquí...',
-                                    showCancelButton: true,
-                                    confirmButtonText: 'Cerrar caja',
-                                    cancelButtonText: 'Cancelar'
-                                }).then((result) => {
-                                    if (result.isConfirmed && result.value) {
-                                        const observacion = result.value;
-
-                                        const formDataObservacion = new FormData();
-                                        formDataObservacion.append('observacion', observacion);
-                                        formDataObservacion.append('id_info_caja', idInfoCaja);
-                                        formDataObservacion.append('valorCierre', valorCierre);
-
-                                        fetch(ruta + 'controllers/adminController.php?option=cerrarCaja', {
-                                            method: 'POST',
-                                            body: formDataObservacion
-                                        })
-                                        .then(response => response.json())
-                                        .then(data => {
-                                            if (data.tipo === 'success') {
-                                                Swal.fire({
-                                                    title: 'Caja cerrada exitosamente',
-                                                    icon: 'success',
-                                                    confirmButtonText: 'Aceptar'
-                                                }).then(() => {
-                                                    window.location.reload();
-                                                });
-                                            } else {
-                                                Swal.fire({
-                                                    title: 'Error al cerrar caja',
-                                                    text: data.mensaje,
-                                                    icon: 'error',
-                                                    confirmButtonText: 'Aceptar'
-                                                });
-                                            }
-                                        });
-                                    }
-                                });
-                            } else {
-                                // Flujo para roles diferentes a 1 y 2
-                                Swal.fire({
-                                    title: 'Valores no coinciden',
-                                    text: `El valor calculado es ${data.resultado}. Por favor ingresa una observación.`,
-                                    input: 'textarea',
-                                    inputPlaceholder: 'Escribe tu observación aquí...',
-                                    showCancelButton: true,
-                                    confirmButtonText: 'Agregar código',
-                                    cancelButtonText: 'Cancelar'
-                                }).then((result) => {
-                                    if (result.isConfirmed && result.value) {
-                                        const observacion = result.value;
-
-                                        const formDataObservacion = new FormData();
-                                        formDataObservacion.append('observacion', observacion);
-                                        formDataObservacion.append('id_info_caja', idInfoCaja);
-
-                                        fetch(ruta + 'controllers/adminController.php?option=guardarObservacion', {
-                                            method: 'POST',
-                                            body: formDataObservacion
-                                        })
-                                        .then(response => response.json())
-                                        .then(data => {
-                                            if (data.tipo === 'success') {
-                                                enviarCodigoAutorizacion(idInfoCaja);
-                                            } else {
-                                                Swal.fire({
-                                                    title: 'Error al guardar observación',
-                                                    text: data.mensaje,
-                                                    icon: 'error',
-                                                    confirmButtonText: 'Aceptar'
-                                                });
-                                            }
-                                        });
-                                    }
-                                });
+                    console.log('Respuesta del servidor:', data); 
+                    if (data.tipo === 'success') {
+                        Swal.fire({
+                            title: 'Caja cerrada exitosamente',
+                            text: data.mensaje,
+                            icon: 'success',
+                            confirmButtonText: 'Aceptar'
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else if (data.tipo === 'error' && data.resultado !== undefined) {
+                        // Mostrar SweetAlert para ingresar observación
+                        Swal.fire({
+                            title: 'Valores no coinciden',
+                            text: 'Los valores no coinciden. Por favor, ingresa una observación.',
+                            input: 'text',
+                            inputPlaceholder: 'Escribe tu observación aquí',
+                            showCancelButton: true,
+                            confirmButtonText: 'Guardar observación',
+                            cancelButtonText: 'Cancelar'
+                        }).then((result) => {
+                            if (result.isConfirmed && result.value) {
+                                cerrarCajaConObservacion(idInfoCaja, valorCierre, result.value);
                             }
-                        } else {
-                            // Cerrar caja si los valores coinciden
-                            Swal.fire({
-                                title: 'Caja cerrada exitosamente',
-                                icon: 'success',
-                                confirmButtonText: 'Aceptar'
-                            }).then(() => {
-                                window.location.reload();
-                            });
-                        }
+                        });
                     } else {
                         Swal.fire({
-                            title: 'Error',
-                            text: 'Error: El valor de la consulta no se ha recibido correctamente.',
+                            title: 'Error al cerrar caja',
+                            text: data.mensaje,
                             icon: 'error',
                             confirmButtonText: 'Aceptar'
                         });

@@ -19,22 +19,23 @@ switch ($option) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Faltan datos para abrir la caja']);
             exit;
         }
-
+    
         $valorApertura = $data['valorApertura'];
         $fechaApertura = DateTime::createFromFormat('d/m/Y H:i:s', $data['fechaApertura'])->format('Y-m-d H:i:s');
-        $id_sede = $_SESSION['id_sede'] ?? 1; // Asignar sede por defecto si no está en sesión
-
-        // Validar si hay una caja sin cerrar
+        $id_sede = ($_SESSION['rol'] == 1 || $_SESSION['rol'] == 2) ? 4 : ($_SESSION['id_sede'] ?? 1);
+    
+        // Validar si hay una caja sin cerrar en la sede 4 (para rol 1 y 2)
         $cajaSinCerrar = $configuracion->checkCajaSinCerrar($id_sede);
         if ($cajaSinCerrar) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'No se puede abrir caja porque hay una caja sin cerrar en esta sede']);
             exit;
         }
-
+    
         // Abrir caja
         $resultado = $configuracion->abrirCaja($id_user, $valorApertura, $id_sede, $fechaApertura);
         if ($resultado) {
-            echo json_encode(['tipo' => 'success', 'mensaje' => 'Caja abierta exitosamente']);
+            $_SESSION['id_sede'] = $id_sede; // Actualiza la sesión con la sede 4 para roles 1 y 2
+            echo json_encode(['tipo' => 'success', 'mensaje' => 'Caja abierta exitosamente en la sede 4']);
         } else {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al abrir la caja']);
         }
