@@ -18,25 +18,45 @@ document.addEventListener('DOMContentLoaded', function () {
     function configurarBotonCompra(boton, estado) {
         if (boton) {
             boton.onclick = function () {
-                Swal.fire({
-                    title: '¿De dónde viene el dinero?',
-                    showCancelButton: true,
-                    cancelButtonText: 'Cancelar',
-                    confirmButtonText: 'Caja',
-                    showDenyButton: true,
-                    denyButtonText: 'Socio',
-                }).then((result) => {
-                    let metodo_compra = 0;
-                    if (result.isConfirmed) {
-                        metodo_compra = 2; // Caja
-                    } else if (result.isDenied) {
-                        metodo_compra = 1; // Socio
-                    }
-                    if (metodo_compra !== 0) {
-                        registrarCompra(estado, metodo_compra);
-                    }
-                });
+                if (rolUsuario === 1 || rolUsuario === 2) {
+                    // Mostrar el modal si el rol es 1 o 2
+                    $('#modalCompra').modal('show');
+                    document.getElementById('estadoCompra').value = estado; // Guardar estado en modal
+                } else {
+                    // Mostrar SweetAlert si el rol es diferente a 1 o 2
+                    Swal.fire({
+                        title: '¿De dónde viene el dinero?',
+                        showCancelButton: true,
+                        cancelButtonText: 'Cancelar',
+                        confirmButtonText: 'Caja',
+                        showDenyButton: true,
+                        denyButtonText: 'Socio',
+                    }).then((result) => {
+                        let metodo_compra = 0;
+                        if (result.isConfirmed) {
+                            metodo_compra = 2; // Caja
+                        } else if (result.isDenied) {
+                            metodo_compra = 1; // Socio
+                        }
+                        if (metodo_compra !== 0) {
+                            registrarCompra(estado, metodo_compra);
+                        }
+                    });
+                }
             };
+        }
+    }
+
+    // Función para registrar compra desde el modal
+    function registrarCompraDesdeModal() {
+        const metodo_compra = document.getElementById('metodoCompra').value;
+        const estado = document.getElementById('estadoCompra').value;
+
+        if (metodo_compra) {
+            registrarCompra(estado, metodo_compra);
+            $('#modalCompra').modal('hide');
+        } else {
+            Swal.fire('Error', 'Seleccione un método de compra válido', 'error');
         }
     }
 

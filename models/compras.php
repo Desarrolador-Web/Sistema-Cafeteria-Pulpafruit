@@ -33,7 +33,7 @@ class Compras {
                 JOIN 
                     cf_empresa e ON c.id_empresa = e.id_empresa
                 WHERE 
-                    c.id_caja = 3
+                    c.id_caja = ?
             ");
             $consult->execute([$id_caja]);
             return $consult->fetchAll(PDO::FETCH_ASSOC);

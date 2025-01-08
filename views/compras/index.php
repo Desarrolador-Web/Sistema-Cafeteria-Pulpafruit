@@ -133,6 +133,33 @@
     </div>
 </div>
 
+<!-- Modal para Registro de Compras -->
+<div class="modal fade" id="modalCompra" tabindex="-1" aria-labelledby="modalCompraLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalCompraLabel">Registrar Compra</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formModalCompra">
+          <input type="hidden" id="estadoCompra" value=""> <!-- Estado Oculto -->
+          <div class="mb-3">
+            <label for="metodoCompra" class="form-label">Método de Compra</label>
+            <select class="form-select" id="metodoCompra">
+              <option value="">Seleccione una opción</option>
+              <option value="2">Caja</option>
+              <option value="1">Socio</option>
+            </select>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="registrarCompraDesdeModal()">Registrar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <style>
     /* Estilos para el modal */
 .modal {
