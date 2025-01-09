@@ -59,7 +59,6 @@ class Compras {
         return $success ? $this->pdo->lastInsertId() : false;
     }
     
-    
 
     public function saveDetalle($id_producto, $id_compra, $cantidad, $precio) {
         $consult = $this->pdo->prepare("INSERT INTO cf_detalle_compras (id_producto, id_compra, cantidad, precio) VALUES (?,?,?,?)");
@@ -80,6 +79,18 @@ class Compras {
         return $result ? $result['sede'] : null;
     }
     
+    public function guardarCompraDesdeModal($sede, $metodo) {
+        try {
+            $sql = "INSERT INTO cf_compras (id_caja, metodo_compra, fecha_compra, estado_compra) 
+                    VALUES (?, ?, GETDATE(), 0)";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([$sede, $metodo]);
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            echo "Error al guardar los datos del modal: " . $e->getMessage();
+            return false;
+        }
+    }         
 
     public function updateEstadoProducto($id_producto, $estado, $barcode) {
         try {

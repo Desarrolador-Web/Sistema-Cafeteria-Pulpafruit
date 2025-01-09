@@ -24,14 +24,13 @@ switch ($option) {
         
 
     case 'registrarCompra':
-        // Verifica si hay un id_sede en la sesión
         if (!isset($_SESSION['id_sede'])) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'No se ha seleccionado ninguna sede. Por favor abra una caja.']);
             exit;
         }
     
         $id_empresa = isset($_POST['id_empresa']) ? (int) $_POST['id_empresa'] : 0;
-        $sede = $_SESSION['id_sede'];  // Utiliza el id_sede de la sesión
+        $sede = $_SESSION['id_sede'];
         $precio_compra = isset($_POST['precio_compra']) ? (float) $_POST['precio_compra'] : 0.0;
         $precio_venta = isset($_POST['precio_venta']) ? (float) $_POST['precio_venta'] : 0.0;
         $cantidad = isset($_POST['cantidad']) ? (int) $_POST['cantidad'] : 0;
@@ -40,7 +39,7 @@ switch ($option) {
         $barcode = isset($_POST['barcode']) ? $_POST['barcode'] : '';
         $fecha = date('Y-m-d');
         $imagen = '';
-        $metodo_compra = isset($_POST['metodo_compra']) ? (int) $_POST['metodo_compra'] : 0; // Método de compra
+        $metodo_compra = isset($_POST['metodo_compra']) ? (int) $_POST['metodo_compra'] : 0;
     
         if (empty($id_empresa)) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Por favor seleccione una empresa.']);
@@ -55,7 +54,6 @@ switch ($option) {
             move_uploaded_file($_FILES['imagen']['tmp_name'], '../' . $imagen);
         }
     
-        // Obtener el número de sede de la sesión
         $id_caja = isset($_SESSION['id_sede']) ? (int) $_SESSION['id_sede'] : 0;
     
         if ($id_caja === 0) {
@@ -64,7 +62,7 @@ switch ($option) {
         }
     
         $total = $precio_compra * $cantidad;
-        // Asegúrate de almacenar el método de compra en la base de datos
+    
         $compraId = $compras->saveCompra($id_empresa, $total, $fecha, $id_user, $estado, $id_caja, $metodo_compra);
     
         if (!$compraId) {
@@ -88,7 +86,79 @@ switch ($option) {
     
         echo json_encode(['tipo' => 'success', 'mensaje' => 'Compra registrada con éxito.']);
         break;
+        
+    case 'guardarDesdeModal':
+        // Verifica si se recibieron los datos necesarios desde el modal
+        $sede = isset($_POST['sede']) ? (int) $_POST['sede'] : 0;
+        $metodo = isset($_POST['metodo']) ? (int) $_POST['metodo'] : 0;
+        $id_user = $_SESSION['idusuario'];
+        
+        // Datos del formulario de productos
+        $id_empresa = isset($_POST['id_empresa']) ? (int) $_POST['id_empresa'] : 0;
+        $precio_compra = isset($_POST['precio_compra']) ? (float) $_POST['precio_compra'] : 0.0;
+        $precio_venta = isset($_POST['precio_venta']) ? (float) $_POST['precio_venta'] : 0.0;
+        $cantidad = isset($_POST['cantidad']) ? (int) $_POST['cantidad'] : 0;
+        $descripcion = isset($_POST['descripcion']) ? $_POST['descripcion'] : '';
+        $barcode = isset($_POST['barcode']) ? $_POST['barcode'] : '';
+        $imagen = isset($_FILES['imagen']) ? $_FILES['imagen'] : null;
     
+        // Validaciones
+        if ($sede === 0 || $metodo === 0) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Faltan datos del modal (sede o método) para guardar.']);
+            exit;
+        }
+    
+        if (empty($id_empresa) || empty($precio_compra) || empty($cantidad) || empty($descripcion)) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Faltan datos del producto para guardar la compra.']);
+            exit;
+        }
+    
+        // Manejo de la imagen del producto
+        $ruta_imagen = '';
+        if ($imagen && $imagen['error'] === 0) {
+            if (!file_exists('../uploads')) {
+                mkdir('../uploads', 0777, true);
+            }
+            $ruta_imagen = 'uploads/' . basename($imagen['name']);
+            move_uploaded_file($imagen['tmp_name'], '../' . $ruta_imagen);
+        }
+    
+        // Inicia el flujo de guardado
+        $fecha = date('Y-m-d');
+        $estado = 1; // Estado inicial
+    
+        $compras->beginTransaction();
+    
+        try {
+            // Guardar la compra
+            $total = $precio_compra * $cantidad;
+            $id_compra = $compras->saveCompra($id_empresa, $total, $fecha, $id_user, $estado, $sede, $metodo);
+    
+            if (!$id_compra) {
+                throw new Exception('Error al guardar la compra.');
+            }
+    
+            // Guardar el producto
+            $id_producto = $compras->saveProduct($barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $ruta_imagen, $cantidad, $estado, $sede);
+    
+            if (!$id_producto) {
+                throw new Exception('Error al guardar el producto.');
+            }
+    
+            // Guardar el detalle de la compra
+            $detalle_guardado = $compras->saveDetalle($id_producto, $id_compra, $cantidad, $precio_compra);
+    
+            if (!$detalle_guardado) {
+                throw new Exception('Error al guardar el detalle de la compra.');
+            }
+    
+            $compras->commit();
+            echo json_encode(['tipo' => 'success', 'mensaje' => 'Datos del modal guardados con éxito.']);
+        } catch (Exception $e) {
+            $compras->rollBack();
+            echo json_encode(['tipo' => 'error', 'mensaje' => $e->getMessage()]);
+        }
+        break;        
 
     case 'cambiarEstado':
         $id_producto = isset($_POST['id']) ? (int) $_POST['id'] : 0;

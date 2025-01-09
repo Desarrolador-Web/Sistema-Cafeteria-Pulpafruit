@@ -37,12 +37,15 @@ document.addEventListener('DOMContentLoaded', function () {
         btnGuardarModal.addEventListener('click', function () {
             const sedeSeleccionada = selectSede.value;
             const metodoSeleccionado = selectMetodo.value;
-
+        
             console.log(`Sede seleccionada: ${sedeSeleccionada}`);
             console.log(`Método seleccionado: ${metodoSeleccionado}`);
-
+        
+            // Enviar datos del modal al backend
+            enviarDatosModal(sedeSeleccionada, metodoSeleccionado);
+        
             cerrarModal();
-        });
+        });        
     }
 
     if (btnCerrarModal) {
@@ -62,20 +65,22 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Mostrar SweetAlert si el rol es 3
                     Swal.fire({
                         title: '¿De dónde viene el dinero?',
+                        input: 'select',
+                        inputOptions: {
+                            1: 'Socio',
+                            2: 'Caja',
+                            3: 'Bancaria',
+                        },
+                        inputPlaceholder: 'Seleccione el método',
                         showCancelButton: true,
                         cancelButtonText: 'Cancelar',
-                        confirmButtonText: 'Caja',
-                        showDenyButton: true,
-                        denyButtonText: 'Socio',
+                        confirmButtonText: 'Guardar',
                     }).then((result) => {
-                        let metodo_compra = 0;
-                        if (result.isConfirmed) {
-                            metodo_compra = 2; // Caja
-                        } else if (result.isDenied) {
-                            metodo_compra = 1; // Socio
-                        }
-                        if (metodo_compra !== 0) {
-                            console.log(`Método de compra seleccionado: ${metodo_compra}`);
+                        if (result.isConfirmed && result.value) {
+                            const metodo_compra = result.value;
+                            enviarDatosCompra(estado, metodo_compra); // Incluye el método
+                        } else {
+                            console.log("Operación cancelada o método no seleccionado");
                         }
                     });
                 } else {
@@ -177,4 +182,51 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.error(error);
             });
     }
+
+    function enviarDatosCompra(estado, metodo_compra) {
+        const formData = new FormData(document.getElementById('frmProductos'));
+
+        // Agrega el estado y método de compra al formulario
+        formData.append('estado', estado);
+        formData.append('metodo_compra', metodo_compra);
+
+        axios.post('controllers/comprasController.php?option=registrarCompra', formData)
+            .then(response => {
+                const data = response.data;
+                if (data.tipo === 'success') {
+                    Swal.fire('Éxito', data.mensaje, 'success');
+                    cargarProductos(); // Recarga la tabla
+                } else {
+                    Swal.fire('Error', data.mensaje, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error al registrar la compra:', error);
+                Swal.fire('Error', 'No se pudo registrar la compra.', 'error');
+            });
+    }
+
+    function enviarDatosModal(sede, metodo) {
+        const formData = new FormData(document.getElementById('frmProductos'));
+    
+        // Añadir datos del modal
+        formData.append('sede', sede);
+        formData.append('metodo', metodo);
+    
+        axios.post('controllers/comprasController.php?option=guardarDesdeModal', formData)
+            .then(response => {
+                const data = response.data;
+                if (data.tipo === 'success') {
+                    Swal.fire('Éxito', data.mensaje, 'success');
+                    cargarProductos(); // Recarga la tabla
+                } else {
+                    Swal.fire('Error', data.mensaje, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error al guardar desde el modal:', error);
+                Swal.fire('Error', 'No se pudo guardar la información del modal.', 'error');
+            });
+    }
+    
 });
