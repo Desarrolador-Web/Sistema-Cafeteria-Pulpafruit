@@ -107,7 +107,4 @@ class Compras {
     public function rollBack() {
         $this->pdo->rollBack();
     }
-    
-    
-    
 }

@@ -98,65 +98,29 @@
     </div>
 </div>
 
-<!-- Modal para método de pago y sede -->
-<div id="modalMetodoPago" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <span class="close" id="closeModal">&times;</span>
-        </div>
-        <div class="modal-body">
-            <form id="formMetodoPago">
-                <div class="mb-3">
-                    <label for="metodo_compra" class="form-label">¿De dónde viene el dinero de la compra?</label>
-                    <select class="form-control" id="metodo_compra" name="metodo_compra" required>
-                        <option value="">Seleccione una opción</option>
-                        <option value="2">Caja</option>
-                        <option value="1">Socio</option>
-                        <option value="3">Bancaria</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="id_caja" class="form-label">¿Para qué sede desea realizar la compra?</label>
-                    <select class="form-control" id="id_caja" name="id_caja" required>
-                        <option value="">Seleccione una sede</option>
-                        <option value="1">Principal</option>
-                        <option value="2">Planta 2</option>
-                        <option value="3">CEDI</option>
-                    </select>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" id="cancelModal">Cancelar</button>
-            <button type="button" class="btn btn-success" id="btnGuardarMetodo">Guardar</button>
-        </div>
+<!-- Modal definido en la vista -->
+<div id="modalMensajeRol" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center;">
+    <div style="background: white; padding: 20px; border-radius: 8px; width: 300px; text-align: center;">
+        <h5>Mensaje</h5>
+        <p id="modalMensajeTexto">Mensaje predeterminado</p>
+        
+        <label for="selectSede">Seleccione la sede:</label>
+        <select id="selectSede" style="width: 100%; margin: 10px 0; padding: 5px;">
+            <option value="1">Planta Principal</option>
+            <option value="2">Planta 2</option>
+            <option value="3">CEDI</option>
+        </select>
+        
+        <label for="selectMetodo">Seleccione el método:</label>
+        <select id="selectMetodo" style="width: 100%; margin: 10px 0; padding: 5px;">
+            <option value="1">Caja</option>
+            <option value="2">Socio</option>
+            <option value="3">Bancaria</option>
+        </select>
+        
+        <button id="guardarModal" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;">Guardar</button>
+        <button id="cerrarModal" style="padding: 10px 20px; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Cerrar</button>
     </div>
-</div>
-
-<!-- Modal para Registro de Compras -->
-<div class="modal fade" id="modalCompra" tabindex="-1" aria-labelledby="modalCompraLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalCompraLabel">Registrar Compra</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form id="formModalCompra">
-          <input type="hidden" id="estadoCompra" value=""> <!-- Estado Oculto -->
-          <div class="mb-3">
-            <label for="metodoCompra" class="form-label">Método de Compra</label>
-            <select class="form-select" id="metodoCompra">
-              <option value="">Seleccione una opción</option>
-              <option value="2">Caja</option>
-              <option value="1">Socio</option>
-            </select>
-          </div>
-          <button type="button" class="btn btn-primary" onclick="registrarCompraDesdeModal()">Registrar</button>
-        </form>
-      </div>
-    </div>
-  </div>
 </div>
 
 
