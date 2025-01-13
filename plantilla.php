@@ -27,7 +27,8 @@ if ($mostrar_todos) {
 // Exponer las variables al frontend evitando duplicación
 echo "<script>const rolUsuario = " . json_encode($rol_usuario) . ";</script>";
 echo "<script>const cajaAbierta = " . json_encode($_SESSION['caja_abierta'] ?? false) . ";</script>";
- 
+echo "<script>const idSede = " . json_encode($id_sede) . ";</script>";
+
 ##### PERMISOS #####
 require_once 'models/permisos.php';
 require_once 'models/admin.php';  

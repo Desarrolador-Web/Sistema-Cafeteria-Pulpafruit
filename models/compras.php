@@ -10,10 +10,11 @@ class Compras {
         $this->pdo = $this->con->conectar();
     }
 
-    public function getProducts($id_caja) {
+    public function getProducts($id_caja, $rolUsuario) {
         try {
-            $consult = $this->pdo->prepare("
-                SELECT 
+            // Consulta base
+            $query = "
+                SELECT
                     c.id_compra AS idcompra,
                     p.id_producto AS id_producto,
                     p.codigo_producto AS codigo,
@@ -24,41 +25,60 @@ class Compras {
                     p.precio_venta,
                     p.imagen,
                     e.razon_social AS empresa
-                FROM 
+                FROM
                     cf_compras c
-                JOIN 
+                JOIN
                     cf_detalle_compras dc ON c.id_compra = dc.id_compra
-                JOIN 
+                JOIN
                     cf_producto p ON dc.id_producto = p.id_producto
-                JOIN 
+                JOIN
                     cf_empresa e ON c.id_empresa = e.id_empresa
-                WHERE 
-                    c.id_caja = ?
-            ");
-            $consult->execute([$id_caja]);
-            return $consult->fetchAll(PDO::FETCH_ASSOC);
+                WHERE
+                    p.estado_producto = 0
+            ";
+
+            // Condicional para rol 3
+            if ($rolUsuario == 3) {
+                $query .= " AND c.id_caja = ?";
+            }
+
+            // Mostrar consulta para depuración
+            // echo json_encode([
+            //     'query' => $query,
+            //     'parametros' => $rolUsuario == 3 ? [$id_caja] : []
+            // ]);
+
+            // Preparar y ejecutar consulta
+            $stmt = $this->pdo->prepare($query);
+            if ($rolUsuario == 3) {
+                $stmt->execute([$id_caja]);
+            } else {
+                $stmt->execute();
+            }
+
+            // Obtener resultados
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            echo "Error en la consulta: " . $e->getMessage();
+            echo json_encode(['error' => 'Error en la consulta: ' . $e->getMessage()]);
             return [];
         }
     }
-    
-    
+
     public function saveCompra($id_empresa, $total, $fecha, $id_user, $estado, $id_caja, $metodo_compra) {
-        $sql = "INSERT INTO cf_compras (id_empresa, total_compra, fecha_compra, id_usuario, estado_compra, id_caja, metodo_compra) 
+        $sql = "INSERT INTO cf_compras (id_empresa, total_compra, fecha_compra, id_usuario, estado_compra, id_caja, metodo_compra)
                 VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$id_empresa, $total, $fecha, $id_user, $estado, $id_caja, $metodo_compra]);
         return $stmt->errorCode() == '00000' ? $this->pdo->lastInsertId() : false;
     }
-    
-    
+
+
     public function saveProduct($barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado, $id_caja) {
         $consult = $this->pdo->prepare("INSERT INTO cf_producto (codigo_producto, descripcion, id_empresa, precio_compra, precio_venta, imagen, existencia, estado_producto, id_caja) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $success = $consult->execute([$barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado, $id_caja]);
         return $success ? $this->pdo->lastInsertId() : false;
     }
-    
+
 
     public function saveDetalle($id_producto, $id_compra, $cantidad, $precio) {
         $consult = $this->pdo->prepare("INSERT INTO cf_detalle_compras (id_producto, id_compra, cantidad, precio) VALUES (?,?,?,?)");
@@ -70,7 +90,7 @@ class Compras {
         $consult->execute();
         return $consult->fetchAll(PDO::FETCH_ASSOC);
     }
-    
+
 
     public function getSedeUsuario($id_usuario) {
         $consult = $this->pdo->prepare("SELECT sede FROM cf_usuario WHERE id_usuario = ?");
@@ -78,10 +98,10 @@ class Compras {
         $result = $consult->fetch(PDO::FETCH_ASSOC);
         return $result ? $result['sede'] : null;
     }
-    
+
     public function guardarCompraDesdeModal($sede, $metodo) {
         try {
-            $sql = "INSERT INTO cf_compras (id_caja, metodo_compra, fecha_compra, estado_compra) 
+            $sql = "INSERT INTO cf_compras (id_caja, metodo_compra, fecha_compra, estado_compra)
                     VALUES (?, ?, GETDATE(), 0)";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([$sede, $metodo]);
@@ -90,14 +110,14 @@ class Compras {
             echo "Error al guardar los datos del modal: " . $e->getMessage();
             return false;
         }
-    }         
+    }
 
     public function updateEstadoProducto($id_producto, $estado, $barcode) {
         try {
             // Primero, actualizaCionzibiris de el código de barras si está vacío
             $consult = $this->pdo->prepare("UPDATE cf_producto SET codigo_producto = ? WHERE id_producto = ? AND (codigo_producto IS NULL OR codigo_producto = '')");
             $consult->execute([$barcode, $id_producto]);
-    
+
             // Luego, actualizacionbiris de el estado del producto
             $consult = $this->pdo->prepare("UPDATE cf_producto SET estado_producto = ? WHERE id_producto = ?");
             return $consult->execute([$estado, $id_producto]);
@@ -110,11 +130,11 @@ class Compras {
     public function beginTransaction() {
         $this->pdo->beginTransaction();
     }
-    
+
     public function commit() {
         $this->pdo->commit();
     }
-    
+
     public function rollBack() {
         $this->pdo->rollBack();
     }

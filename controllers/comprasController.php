@@ -7,15 +7,28 @@ $id_user = $_SESSION['idusuario'];
 switch ($option) {
 
     case 'listarProductos':
-        // Verifica si el valor de id_sede está en la sesión
-        if (isset($_SESSION['id_sede'])) {
-            $id_caja = $_SESSION['id_sede'];
-            $result = $compras->getProducts($id_caja);
-            echo json_encode($result);
+        if (isset($_GET['id_caja']) && isset($_GET['rolUsuario'])) {
+            $id_caja = intval($_GET['id_caja']);
+            $rolUsuario = intval($_GET['rolUsuario']);
+    
+            // Obtener productos
+            $productos = $compras->getProducts($id_caja, $rolUsuario);
+    
+            // Crear una única respuesta consolidada
+            $respuesta = [
+                'parametros_recibidos' => [
+                    'id_caja' => $id_caja,
+                    'rolUsuario' => $rolUsuario
+                ],
+                'productos' => $productos
+            ];
+            echo json_encode($respuesta);
+            
         } else {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'No se ha seleccionado ninguna sede.']);
+            echo json_encode(['error' => 'Faltan parámetros necesarios: id_caja o rolUsuario']);
         }
-        break;
+        break;        
+    
     
     case 'listarEmpresas':
         $result = $compras->getEmpresas();
