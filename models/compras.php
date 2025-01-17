@@ -11,74 +11,58 @@ class Compras {
     }
 
     public function getProducts($id_caja, $rolUsuario) {
-        try {
-            // Consulta base
-            $query = "
-                SELECT
-                    c.id_compra AS idcompra,
-                    p.id_producto AS id_producto,
-                    p.codigo_producto AS codigo,
-                    p.descripcion,
-                    p.existencia,
-                    p.estado_producto AS status,
-                    p.precio_compra,
-                    p.precio_venta,
-                    p.imagen,
-                    e.razon_social AS empresa
-                FROM
-                    cf_compras c
-                JOIN
-                    cf_detalle_compras dc ON c.id_compra = dc.id_compra
-                JOIN
-                    cf_producto p ON dc.id_producto = p.id_producto
-                JOIN
-                    cf_empresa e ON c.id_empresa = e.id_empresa
-                WHERE
-                    p.estado_producto = 0
-            ";
-
-            // Condicional para rol 3
-            if ($rolUsuario == 3) {
-                $query .= " AND c.id_caja = ?";
-            }
-
-            // Mostrar consulta para depuración
-            // echo json_encode([
-            //     'query' => $query,
-            //     'parametros' => $rolUsuario == 3 ? [$id_caja] : []
-            // ]);
-
-            // Preparar y ejecutar consulta
-            $stmt = $this->pdo->prepare($query);
-            if ($rolUsuario == 3) {
-                $stmt->execute([$id_caja]);
-            } else {
-                $stmt->execute();
-            }
-
-            // Obtener resultados
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            echo json_encode(['error' => 'Error en la consulta: ' . $e->getMessage()]);
-            return [];
+        if ($rolUsuario == '1' or $rolUsuario == '2') {
+            $sql = "SELECT 
+                        c.id_compra AS Id,
+                        p.codigo_producto AS Barcode,
+                        p.descripcion AS Descripción,
+                        p.precio_compra AS Precio_Compra,
+                        p.precio_venta AS Precio_Venta,
+                        e.razon_social AS Proveedor,
+                        p.imagen AS Imagen,
+                        dc.cantidad AS Cantidad
+                    FROM cf_compras c
+                    INNER JOIN cf_detalle_compras dc ON c.id_compra = dc.id_compra
+                    INNER JOIN cf_producto p ON dc.id_producto = p.id_producto
+                    INNER JOIN cf_empresa e ON c.id_empresa = e.id_empresa
+                    WHERE c.estado_compra = 0;";
+        } else if ($rolUsuario == "3") {
+            $sql = "SELECT 
+                        c.id_compra AS Id,
+                        p.codigo_producto AS Barcode,
+                        p.descripcion AS Descripción,
+                        p.precio_compra AS Precio_Compra,
+                        p.precio_venta AS Precio_Venta,
+                        e.razon_social AS Proveedor,
+                        p.imagen AS Imagen,
+                        dc.cantidad AS Cantidad
+                    FROM cf_compras c
+                    INNER JOIN cf_detalle_compras dc ON c.id_compra = dc.id_compra
+                    INNER JOIN cf_producto p ON dc.id_producto = p.id_producto
+                    INNER JOIN cf_empresa e ON c.id_empresa = e.id_empresa
+                    WHERE c.estado_compra = 1;
+                    ";
         }
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function saveCompra($id_empresa, $total, $fecha, $id_user, $estado, $id_caja, $metodo_compra) {
+        $fecha_hora = date('Y-m-d H:i:s');
         $sql = "INSERT INTO cf_compras (id_empresa, total_compra, fecha_compra, id_usuario, estado_compra, id_caja, metodo_compra)
                 VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$id_empresa, $total, $fecha, $id_user, $estado, $id_caja, $metodo_compra]);
+        $stmt->execute([$id_empresa, $total, $fecha_hora, $id_user, $estado, $id_caja, $metodo_compra]);
         return $stmt->errorCode() == '00000' ? $this->pdo->lastInsertId() : false;
     }
-
+    
 
     public function saveProduct($barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado, $id_caja) {
         $consult = $this->pdo->prepare("INSERT INTO cf_producto (codigo_producto, descripcion, id_empresa, precio_compra, precio_venta, imagen, existencia, estado_producto, id_caja) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $success = $consult->execute([$barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado, $id_caja]);
         return $success ? $this->pdo->lastInsertId() : false;
     }
-
 
     public function saveDetalle($id_producto, $id_compra, $cantidad, $precio) {
         $consult = $this->pdo->prepare("INSERT INTO cf_detalle_compras (id_producto, id_compra, cantidad, precio) VALUES (?,?,?,?)");
@@ -90,7 +74,6 @@ class Compras {
         $consult->execute();
         return $consult->fetchAll(PDO::FETCH_ASSOC);
     }
-
 
     public function getSedeUsuario($id_usuario) {
         $consult = $this->pdo->prepare("SELECT sede FROM cf_usuario WHERE id_usuario = ?");
@@ -114,11 +97,11 @@ class Compras {
 
     public function updateEstadoProducto($id_producto, $estado, $barcode) {
         try {
-            // Primero, actualizaCionzibiris de el código de barras si está vacío
+            // Primero, actualizaciòn de el código de barras si está vacío
             $consult = $this->pdo->prepare("UPDATE cf_producto SET codigo_producto = ? WHERE id_producto = ? AND (codigo_producto IS NULL OR codigo_producto = '')");
             $consult->execute([$barcode, $id_producto]);
 
-            // Luego, actualizacionbiris de el estado del producto
+            // Luego, actualizaciòn de el estado del producto
             $consult = $this->pdo->prepare("UPDATE cf_producto SET estado_producto = ? WHERE id_producto = ?");
             return $consult->execute([$estado, $id_producto]);
         } catch (PDOException $e) {

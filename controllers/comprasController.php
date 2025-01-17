@@ -29,7 +29,6 @@ switch ($option) {
         }
         break;        
     
-    
     case 'listarEmpresas':
         $result = $compras->getEmpresas();
         echo json_encode($result);
@@ -104,8 +103,15 @@ switch ($option) {
         // Verifica si se recibieron los datos necesarios desde el modal
         $sede = isset($_POST['sede']) ? (int) $_POST['sede'] : 0;
         $metodo = isset($_POST['metodo']) ? (int) $_POST['metodo'] : 0;
+        $estado = isset($_POST['estado']) ? (int) $_POST['estado'] : null; 
         $id_user = $_SESSION['idusuario'];
-        
+    
+        // Validar si el estado se recibió correctamente
+        if (is_null($estado)) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'El estado no fue enviado correctamente.']);
+            exit;
+        }
+    
         // Datos del formulario de productos
         $id_empresa = isset($_POST['id_empresa']) ? (int) $_POST['id_empresa'] : 0;
         $precio_compra = isset($_POST['precio_compra']) ? (float) $_POST['precio_compra'] : 0.0;
@@ -138,7 +144,6 @@ switch ($option) {
     
         // Inicia el flujo de guardado
         $fecha = date('Y-m-d');
-        $estado = 1; // Estado inicial
     
         $compras->beginTransaction();
     
@@ -172,6 +177,7 @@ switch ($option) {
             echo json_encode(['tipo' => 'error', 'mensaje' => $e->getMessage()]);
         }
         break;        
+    
 
     case 'cambiarEstado':
         $id_producto = isset($_POST['id']) ? (int) $_POST['id'] : 0;

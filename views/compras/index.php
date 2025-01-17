@@ -68,8 +68,8 @@
             </div>
         </div>
         <div class="card-footer text-right">
-            <button type="button" class="btn btn-secondary" id="btn-pendiente">Pendiente</button>
-            <button type="button" class="btn btn-success" id="btn-Recibido">Recibido</button>
+            <button type="button" class="btn btn-secondary" data-estado="0" id="btn-pendiente">Pendiente</button>
+            <button type="button" class="btn btn-success" data-estado="1" id="btn-Recibido">Recibido</button>
         </div>
     </div>
 </form>
