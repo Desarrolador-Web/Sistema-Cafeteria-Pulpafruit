@@ -94,12 +94,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 <td>
                     ${producto.status == 1 
                         ? '<button class="btn btn-success btn-sm" disabled>Recibido</button>' 
-                        : `<button class="btn btn-warning btn-sm" onclick="cambiarEstado(${producto.id_producto}, 1)">Pendiente</button>`}
+                        : `<button class="btn btn-warning btn-sm" onclick="cambiarEstado(${producto.Id}, 1)">Pendiente</button>`}
                 </td>
             `;
             table_productos.appendChild(row);
         });
-    }
+    }    
 
     if (selectEmpresa) {
         cargarEmpresas();
@@ -165,42 +165,57 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Error al guardar datos del modal:', error));
     }
 
-    window.cambiarEstado = function (id, nuevoEstado) {
+    window.cambiarEstado = function (id_producto, nuevoEstado) {
         Swal.fire({
             title: 'Ingrese el código de barras para actualizar el producto pendiente:',
             input: 'text',
+            inputPlaceholder: 'Código de barras',
             showCancelButton: true,
             confirmButtonText: 'Actualizar',
             cancelButtonText: 'Cancelar',
-            preConfirm: barcode => {
-                if (!/^\d+$/.test(barcode)) {
-                    Swal.showValidationMessage('El código de barras debe ser numérico.');
-                    return false;
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'El código de barras no puede estar vacío.';
                 }
-                return barcode;
+                if (!/^\d+$/.test(value)) {
+                    return 'El código de barras debe ser numérico.';
+                }
             }
-        }).then(result => {
+        }).then((result) => {
             if (result.isConfirmed) {
+                const barcode = result.value;
+    
+                // Crear el FormData para enviar los datos al controlador
                 const formData = new FormData();
-                formData.append('id', id);
-                formData.append('estado', nuevoEstado);
-                formData.append('barcode', result.value);
-
+                formData.append('id_producto', id_producto); // ID dinámico del producto
+                formData.append('estado', nuevoEstado); // Estado nuevo
+                formData.append('barcode', barcode); // Código de barras ingresado
+    
+                // Log de depuración
+                console.log('Datos enviados al backend:', {
+                    id_producto,
+                    estado: nuevoEstado,
+                    barcode,
+                });
+    
+                // Enviar al controlador
                 axios.post('controllers/comprasController.php?option=cambiarEstado', formData)
-                    .then(response => {
-                        const info = response.data;
-                        if (info.tipo === 'success') {
-                            Swal.fire('Éxito', info.mensaje, 'success');
-                            cargarProductos();
+                    .then((response) => {
+                        const data = response.data;
+    
+                        if (data.tipo === 'success') {
+                            Swal.fire('Éxito', data.mensaje, 'success').then(() => {
+                                location.reload(); // Recargar la página
+                            });
                         } else {
-                            Swal.fire('Error', info.mensaje, 'error');
+                            Swal.fire('Error', data.mensaje, 'error');
                         }
                     })
-                    .catch(error => {
-                        console.error('Error al cambiar el estado:', error);
-                        Swal.fire('Error', 'Error inesperado.', 'error');
+                    .catch((error) => {
+                        console.error('Error al enviar la solicitud:', error);
+                        Swal.fire('Error', 'No se pudo actualizar el estado del producto.', 'error');
                     });
             }
         });
-    };
+    };               
 });

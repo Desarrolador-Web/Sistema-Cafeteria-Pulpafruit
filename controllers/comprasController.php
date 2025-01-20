@@ -3,6 +3,9 @@ $option = isset($_GET['option']) ? $_GET['option'] : '';
 require_once '../models/compras.php';
 $compras = new Compras();
 $id_user = $_SESSION['idusuario'];
+$option = isset($_GET['option']) ? $_GET['option'] : '';
+error_log("Opción recibida: $option");
+
 
 switch ($option) {
 
@@ -178,28 +181,31 @@ switch ($option) {
         }
         break;        
     
-
     case 'cambiarEstado':
-        $id_producto = isset($_POST['id']) ? (int) $_POST['id'] : 0;
-        $estado = isset($_POST['estado']) ? (int) $_POST['estado'] : 1;
-        $barcode = isset($_POST['barcode']) ? $_POST['barcode'] : '';
+        // Obtener los datos enviados por el frontend
+        $id_producto = isset($_POST['id_producto']) ? (int)$_POST['id_producto'] : 0;
+        $estado = isset($_POST['estado']) ? (int)$_POST['estado'] : null;
+        $barcode = isset($_POST['barcode']) ? trim($_POST['barcode']) : '';
     
-        if (empty($id_producto) || empty($barcode)) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'Datos incompletos para cambiar el estado.']);
+        // Validar los datos requeridos
+        if ($id_producto === 0 || is_null($estado) || empty($barcode)) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Todos los campos son obligatorios para cambiar el estado.']);
             exit;
         }
     
-        // Actualizar el estado del producto y agregar el código de barras si estaba vacío
+        // Llamar al modelo para actualizar los datos
         $result = $compras->updateEstadoProducto($id_producto, $estado, $barcode);
     
+        // Verificar el resultado de la actualización
         if ($result) {
-            echo json_encode(['tipo' => 'success', 'mensaje' => 'Estado del producto actualizado con éxito.']);
+            echo json_encode(['tipo' => 'success', 'mensaje' => 'Estado del producto y la compra actualizado con éxito.']);
         } else {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al actualizar el estado del producto.']);
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al actualizar el estado del producto o la compra.']);
         }
-        exit;
-
-    default:
-        echo json_encode(['tipo' => 'error', 'mensaje' => 'Opción no válida.']);
         break;
+    
+    default:
+    echo json_encode(['tipo' => 'error', 'mensaje' => 'Opción no válida.']);
+    error_log("Opción no válida: $option");
+    break;
 }
