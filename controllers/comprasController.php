@@ -85,7 +85,7 @@ switch ($option) {
             break;
         }
     
-        $productId = $compras->saveProduct($barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado, $id_caja);
+        $productId = $compras->saveOrUpdateProduct($barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado, $id_caja);
     
         if (!$productId) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al guardar el producto.']);
@@ -108,13 +108,7 @@ switch ($option) {
         $metodo = isset($_POST['metodo']) ? (int) $_POST['metodo'] : 0;
         $estado = isset($_POST['estado']) ? (int) $_POST['estado'] : null; 
         $id_user = $_SESSION['idusuario'];
-    
-        // Validar si el estado se recibió correctamente
-        if (is_null($estado)) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'El estado no fue enviado correctamente.']);
-            exit;
-        }
-    
+        
         // Datos del formulario de productos
         $id_empresa = isset($_POST['id_empresa']) ? (int) $_POST['id_empresa'] : 0;
         $precio_compra = isset($_POST['precio_compra']) ? (float) $_POST['precio_compra'] : 0.0;
@@ -158,9 +152,9 @@ switch ($option) {
             if (!$id_compra) {
                 throw new Exception('Error al guardar la compra.');
             }
-    
+      
             // Guardar el producto
-            $id_producto = $compras->saveProduct($barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $ruta_imagen, $cantidad, $estado, $sede);
+            $id_producto = $compras->saveOrUpdateProduct($barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $ruta_imagen, $cantidad, $estado, $sede);
     
             if (!$id_producto) {
                 throw new Exception('Error al guardar el producto.');
@@ -186,7 +180,7 @@ switch ($option) {
         $id_producto = isset($_POST['id_producto']) ? (int)$_POST['id_producto'] : 0;
         $estado = isset($_POST['estado']) ? (int)$_POST['estado'] : null;
         $barcode = isset($_POST['barcode']) ? trim($_POST['barcode']) : '';
-    
+
         // Validar los datos requeridos
         if ($id_producto === 0 || is_null($estado) || empty($barcode)) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Todos los campos son obligatorios para cambiar el estado.']);
