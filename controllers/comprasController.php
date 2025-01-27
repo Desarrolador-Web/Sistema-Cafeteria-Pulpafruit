@@ -16,9 +16,7 @@ switch ($option) {
     
             // Obtener productos
             $productos = $compras->getProducts($id_caja, $rolUsuario);
-    
-            // Crear una única respuesta consolidada
-            $respuesta = [
+                $respuesta = [
                 'parametros_recibidos' => [
                     'id_caja' => $id_caja,
                     'rolUsuario' => $rolUsuario
@@ -52,7 +50,6 @@ switch ($option) {
         $estado = isset($_POST['estado']) ? (int) $_POST['estado'] : 1;
         $descripcion = isset($_POST['descripcion']) ? $_POST['descripcion'] : '';
         $barcode = isset($_POST['barcode']) ? $_POST['barcode'] : '';
-        $fecha = date('Y-m-d');
         $imagen = '';
         $metodo_compra = isset($_POST['metodo_compra']) ? (int) $_POST['metodo_compra'] : 0;
     
@@ -78,7 +75,7 @@ switch ($option) {
     
         $total = $precio_compra * $cantidad;
     
-        $compraId = $compras->saveCompra($id_empresa, $total, $fecha, $id_user, $estado, $id_caja, $metodo_compra);
+        $compraId = $compras->saveCompra($id_empresa, $total, null, $id_user, $estado, $id_caja, $metodo_compra);
     
         if (!$compraId) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al registrar la compra.']);
@@ -101,15 +98,13 @@ switch ($option) {
     
         echo json_encode(['tipo' => 'success', 'mensaje' => 'Compra registrada con éxito.']);
         break;
-        
+    
     case 'guardarDesdeModal':
-        // Verifica si se recibieron los datos necesarios desde el modal
         $sede = isset($_POST['sede']) ? (int) $_POST['sede'] : 0;
         $metodo = isset($_POST['metodo']) ? (int) $_POST['metodo'] : 0;
         $estado = isset($_POST['estado']) ? (int) $_POST['estado'] : null; 
         $id_user = $_SESSION['idusuario'];
-        
-        // Datos del formulario de productos
+    
         $id_empresa = isset($_POST['id_empresa']) ? (int) $_POST['id_empresa'] : 0;
         $precio_compra = isset($_POST['precio_compra']) ? (float) $_POST['precio_compra'] : 0.0;
         $precio_venta = isset($_POST['precio_venta']) ? (float) $_POST['precio_venta'] : 0.0;
@@ -118,18 +113,11 @@ switch ($option) {
         $barcode = isset($_POST['barcode']) ? $_POST['barcode'] : '';
         $imagen = isset($_FILES['imagen']) ? $_FILES['imagen'] : null;
     
-        // Validaciones
         if ($sede === 0 || $metodo === 0) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Faltan datos del modal (sede o método) para guardar.']);
             exit;
         }
     
-        if (empty($id_empresa) || empty($precio_compra) || empty($cantidad) || empty($descripcion)) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'Faltan datos del producto para guardar la compra.']);
-            exit;
-        }
-    
-        // Manejo de la imagen del producto
         $ruta_imagen = '';
         if ($imagen && $imagen['error'] === 0) {
             if (!file_exists('../uploads')) {
@@ -139,28 +127,22 @@ switch ($option) {
             move_uploaded_file($imagen['tmp_name'], '../' . $ruta_imagen);
         }
     
-        // Inicia el flujo de guardado
-        $fecha = date('Y-m-d');
-    
         $compras->beginTransaction();
     
         try {
-            // Guardar la compra
             $total = $precio_compra * $cantidad;
-            $id_compra = $compras->saveCompra($id_empresa, $total, $fecha, $id_user, $estado, $sede, $metodo);
+            $id_compra = $compras->saveCompra($id_empresa, $total, null, $id_user, $estado, $sede, $metodo);
     
             if (!$id_compra) {
                 throw new Exception('Error al guardar la compra.');
             }
-      
-            // Guardar el producto
+    
             $id_producto = $compras->saveOrUpdateProduct($barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $ruta_imagen, $cantidad, $estado, $sede);
     
             if (!$id_producto) {
                 throw new Exception('Error al guardar el producto.');
             }
     
-            // Guardar el detalle de la compra
             $detalle_guardado = $compras->saveDetalle($id_producto, $id_compra, $cantidad, $precio_compra);
     
             if (!$detalle_guardado) {
@@ -173,7 +155,8 @@ switch ($option) {
             $compras->rollBack();
             echo json_encode(['tipo' => 'error', 'mensaje' => $e->getMessage()]);
         }
-        break;        
+        break;
+             
     
     case 'cambiarEstado':
         // Obtener los datos enviados por el frontend

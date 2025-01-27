@@ -54,14 +54,19 @@
     
 
     public function saveCompra($id_empresa, $total, $fecha, $id_user, $estado, $id_caja, $metodo_compra) {
-        $fecha_hora = date('Y-m-d H:i:s');
+        // Si $fecha es null, generar automáticamente la fecha y hora
+        if ($fecha === null) {
+            date_default_timezone_set('America/Bogota');
+            $fecha = date('Y-m-d H:i:s'); // Fecha y hora actual en Bogotá
+        }
+    
         $sql = "INSERT INTO cf_compras (id_empresa, total_compra, fecha_compra, id_usuario, estado_compra, id_caja, metodo_compra)
                 VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$id_empresa, $total, $fecha_hora, $id_user, $estado, $id_caja, $metodo_compra]);
+        $stmt->execute([$id_empresa, $total, $fecha, $id_user, $estado, $id_caja, $metodo_compra]);
         return $stmt->errorCode() == '00000' ? $this->pdo->lastInsertId() : false;
     }
-
+    
     public function saveDetalle($id_producto, $id_compra, $cantidad, $precio) {
         $sql = "INSERT INTO cf_detalle_compras (id_producto, id_compra, cantidad, precio) VALUES (?, ?, ?, ?)";
         $stmt = $this->pdo->prepare($sql);
@@ -98,30 +103,29 @@
     }
     
     public function saveOrUpdateProduct($barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado, $id_caja) {
-        // Verificar si el producto ya existe con el mismo código de barras y en estado activo (1)
-        $sql_check = "SELECT id_producto, existencia FROM cf_producto WHERE codigo_producto = ? AND estado_producto = 1";
+        // Verificar si el producto ya existe con el mismo código de barras, estado activo (1) y misma sede (id_caja)
+        $sql_check = "SELECT id_producto, existencia FROM cf_producto WHERE codigo_producto = ? AND estado_producto = 1 AND id_caja = ?";
         $stmt_check = $this->pdo->prepare($sql_check);
-        $stmt_check->execute([$barcode]);
+        $stmt_check->execute([$barcode, $id_caja]);
         $producto_existente = $stmt_check->fetch(PDO::FETCH_ASSOC);
     
         if ($producto_existente) {
-            // Actualizar la existencia del producto existente
+            // Si el producto existe en la misma sede, actualizar la existencia
             $nueva_existencia = $producto_existente['existencia'] + $cantidad;
-            $sql_update = "UPDATE cf_producto SET existencia = ?, precio_compra = ?, precio_venta = ?, imagen = ? WHERE id_producto = ?";
+            $sql_update = "UPDATE cf_producto SET existencia = ?,  precio_compra = ?, precio_venta = ?, imagen = ? WHERE id_producto = ?";
             $stmt_update = $this->pdo->prepare($sql_update);
             $stmt_update->execute([$nueva_existencia, $precio_compra, $precio_venta, $imagen, $producto_existente['id_producto']]);
             return $producto_existente['id_producto']; // Retornar el ID del producto actualizado
+
         } else {
-            // Insertar un nuevo producto si no existe
-            $sql_insert = "INSERT INTO cf_producto (codigo_producto, descripcion, id_empresa, precio_compra, precio_venta, imagen, existencia, estado_producto, id_caja)
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            // Si no existe, insertar un nuevo producto
+            $sql_insert = "INSERT INTO cf_producto (codigo_producto, descripcion, id_empresa, precio_compra, precio_venta, imagen, existencia, estado_producto, id_caja) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt_insert = $this->pdo->prepare($sql_insert);
             $stmt_insert->execute([$barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado, $id_caja]);
             return $stmt_insert->errorCode() == '00000' ? $this->pdo->lastInsertId() : false;
         }
     }
-     
-
+    
     public function beginTransaction() {
         $this->pdo->beginTransaction();
     }

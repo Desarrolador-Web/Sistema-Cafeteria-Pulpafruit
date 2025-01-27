@@ -152,7 +152,6 @@ switch ($option) {
         $observacion = $_POST['observacion'];
         $id_info_caja = $_POST['id_info_caja'];
 
-        // Llama al modelo para guardar la observación
         $resultado = $admin->guardarObservacionYCodigo($id_info_caja, $observacion, null);
 
         if ($resultado) {
