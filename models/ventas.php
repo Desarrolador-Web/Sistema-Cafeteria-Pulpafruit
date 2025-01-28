@@ -51,12 +51,12 @@ class Ventas {
     }
 
     // Guardar una nueva venta
-    public function saveVenta($id_personal, $total, $metodo, $fecha, $id_user) {
+    public function saveVenta($id_personal, $total, $metodo, $fechaHora, $id_user) {
         $consult = $this->pdo->prepare("
             INSERT INTO cf_ventas (id_personal, total, metodo, fecha, id_usuario) 
             VALUES (?, ?, ?, ?, ?)
         ");
-        $consult->execute([$id_personal, $total, $metodo, $fecha, $id_user]);
+        $consult->execute([$id_personal, $total, $metodo, $fechaHora, $id_user]);
         return $this->pdo->lastInsertId();
     }
      

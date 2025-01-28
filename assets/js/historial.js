@@ -40,13 +40,13 @@ document.addEventListener('DOMContentLoaded', function () {
       dataSrc: ''
     },
     columns: [
-      { data: 'id_ventas' },
       { data: 'nombres' },
       { data: 'producto' },
-      { data: 'cantidad' },  
-      { data: 'precio_venta' },  
-      { data: 'subtotal' },  
-      { data: 'fecha' }
+      { data: 'cantidad' },
+      { data: 'precio_venta' },
+      { data: 'subtotal' },
+      { data: 'fecha' },
+      { data: 'metodo_pago' } 
     ],
     orderCellsTop: true,
     fixedHeader: true,

@@ -1,7 +1,7 @@
 <?php
 require_once '../models/ventas.php';
 
-date_default_timezone_set('America/Bogota'); 
+date_default_timezone_set('America/Bogota');
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -227,8 +227,8 @@ switch ($option) {
         }
     
         // Guardar la venta
-        $fecha = date('Y-m-d'); 
-        $saleId = $ventas->saveVenta($cedula, $total, $metodo, $fecha, $id_user);
+        $fechaHora = date('Y-m-d H:i:s'); // Fecha y hora exacta 
+        $saleId = $ventas->saveVenta($cedula, $total, $metodo, $fechaHora, $id_user);
     
         // Obtener la sede del usuario desde la sesión
         $id_sede = $_SESSION['id_sede'];

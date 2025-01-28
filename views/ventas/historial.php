@@ -1,4 +1,3 @@
-
 <div class="card">
     <div class="card-body">
         <div class="d-flex justify-content-center">
@@ -17,7 +16,6 @@
             <table class="table table-striped table-hover" style="width: 100%;" id="table_ventas">
             <thead>
                 <tr>
-                <th scope="col">Id</th>
                 <th scope="col">Cliente</th>
                 <th scope="col">Productos</th>
                 <th scope="col">Cantidad</th>
