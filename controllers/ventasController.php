@@ -160,20 +160,12 @@ switch ($option) {
     case 'saveventa':
         $data = json_decode(file_get_contents('php://input'), true);
     
-        $cedula = $data['cedula'] ?? null;
+        // Inicializar método de pago
         $metodo = $data['metodo'] ?? null;
     
-        // Validar parámetros obligatorios
-        if (is_null($cedula) || is_null($metodo)) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'Datos de personal o método de pago no válidos']);
-            break;
-        }
-    
-        // Obtener datos del personal
-        $personal = $ventas->getPersonalById($cedula);
-        if (!$personal) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'El personal seleccionado no existe']);
-            break;
+        if (!$metodo) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Método de pago no especificado']);
+            exit;
         }
     
         // Validar método de pago
@@ -181,25 +173,29 @@ switch ($option) {
             case 'Efectivo':
                 $metodo = 1;
                 break;
-            case 'Credito':
-                $metodo = 3;
-                break;
             case 'Bancaria':
                 $metodo = 2;
+                break;
+            case 'Credito':
+                $metodo = 3;
                 break;
             default:
                 echo json_encode(['tipo' => 'error', 'mensaje' => 'Método de pago no válido']);
                 exit;
         }
     
-        // Validar carrito
-        if (!isset($_SESSION['cart'][$id_user])) {
-            $_SESSION['cart'][$id_user] = [];
+        // Determinar id_personal
+        $cedula = ($metodo == 3) ? ($data['cedula'] ?? null) : 0; // 0 si no es crédito
+    
+        if ($metodo == 3 && !$cedula) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Debe seleccionar un personal para el método de pago Crédito.']);
+            exit;
         }
     
-        if (empty($_SESSION['cart'][$id_user])) {
+        // Validar carrito
+        if (!isset($_SESSION['cart'][$id_user]) || empty($_SESSION['cart'][$id_user])) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'CARRITO VACÍO']);
-            break;
+            exit;
         }
     
         // Validar stock y calcular total
@@ -217,40 +213,39 @@ switch ($option) {
     
         if ($stock_insuficiente) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'STOCK INSUFICIENTE']);
-            break;
+            exit;
         }
     
-        // Validar capacidad de crédito si el método es Crédito
-        if ($metodo == 3 && $personal['capacidad'] < $total) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'CAPACIDAD DE CRÉDITO INSUFICIENTE']);
-            break;
+        // Validar capacidad de crédito solo si el método es Crédito
+        if ($metodo == 3) {
+            $personal = $ventas->getPersonalById($cedula);
+            if (!$personal) {
+                echo json_encode(['tipo' => 'error', 'mensaje' => 'El personal seleccionado no existe']);
+                exit;
+            }
+            if ($personal['capacidad'] < $total) {
+                echo json_encode(['tipo' => 'error', 'mensaje' => 'CAPACIDAD DE CRÉDITO INSUFICIENTE']);
+                exit;
+            }
         }
     
         // Guardar la venta
         $fechaHora = date('Y-m-d H:i:s'); // Fecha y hora exacta 
         $saleId = $ventas->saveVenta($cedula, $total, $metodo, $fechaHora, $id_user);
     
-        // Obtener la sede del usuario desde la sesión
-        $id_sede = $_SESSION['id_sede'];
-    
-        // Guardar detalles de venta y actualizar stock
+        // Guardar detalles y actualizar stock
         foreach ($_SESSION['cart'][$id_user] as $id_product => $item) {
-            $ventas->saveDetalle($id_product, $saleId, $item['cantidad'], $item['precio'], $id_sede);
+            $ventas->saveDetalle($id_product, $saleId, $item['cantidad'], $item['precio'], $_SESSION['id_sede']);
             $product = $ventas->getProduct($id_product);
             $stock = $product['existencia'] - $item['cantidad'];
             $ventas->updateStock($stock, $id_product);
         }
     
-        // Actualizar deuda y capacidad si el método es Crédito
-        if ($metodo == 3) {
-            $ventas->updateDeudaCapacidad($cedula, $total);
-        }
-    
-        unset($_SESSION['cart'][$id_user]);
+        unset($_SESSION['cart'][$id_user]); // Limpiar el carrito
     
         echo json_encode(['tipo' => 'success', 'mensaje' => 'Venta guardada correctamente']);
         break;
-        
+    
         
 
     case 'searchbarcode':

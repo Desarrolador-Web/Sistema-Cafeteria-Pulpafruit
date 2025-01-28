@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (btn_save) {
         btn_save.onclick = function () {
             if (!id_personal.value || !metodo.value) {
-                message('error', 'Debe seleccionar un personal y un método de pago');
+                message('error', 'Debe seleccionar un personal');
                 return;
             }
         
