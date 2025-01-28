@@ -17,17 +17,12 @@ class UsuariosModel {
         return $consult->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getUsers() {
-        $consult = $this->pdo->prepare("SELECT u.*, c.nombre_caja FROM cf_usuario u INNER JOIN cf_caja c ON u.sede = c.id_caja WHERE u.estado_usuario = 1");
+    public function getUser() {
+        $consult = $this->pdo->prepare("SELECT id_usuario, nombres, apellidos, correo FROM cf_usuario WHERE estado_usuario = 1");
         $consult->execute();
         return $consult->fetchAll(PDO::FETCH_ASSOC);
-    }  
-
-    public function getUser($id) {
-        $consult = $this->pdo->prepare("SELECT * FROM cf_usuario WHERE id_usuario = ?");
-        $consult->execute([$id]);
-        return $consult->fetch(PDO::FETCH_ASSOC);
     }
+    
 
     public function comprobarCedula($cedula) {
         $consult = $this->pdo->prepare("SELECT * FROM cf_usuario WHERE id_usuario = ?");

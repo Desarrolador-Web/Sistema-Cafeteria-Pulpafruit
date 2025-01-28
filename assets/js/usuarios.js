@@ -19,9 +19,8 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         columns: [
             { data: 'id_usuario' },
-            { data: 'nombre_completo' }, 
+            { data: 'nombre_completo' },
             { data: 'correo' },
-            { data: 'sede_nombre' },
             { data: 'accion' }
         ],
         language: {
@@ -29,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         "order": [[0, 'desc']]
     });
+    
 
     frm.onsubmit = function (e) {
         e.preventDefault();

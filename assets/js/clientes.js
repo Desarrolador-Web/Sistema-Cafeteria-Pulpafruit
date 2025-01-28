@@ -77,33 +77,10 @@ class Clientes {
             });
     }
 
-    // Método auxiliar para los textos de DataTable
-    getDataTableLanguage() {
-        return {
-            sProcessing: "Procesando...",
-            sLengthMenu: "Mostrar _MENU_ registros",
-            sZeroRecords: "No se encontraron resultados",
-            sEmptyTable: "Ningún dato disponible en esta tabla",
-            sInfo: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-            sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
-            sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
-            sSearch: "Buscar:",
-            oPaginate: {
-                sFirst: "Primero",
-                sLast: "Último",
-                sNext: "Siguiente",
-                sPrevious: "Anterior"
-            }
-        };
-    }
 }
-
 // Inicialización de cliente y eventos
 document.addEventListener('DOMContentLoaded', function () {
     const cliente = new Clientes();
-
-    // Inicializar tabla y cargar datos
-    cliente.inicializarTablaClientes();
 
     // Eventos para los botones
     document.getElementById('metric-inicios-sesion').addEventListener('click', () => cliente.mostrarIniciosSesion());

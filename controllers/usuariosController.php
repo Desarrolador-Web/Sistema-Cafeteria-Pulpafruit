@@ -27,19 +27,17 @@ switch ($option) {
     
 
     case 'listar':
-        $data = $usuarios->getUsers();
+        $data = $usuarios->getUser();
         for ($i = 0; $i < count($data); $i++) {
             $data[$i]['nombre_completo'] = $data[$i]['nombres'] . ' ' . $data[$i]['apellidos'];
-            $data[$i]['sede_nombre'] = $data[$i]['nombre_caja']; // Añadir el nombre de la sede
             $data[$i]['accion'] = '<div class="d-flex">
                 <a class="btn btn-danger btn-sm" onclick="deleteUser(' . $data[$i]['id_usuario'] . ')"><i class="fas fa-eraser"></i></a>
                 <a class="btn btn-primary btn-sm" onclick="editUser(' . $data[$i]['id_usuario'] . ')"><i class="fas fa-edit"></i></a>
                 <a class="btn btn-info btn-sm" onclick="permisos(' . $data[$i]['id_usuario'] . ')"><i class="fas fa-lock"></i></a>
-                </div>';
+            </div>';
         }
         echo json_encode($data);
         break;
-
         
     case 'save':
         $cedula = $_POST['cedula']; 
