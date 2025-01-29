@@ -245,8 +245,7 @@ switch ($option) {
     
         echo json_encode(['tipo' => 'success', 'mensaje' => 'Venta guardada correctamente']);
         break;
-    
-        
+
 
     case 'searchbarcode':
         $barcode = $_GET['barcode'];
