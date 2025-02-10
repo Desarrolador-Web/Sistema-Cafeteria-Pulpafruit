@@ -1,59 +1,92 @@
 <?php
 require_once '../config.php';
 require_once 'conexion.php';
-class Productos{
+
+class Compras {
     private $pdo, $con;
+
     public function __construct() {
         $this->con = new Conexion();
         $this->pdo = $this->con->conectar();
     }
 
-    public function getProducts()
-    {
-        $consult = $this->pdo->prepare("SELECT * FROM cf_producto WHERE estado_producto = 1");
-        $consult->execute();
-        return $consult->fetchAll(PDO::FETCH_ASSOC);
-    }
+    public function getProducts($id_caja, $rolUsuario): array {
+        $sql = ($rolUsuario == '1' || $rolUsuario == '2') 
+            ? "SELECT 
+                    c.id_compra AS Id,
+                    p.codigo_producto AS Barcode,
+                    p.descripcion AS Descripción,
+                    p.precio_compra AS Precio_Compra,
+                    p.precio_venta AS Precio_Venta,
+                    e.razon_social AS Proveedor,
+                    p.imagen AS Imagen,
+                    dc.cantidad AS Cantidad
+                FROM cf_compras c
+                INNER JOIN cf_detalle_compras dc ON c.id_compra = dc.id_compra
+                INNER JOIN cf_producto p ON dc.id_producto = p.id_producto
+                INNER JOIN cf_empresa e ON c.id_empresa = e.id_empresa
+                WHERE c.estado_compra = 0"
+            : "SELECT 
+                    c.id_compra AS Id,
+                    p.codigo_producto AS Barcode,
+                    p.descripcion AS Descripción,
+                    p.precio_compra AS Precio_Compra,
+                    p.precio_venta AS Precio_Venta,
+                    e.razon_social AS Proveedor,
+                    p.imagen AS Imagen,
+                    dc.cantidad AS Cantidad
+                FROM cf_compras c
+                INNER JOIN cf_detalle_compras dc ON c.id_compra = dc.id_compra
+                INNER JOIN cf_producto p ON dc.id_producto = p.id_producto
+                INNER JOIN cf_empresa e ON c.id_empresa = e.id_empresa
+                WHERE c.estado_compra = 0 AND dc.id_caja = :id_caja";
     
-    public function getProduct($id)
-    {
-        $consult = $this->pdo->prepare("SELECT * FROM cf_producto WHERE id_producto = ?");
-        $consult->execute([$id]);
-        return $consult->fetch(PDO::FETCH_ASSOC);
-    }
-
-    public function comprobarBarcode($barcode)
-    {
-        $consult = $this->pdo->prepare("SELECT * FROM cf_producto WHERE codigo_producto = ?");
-        $consult->execute([$barcode]);
-        return $consult->fetch(PDO::FETCH_ASSOC);
-    }
-
-    public function saveProduct($barcode, $nombre, $precio_compra, $precio_venta, $stock, $imagen, $id_proveedor)
-    {
-        $consult = $this->pdo->prepare("INSERT INTO cf_producto (codigo_producto, descripcion, precio_compra, precio_venta, existencia, imagen, id_proveedor, estado_producto) VALUES (?,?,?,?,?,?,?,1)");
-        return $consult->execute([$barcode, $nombre, $precio_compra, $precio_venta, $stock, $imagen, $id_proveedor]);
-    }
-
-    public function deleteProducto($id)
-    {
-        $consult = $this->pdo->prepare("UPDATE cf_producto SET estado_producto = 0 WHERE id_producto = ?");
-        return $consult->execute([$id]);
-    }
-
-    public function getProductsBySede($id_sede) {
-        // Solo muestra productos cuyo id_caja coincida con el id_sede y que estén activos (estado_producto = 1)
-        $consult = $this->pdo->prepare("SELECT * FROM cf_producto WHERE estado_producto = 1 AND id_caja = ?");
-        $consult->execute([$id_sede]);
-        return $consult->fetchAll(PDO::FETCH_ASSOC);
-    }
+        $stmt = $this->pdo->prepare($sql);
     
+        if ($rolUsuario == '3') {
+            $stmt->bindParam(':id_caja', $id_caja, PDO::PARAM_INT);
+        }
+    
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
-    public function updateProduct($barcode, $nombre, $precio_compra, $precio_venta, $stock, $imagen, $id_proveedor, $id)
-    {
-        $consult = $this->pdo->prepare("UPDATE cf_producto SET codigo_producto=?, descripcion=?, precio_compra=?, precio_venta=?, existencia=?, imagen=?, id_proveedor=? WHERE id_producto=?");
-        return $consult->execute([$barcode, $nombre, $precio_compra, $precio_venta, $stock, $imagen, $id_proveedor, $id]);
+    public function buscarProductoPorBarcode($barcode) {
+        $sql = "SELECT id_producto, precio_compra, precio_venta, existencia FROM cf_producto WHERE codigo_producto = ?";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$barcode]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function saveCompra($sede, $total, $id_usuario, $estado, $id_caja, $metodo_compra) {
+        date_default_timezone_set('America/Bogota');
+        $fecha = date('Y-m-d H:i:s');
+    
+        $sql = "INSERT INTO cf_compras (id_empresa, total_compra, fecha_compra, id_usuario, estado_compra, id_caja, metodo_compra)
+                VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$sede, $total, $fecha, $id_usuario, $estado, $id_caja, $metodo_compra]);
+        return $stmt->errorCode() == '00000' ? $this->pdo->lastInsertId() : false;
+    }
+
+    public function saveOrUpdateProduct($barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado, $id_caja) {
+        $sql_check = "SELECT id_producto, existencia FROM cf_producto WHERE codigo_producto = ? AND estado_producto = 1 AND id_caja = ?";
+        $stmt_check = $this->pdo->prepare($sql_check);
+        $stmt_check->execute([$barcode, $id_caja]);
+        $producto_existente = $stmt_check->fetch(PDO::FETCH_ASSOC);
+    
+        if ($producto_existente) {
+            $nueva_existencia = $producto_existente['existencia'] + $cantidad;
+            $sql_update = "UPDATE cf_producto SET existencia = ?, precio_compra = ?, precio_venta = ?, imagen = ? WHERE id_producto = ?";
+            $stmt_update = $this->pdo->prepare($sql_update);
+            $stmt_update->execute([$nueva_existencia, $precio_compra, $precio_venta, $imagen, $producto_existente['id_producto']]);
+            return $producto_existente['id_producto'];
+        }
+    }
+
+    public function saveDetalle($id_producto, $id_compra, $cantidad, $precio) {
+        $sql = "INSERT INTO cf_detalle_compras (id_producto, id_compra, cantidad, precio) VALUES (?, ?, ?, ?)";
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([$id_producto, $id_compra, $cantidad, $precio]);
     }
 }
-
-

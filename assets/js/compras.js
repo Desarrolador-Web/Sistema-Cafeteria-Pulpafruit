@@ -1,91 +1,74 @@
-$(document).ready(function() {
-    $('#table_productos').DataTable({
-        "ajax": {
-            "url": "controllers/productosController.php?option=listar",
-            "dataSrc": "",
-            "error": function(xhr, error, code){
-                console.log(xhr.responseText);
-            }
-        },
-        "columns": [
-            {"data": "id_producto"},
-            {"data": "codigo_producto"},
-            {"data": "descripcion"},
-            {"data": "precio_compra"},
-            {"data": "precio_venta"},
-            {
-              "data": "imagen",
-              "render": function(data, type, row) {
-                  if (data) {
-                      // imagen para que sea relativa a la raíz del servidor web
-                      var relativePath = data.replace("C:\\xampp\\htdocs\\venta\\", "").replace(/\\/g, "/");
-                      return '<img src="' + relativePath + '" width="50" height="50"/>';
-                  } else {
-                      return '<img src="uploads/default.png" width="50" height="50"/>'; // Ruta a una imagen por defecto
-                  }
-              }
-          },
-          
-          
-            {"data": "existencia"},
-        ]
-    });
-  
-    
-  });
-  
-  
-  function deleteProducto(id) {
-    $.ajax({
-        url: 'controllers/productosController.php?option=delete&id=' + id,
-        type: 'GET',
-        success: function(response) {
-            var res = JSON.parse(response);
-            if (res.tipo === 'success') {
-                $('#table_productos').DataTable().ajax.reload();
-                alert(res.mensaje);
-            } else {
-                alert(res.mensaje);
-            }
+document.addEventListener('DOMContentLoaded', function () {
+    const barcodeInput = document.getElementById('barcode');
+    const precioCompraInput = document.getElementById('precio_compra');
+    const precioVentaInput = document.getElementById('precio_venta');
+    const cantidadInput = document.getElementById('cantidad');
+    const selectSede = document.getElementById('selectSede');
+    const selectMetodo = document.getElementById('selectMetodo');
+    const btnGuardar = document.getElementById('btn-Recibido');
+
+    barcodeInput.addEventListener('input', function () {
+        let barcode = barcodeInput.value.trim();
+        if (barcode.length > 0) {
+            buscarProductoPorBarcode(barcode);
         }
     });
-  }
-  
-  function editProducto(id) {
-    $.ajax({
-        url: 'controllers/productosController.php?option=edit&id=' + id,
-        type: 'GET',
-        success: function(response) {
-            var data = JSON.parse(response);
-            $('#id_product').val(data.codproducto);
-            $('#barcode').val(data.codigo);
-            $('#nombre').val(data.descripcion);
-            $('#precio').val(data.precio_compra); 
-            $('#stock').val(data.existencia);
-            $('#modalProducto').modal('show');
+
+    function buscarProductoPorBarcode(barcode) {
+        axios.get(`controllers/comprasController.php?option=buscarProducto&barcode=${barcode}`)
+            .then(response => {
+                const data = response.data;
+                if (data.existe) {
+                    precioCompraInput.value = data.precio_compra;
+                    precioVentaInput.value = data.precio_venta;
+                } else {
+                    precioCompraInput.value = '';
+                    precioVentaInput.value = '';
+                }
+            })
+            .catch(error => console.error('Error al buscar el producto:', error));
+    }
+
+    btnGuardar.addEventListener('click', function () {
+        const barcode = barcodeInput.value.trim();
+        const precio_compra = precioCompraInput.value.trim();
+        const precio_venta = precioVentaInput.value.trim();
+        const cantidad = cantidadInput.value.trim();
+        const sede = selectSede.value;
+        const metodo = selectMetodo.value;
+
+        if (!barcode || !precio_compra || !precio_venta || !cantidad || !sede || !metodo) {
+            Swal.fire('Error', 'Todos los campos son obligatorios.', 'error');
+            return;
         }
+
+        const formData = new FormData();
+        formData.append('barcode', barcode);
+        formData.append('precio_compra', precio_compra);
+        formData.append('precio_venta', precio_venta);
+        formData.append('cantidad', cantidad);
+        formData.append('sede', sede);
+        formData.append('metodo', metodo);
+
+        axios.post('controllers/comprasController.php?option=registrarCompra', formData)
+            .then(response => {
+                const data = response.data;
+                if (data.tipo === 'success') {
+                    Swal.fire('Éxito', data.mensaje, 'success');
+                    limpiarFormulario();
+                } else {
+                    Swal.fire('Error', data.mensaje, 'error');
+                }
+            })
+            .catch(error => console.error('Error al guardar la compra:', error));
     });
-  }
-  
-  $('#formProducto').submit(function(e) {
-    e.preventDefault();
-    var formData = new FormData(this);
-    $.ajax({
-        url: 'controllers/productosController.php?option=save',
-        type: 'POST',
-        data: formData,
-        contentType: false,
-        processData: false,
-        success: function(response) {
-            var res = JSON.parse(response);
-            if (res.tipo === 'success') {
-                $('#table_productos').DataTable().ajax.reload();
-                $('#modalProducto').modal('hide');
-                alert(res.mensaje);
-            } else {
-                alert(res.mensaje);
-            }
-        }
-    });
-  });
-  
+
+    function limpiarFormulario() {
+        barcodeInput.value = '';
+        precioCompraInput.value = '';
+        precioVentaInput.value = '';
+        cantidadInput.value = '';
+        selectSede.value = '';
+        selectMetodo.value = '';
+    }
+});

@@ -87,7 +87,6 @@
                         <th scope="col">Proveedor</th>
                         <th scope="col">Imagen</th>
                         <th scope="col">Cantidad</th>
-                        <th scope="col">Acción</th>
                     </tr>
                 </thead>
                 <tbody>
