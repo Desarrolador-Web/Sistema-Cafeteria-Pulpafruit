@@ -1,71 +1,82 @@
 <?php
-$option = (empty($_GET['option'])) ? '' : $_GET['option'];
 require_once '../models/productos.php';
-$productos = new Productos();
-switch ($option) {
+$productos = new Compras();
+$option = isset($_GET['option']) ? $_GET['option'] : '';
 
-    case 'listar':
-        // Verifica si el id_sede está en la sesión
-        if (isset($_SESSION['id_sede'])) {
-            $id_sede = $_SESSION['id_sede'];
-            $data = $productos->getProductsBySede($id_sede);  // Filtra los productos por sede
-            echo json_encode($data);
+switch ($option) {
+    case 'listarProductos':
+        // Validar que los parámetros necesarios estén presentes
+        if (isset($_GET['id_caja']) && isset($_GET['rolUsuario'])) {
+            $id_caja = intval($_GET['id_caja']);
+            $rolUsuario = intval($_GET['rolUsuario']);
+
+            // Obtener productos desde el modelo
+            $productosLista = $productos->getProducts($id_caja, $rolUsuario);
+
+            // Validar si se obtuvieron productos
+            if (!empty($productosLista)) {
+                echo json_encode(['productos' => $productosLista]);
+            } else {
+                echo json_encode(['error' => 'No se encontraron productos para los parámetros especificados.']);
+            }
         } else {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'No se ha seleccionado ninguna sede.']);
+            echo json_encode(['error' => 'Faltan parámetros necesarios: id_caja o rolUsuario']);
+        }
+        break;
+
+    case 'registrarProducto':
+        // Validar y capturar datos del formulario
+        $barcode = isset($_POST['barcode']) ? trim($_POST['barcode']) : '';
+        $descripcion = isset($_POST['descripcion']) ? trim($_POST['descripcion']) : '';
+        $precio_compra = isset($_POST['precio_compra']) ? (float)$_POST['precio_compra'] : 0.0;
+        $precio_venta = isset($_POST['precio_venta']) ? (float)$_POST['precio_venta'] : 0.0;
+        $cantidad = isset($_POST['cantidad']) ? (int)$_POST['cantidad'] : 0;
+        $id_empresa = isset($_POST['id_empresa']) ? (int)$_POST['id_empresa'] : 0;
+        $id_caja = isset($_POST['id_caja']) ? (int)$_POST['id_caja'] : 0;
+        $imagen = '';
+        $estado_producto = 1; // Estado por defecto (1)
+
+        // Subir imagen si está presente
+        if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] == 0) {
+            if (!file_exists('../uploads')) {
+                mkdir('../uploads', 0777, true);
+            }
+            $imagen = 'uploads/' . basename($_FILES['imagen']['name']);
+            move_uploaded_file($_FILES['imagen']['tmp_name'], '../' . $imagen);
+        }
+    
+        // Validar campos obligatorios
+        if (empty($barcode) || empty($descripcion) || $precio_compra <= 0 || $precio_venta <= 0 || $cantidad <= 0 || $id_empresa <= 0 || $id_caja <= 0) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Todos los campos son obligatorios.']);
+            break;
+        }
+    
+        // Guardar el producto en la base de datos
+        $result = $productos->saveProduct($barcode, $descripcion, $precio_compra, $precio_venta, $cantidad, $estado_producto, $id_empresa, $id_caja, $imagen);
+    
+        // Responder al frontend según el resultado
+        if ($result) {
+            echo json_encode(['tipo' => 'success', 'mensaje' => 'Producto registrado con éxito.']);
+        } else {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al registrar el producto.']);
+        }
+        break;
+        
+    case 'listarProveedores':
+        require_once '../models/productos.php';
+        $productos = new Compras();
+    
+        $proveedores = $productos->getProveedores();
+        if (!empty($proveedores)) {
+            echo json_encode(['proveedores' => $proveedores]);
+        } else {
+            echo json_encode(['error' => 'No se encontraron proveedores.']);
         }
         break;
     
 
-    case 'save':
-        $barcode = $_POST['barcode'];
-        $nombre = $_POST['nombre'];
-        $precio_compra = $_POST['precio_compra'];
-        $precio_venta = $_POST['precio_venta'];
-        $stock = $_POST['stock'];
-        $imagen = $_FILES['imagen']['name'];
-        $id_proveedor = $_POST['id_proveedor'];
-        $id_product = $_POST['id_product'];
-        if ($id_product == '') {
-            $consult = $productos->comprobarBarcode($barcode);
-            if (empty($consult)) {
-                $result = $productos->saveProduct($barcode, $nombre, $precio_compra, $precio_venta, $stock, $imagen, $id_proveedor);
-                if ($result) {
-                    $res = array('tipo' => 'success', 'mensaje' => 'PRODUCTO REGISTRADO');
-                } else {
-                    $res = array('tipo' => 'error', 'mensaje' => 'ERROR AL AGREGAR');
-                }
-            } else {
-                $res = array('tipo' => 'error', 'mensaje' => 'EL BARCODE YA EXISTE');
-            }
-        } else {
-            $result = $productos->updateProduct($barcode, $nombre, $precio_compra, $precio_venta, $stock, $imagen, $id_proveedor, $id_product);
-            if ($result) {
-                $res = array('tipo' => 'success', 'mensaje' => 'PRODUCTO MODIFICADO');
-            } else {
-                $res = array('tipo' => 'error', 'mensaje' => 'ERROR AL MODIFICAR');
-            }
-        }
-        echo json_encode($res);
-        break;
-
-    case 'delete':
-        $id = $_GET['id'];
-        $data = $productos->deleteProducto($id);
-        if ($data) {
-            $res = array('tipo' => 'success', 'mensaje' => 'PRODUCTO ELIMINADO');
-        } else {
-            $res = array('tipo' => 'error', 'mensaje' => 'ERROR AL ELIMINAR');
-        }
-        echo json_encode($res);
-        break;
-        
-    case 'edit':
-        $id = $_GET['id'];
-        $data = $productos->getProduct($id);
-        echo json_encode($data);
-        break;
     default:
-        # code...
+        // Opción no válida
+        echo json_encode(['tipo' => 'error', 'mensaje' => 'Opción no válida.']);
         break;
 }
-
