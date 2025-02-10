@@ -49,38 +49,29 @@ class Compras {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Guardar o actualizar un producto
-    public function saveProduct($barcode, $descripcion, $precio_compra, $precio_venta, $cantidad, $estado_producto, $id_empresa, $id_caja, $imagen) {
-        // Verificar si el producto ya existe con el mismo código de barras y la misma sede
-        $sql_check = "SELECT id_producto, existencia FROM cf_producto WHERE codigo_producto = ? AND estado_producto = 1 AND id_caja = ?";
-        $stmt_check = $this->pdo->prepare($sql_check);
-        $stmt_check->execute([$barcode, $id_caja]);
-        $producto_existente = $stmt_check->fetch(PDO::FETCH_ASSOC);
+    // Guardar un producto (nuevo registro)
+    public function saveProduct($barcode, $descripcion, $precio_compra, $precio_venta, $cantidad, $id_empresa, $id_caja, $imagen) {
+        $sql = $this->pdo->prepare("INSERT INTO cf_producto 
+                                    (codigo_producto, descripcion, precio_compra, precio_venta, existencia, estado_producto, id_empresa, id_caja, imagen) 
+                                    VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?)");
+        return $sql->execute([$barcode, $descripcion, $precio_compra, $precio_venta, $cantidad, $id_empresa, $id_caja, $imagen]);
+    }    
 
-        if ($producto_existente) {
-            // Si el producto ya existe, actualizar su cantidad y precios
-            $nueva_existencia = $producto_existente['existencia'] + $cantidad;
-            $sql_update = "UPDATE cf_producto 
-                           SET existencia = ?, precio_compra = ?, precio_venta = ?, imagen = ? 
-                           WHERE id_producto = ?";
-            $stmt_update = $this->pdo->prepare($sql_update);
-            $stmt_update->execute([$nueva_existencia, $precio_compra, $precio_venta, $imagen, $producto_existente['id_producto']]);
-            return $producto_existente['id_producto']; // Retornar el ID del producto actualizado
-        } else {
-            // Si el producto no existe, insertar un nuevo registro
-            $sql_insert = "INSERT INTO cf_producto 
-                           (codigo_producto, descripcion, precio_compra, precio_venta, existencia, estado_producto, id_empresa, id_caja, imagen) 
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            $stmt_insert = $this->pdo->prepare($sql_insert);
-            $stmt_insert->execute([$barcode, $descripcion, $precio_compra, $precio_venta, $cantidad, $estado_producto, $id_empresa, $id_caja, $imagen]);
-            return $stmt_insert->errorCode() == '00000' ? $this->pdo->lastInsertId() : false;
-        }
+    // Verificar si un producto ya existe (por barcode)
+    public function verificarProductoPorBarcode($barcode): bool {
+        $sql = "SELECT COUNT(*) AS total FROM cf_producto WHERE codigo_producto = ? AND estado_producto = 1";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$barcode]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result['total'] > 0;
     }
 
+    // Obtener la lista de proveedores
     public function getProveedores(): array {
         $sql = "SELECT id_empresa, razon_social FROM cf_empresa";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }    
+    }
 }

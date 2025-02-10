@@ -24,6 +24,17 @@ switch ($option) {
         }
         break;
 
+    case 'verificarBarcode':
+        if (isset($_GET['barcode'])) {
+            $barcode = $_GET['barcode'];
+            $existe = $productos->verificarProductoPorBarcode($barcode);
+    
+            echo json_encode(['existe' => $existe]);
+        } else {
+            echo json_encode(['existe' => false]);
+        }
+        break;
+    
     case 'registrarProducto':
         // Validar y capturar datos del formulario
         $barcode = isset($_POST['barcode']) ? trim($_POST['barcode']) : '';

@@ -1,12 +1,35 @@
 document.addEventListener('DOMContentLoaded', function () {
     // Elementos del DOM
     const formProductos = document.getElementById('frmProductos');
+    const barcodeInput = document.getElementById('barcode');
     const btnRecibido = document.getElementById('btn-Recibido');
     const selectSede = document.getElementById('selectSede');
     const modalMensajeRol = document.getElementById('modalMensajeRol');
     const guardarModal = document.getElementById('guardarModal');
     const cerrarModal = document.getElementById('cerrarModal');
     const table_productos = document.querySelector('#table_productos tbody');
+
+    // Validar si el código de barras ya existe
+    barcodeInput.addEventListener('blur', function () {
+        const barcode = barcodeInput.value.trim();
+
+        if (barcode) {
+            axios.get(`controllers/productosController.php?option=verificarBarcode&barcode=${barcode}`)
+                .then(response => {
+                    const data = response.data;
+
+                    if (data.existe) {
+                        Swal.fire({
+                            title: 'Producto existente',
+                            text: 'El producto con este código de barras ya existe. Si desea agregar más cantidad, debe realizar una nueva compra.',
+                            icon: 'warning',
+                            confirmButtonText: 'Entendido'
+                        });
+                    }
+                })
+                .catch(error => console.error('Error al verificar el código de barras:', error));
+        }
+    });
 
     // Función para cargar los productos desde el backend
     function cargarProductos() {
@@ -46,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Función para cargar los proveedores en el select
+    // Cargar proveedores al inicio
     function cargarProveedores() {
         axios.get('controllers/productosController.php?option=listarProveedores')
             .then(response => {
@@ -65,64 +88,30 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Error al cargar proveedores:', error));
     }
 
-    // Manejar el evento de envío del formulario principal
-    formProductos.addEventListener('submit', function (e) {
-        e.preventDefault(); // Evitar que el formulario recargue la página
-
-        const formData = new FormData(formProductos);
-
-        // Enviar los datos al backend para registrar el producto
-        axios.post('controllers/productosController.php?option=registrarProducto', formData)
-            .then(response => {
-                const data = response.data;
-
-                if (data.tipo === 'success') {
-                    Swal.fire('Éxito', data.mensaje, 'success');
-                    cargarProductos(); // Recargar los productos para mostrar el nuevo
-                } else {
-                    Swal.fire('Error', data.mensaje, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error al registrar el producto:', error);
-                Swal.fire('Error', 'Hubo un problema al guardar el producto.', 'error');
-            });
-    });
-
-    // Abrir el modal al presionar "Recibido"
+    // Manejo del modal "Recibido"
     btnRecibido.addEventListener('click', function () {
-        modalMensajeRol.style.display = 'flex'; // Muestra el modal
+        modalMensajeRol.style.display = 'flex'; // Mostrar el modal
     });
 
-    // Manejar el evento "Guardar" en el modal
     guardarModal.addEventListener('click', function () {
-        const idCaja = selectSede.value; // Valor seleccionado en el modal
+        const idCaja = selectSede.value; // Obtener la sede seleccionada
         if (!idCaja) {
             alert('Por favor seleccione una sede antes de continuar.');
             return;
         }
 
-        // Crear FormData a partir del formulario
         const formData = new FormData(formProductos);
+        formData.append('id_caja', idCaja); // Agregar la sede al FormData
 
-        // Agregar el valor de `id_caja` del modal al FormData
-        formData.append('id_caja', idCaja);
-
-        // Verificar los datos enviados (opcional para depuración)
-        for (let [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`);
-        }
-
-        // Enviar datos al backend
         axios.post('controllers/productosController.php?option=registrarProducto', formData)
             .then(response => {
                 const data = response.data;
 
                 if (data.tipo === 'success') {
                     Swal.fire('Éxito', data.mensaje, 'success');
-                    modalMensajeRol.style.display = 'none'; // Oculta el modal
-                    formProductos.reset(); // Limpia el formulario
-                    cargarProductos(); // Recarga la tabla de productos
+                    modalMensajeRol.style.display = 'none'; // Ocultar modal
+                    formProductos.reset(); // Limpiar el formulario
+                    cargarProductos(); // Recargar la tabla de productos
                 } else {
                     Swal.fire('Error', data.mensaje, 'error');
                 }
@@ -133,12 +122,11 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     });
 
-    // Cerrar el modal
     cerrarModal.addEventListener('click', function () {
-        modalMensajeRol.style.display = 'none';
+        modalMensajeRol.style.display = 'none'; // Cerrar el modal
     });
 
-    // Cargar productos y proveedores al cargar la página
+    // Cargar los productos y proveedores al iniciar la página
     if (table_productos) {
         cargarProductos();
     }
