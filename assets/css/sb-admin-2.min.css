@@ -18,6 +18,14 @@
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
 }
+
+.input-bloqueado {
+background-color: #e9ecef !important; /* Color gris claro (igual a un campo deshabilitado) */
+pointer-events: none; /* Evita que se resalte o seleccione */
+border: 1px solid #ced4da; /* Mantiene el estilo de un input normal */
+cursor: default; /* Cambia el cursor para que no parezca editable */
+}
+
 .metric-card:hover {
     transform: translateY(-10px);
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);

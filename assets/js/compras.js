@@ -21,13 +21,27 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (data.existe) {
                     precioCompraInput.value = data.precio_compra;
                     precioVentaInput.value = data.precio_venta;
+    
+                    // Bloquear los campos visualmente
+                    precioCompraInput.setAttribute('readonly', true);
+                    precioVentaInput.setAttribute('readonly', true);
+                    precioCompraInput.classList.add('input-bloqueado');
+                    precioVentaInput.classList.add('input-bloqueado');
                 } else {
                     precioCompraInput.value = '';
                     precioVentaInput.value = '';
+    
+                    // Desbloquear los campos si no se encontró el producto
+                    precioCompraInput.removeAttribute('readonly');
+                    precioVentaInput.removeAttribute('readonly');
+                    precioCompraInput.classList.remove('input-bloqueado');
+                    precioVentaInput.classList.remove('input-bloqueado');
                 }
             })
             .catch(error => console.error('Error al buscar el producto:', error));
     }
+    
+    
 
     btnGuardar.addEventListener('click', function () {
         const barcode = barcodeInput.value.trim();
