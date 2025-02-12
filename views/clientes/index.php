@@ -22,6 +22,46 @@
             <div class="metric-title">Productos Agotados</div>
             <div class="metric-description">Consulta los productos que están actualmente agotados.</div>
         </div>
+
+        <!-- Nivelar Inventario -->
+        <div class="metric-card" id="metric-nivelar-inventario">
+            <i class="fas fa-cogs metric-icon"></i>
+            <div class="metric-title">Nivelar Inventario</div>
+            <div class="metric-description">Ajusta la existencia y precios de los productos.</div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nivelar Inventario -->
+<div class="modal fade" id="modalNivelarInventario" tabindex="-1" aria-labelledby="modalNivelarInventarioLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalNivelarInventarioLabel">Nivelar Inventario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-striped table-hover">
+                    <thead class="table-success">
+                        <tr>
+                            <th>Código Producto</th>
+                            <th>Descripción</th>
+                            <th>Existencia</th>
+                            <th>Precio Compra</th>
+                            <th>Precio Venta</th>
+                            <th>Imagen</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaNivelarInventarioBody">
+                        <!-- Los datos se cargarán dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
     </div>
 </div>
 

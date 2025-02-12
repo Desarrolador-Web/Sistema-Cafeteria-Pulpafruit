@@ -49,5 +49,26 @@ class ClientesModel {
                       GROUP BY cf_producto.descripcion";
             return $this->pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
         }
-    }
-    
+
+        public function getNivelarInventario() {
+            $query = "SELECT 
+                        codigo_producto,
+                        descripcion,
+                        existencia,
+                        precio_compra,
+                        precio_venta,
+                        imagen 
+                      FROM cf_producto";
+            return $this->pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        }
+        
+        public function actualizarProducto($codigo_producto, $existencia, $precio_compra, $precio_venta) {
+            $query = "UPDATE cf_producto 
+                      SET existencia = ?, precio_compra = ?, precio_venta = ? 
+                      WHERE codigo_producto = ?";
+            
+            $stmt = $this->pdo->prepare($query);
+            return $stmt->execute([$existencia, $precio_compra, $precio_venta, $codigo_producto]);
+        }
+        
+}
