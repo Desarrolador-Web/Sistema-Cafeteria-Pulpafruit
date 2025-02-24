@@ -35,43 +35,6 @@ document.addEventListener('DOMContentLoaded', function () {
         "order": [[0, 'desc']]
     });
 
-    // Exportar a PDF
-    document.getElementById('exportar-pdf').addEventListener('click', function() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        doc.text("Lista de Proveedores", 14, 16);
-        doc.setFontSize(10);
-        doc.setTextColor(100);
-
-        let table = document.getElementById('table_proveedores');
-        let rows = [];
-
-        for (let i = 0, row; row = table.rows[i]; i++) {
-            let rowData = [];
-            for (let j = 0, col; col = row.cells[j]; j++) {
-                rowData.push(col.innerText);
-            }
-            rows.push(rowData);
-        }
-
-        doc.autoTable({
-            head: [rows[0]],   // Las cabeceras de la tabla
-            body: rows.slice(1),  // Los datos de la tabla
-            startY: 20,
-            theme: 'striped'
-        });
-
-        doc.save('lista_proveedores.pdf');
-    });
-
-    // Exportar a Excel
-    document.getElementById('exportar-excel').addEventListener('click', function() {
-        let table = document.getElementById('table_proveedores');
-        let wb = XLSX.utils.table_to_book(table, { sheet: "Proveedores" });
-        XLSX.writeFile(wb, 'lista_proveedores.xlsx');
-    });
-
     frmProveedor.onsubmit = function (e) {
         e.preventDefault();
         if (empresa_id.value == '' || nombres.value == '' || apellidos.value == '' || celular.value == '' || correo.value == '') {

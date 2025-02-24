@@ -65,7 +65,6 @@
             </div>
         </div>
         <div class="card-footer text-right">
-            <button type="button" class="btn btn-danger" id="btn-nuevo">Nuevo</button>
             <button type="submit" class="btn btn-primary" id="btn-save">Guardar</button>
         </div>
     </div>

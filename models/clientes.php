@@ -61,14 +61,35 @@ class ClientesModel {
                       FROM cf_producto";
             return $this->pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
         }
-        
-        public function actualizarProducto($codigo_producto, $existencia, $precio_compra, $precio_venta) {
-            $query = "UPDATE cf_producto 
-                      SET existencia = ?, precio_compra = ?, precio_venta = ? 
-                      WHERE codigo_producto = ?";
-            
+
+        public function actualizarProducto($codigo_producto, $existencia, $precio_compra, $precio_venta, $confirmacion) {
+            // Obtener los valores actuales antes de actualizar
+            $query = "SELECT existencia, precio_compra, precio_venta FROM cf_producto WHERE codigo_producto = ?";
             $stmt = $this->pdo->prepare($query);
-            return $stmt->execute([$existencia, $precio_compra, $precio_venta, $codigo_producto]);
-        }
+            $stmt->execute([$codigo_producto]);
+            $producto_actual = $stmt->fetch(PDO::FETCH_ASSOC);
         
+            if (!$producto_actual) {
+                return ['tipo' => 'error', 'mensaje' => 'Producto no encontrado'];
+            }
+        
+            $existencia_actual = $producto_actual['existencia'];
+            $precio_compra_actual = $producto_actual['precio_compra'];
+            $precio_venta_actual = $producto_actual['precio_venta'];
+        
+            // Verificar si hay reducción de valores y si el usuario no ha confirmado aún
+            if (($existencia < $existencia_actual || $precio_compra < $precio_compra_actual || $precio_venta < $precio_venta_actual) && !$confirmacion) {
+                return ['tipo' => 'alerta', 'mensaje' => 'Se detectó una reducción en los valores. ¿Está seguro de continuar?'];
+            }
+        
+            // Si el usuario confirmó o no hay reducción, actualizar el producto
+            $query = "UPDATE cf_producto SET existencia = ?, precio_compra = ?, precio_venta = ? WHERE codigo_producto = ?";
+            $stmt = $this->pdo->prepare($query);
+            if ($stmt->execute([$existencia, $precio_compra, $precio_venta, $codigo_producto])) {
+                return ['tipo' => 'success', 'mensaje' => 'Producto actualizado correctamente'];
+            } else {
+                return ['tipo' => 'error', 'mensaje' => 'No se pudo actualizar el producto'];
+            }
+        }
+                
 }

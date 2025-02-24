@@ -71,10 +71,9 @@ if (!isset($_SESSION['rol'])) {
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="plantilla.php">
-                <div class="sidebar-brand-icon rotate-n-15">
-                    <img src="assets/img/logo.png" alt="LOGO-PNG" width="50">
+                <div class="sidebar-brand-icon">
+                    <img src="assets/img/Logo.svg" alt="LOGO-PNG" width="50">
                 </div>
-                <div class="sidebar-brand-text mx-3"><sup>1.0</sup></div>
             </a>
 
             <!-- Divider -->
@@ -131,91 +130,88 @@ if (!isset($_SESSION['rol'])) {
                 </a>
             </li>
         <?php endif; ?>
-    
+
+        <?php if (!empty($proveedor)) { ?>
+            <hr class="sidebar-divider d-none d-md-block">
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'proveedor') ? 'bg-gradient-info' : ''; ?>">
+                <a class="nav-link" href="?pagina=proveedor">
+                    <i class="fas fa-store"></i>
+                    <span>Proveedores</span>
+                </a>
+            </li>
+        <?php } ?>
+
+        <?php 
+        // Mostrar la opción de usuarios solo si el rol no es 3
+        if (!empty($usuarios) && $_SESSION['rol'] != 3) { ?>
+            <hr class="sidebar-divider d-none d-md-block">
+            <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'usuarios') ? 'bg-gradient-info' : ''; ?>">
+                <a class="nav-link" href="?pagina=usuarios">
+                    <i class="fas fa-fw fa-user"></i>
+                    <span>Usuarios</span>
+                </a>
+            </li>
+        <?php } ?>
 
 
-
-            <?php if (!empty($proveedor)) { ?>
-                <hr class="sidebar-divider d-none d-md-block">
-                <!-- Nav Item - Pages Collapse Menu -->
-                <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'proveedor') ? 'bg-gradient-info' : ''; ?>">
-                    <a class="nav-link" href="?pagina=proveedor">
-                        <i class="fas fa-store"></i>
-                        <span>Proveedores</span>
-                    </a>
-                </li>
-            <?php } ?>
-
-            <?php 
-            // Mostrar la opción de usuarios solo si el rol no es 3
-            if (!empty($usuarios) && $_SESSION['rol'] != 3) { ?>
-                <hr class="sidebar-divider d-none d-md-block">
-                <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'usuarios') ? 'bg-gradient-info' : ''; ?>">
-                    <a class="nav-link" href="?pagina=usuarios">
-                        <i class="fas fa-fw fa-user"></i>
-                        <span>Usuarios</span>
-                    </a>
-                </li>
-            <?php } ?>
-
-
-            <?php if (!empty($productos)) { ?>
-                <!-- Divider -->
-                <hr class="sidebar-divider d-none d-md-block">
-
-                <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'productos') ? 'bg-gradient-info' : ''; ?>">
-                    <a class="nav-link" href="?pagina=productos">
-                        <i class="fas fa-fw fa-list"></i>
-                        <span>Productos</span>
-                    </a>
-                </li>
-            <?php } ?>
-
-            <?php if (!empty($nueva_compra) || !empty($compras)) { ?>
-                <!-- Divider -->
-                <hr class="sidebar-divider d-none d-md-block">
-                <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'compras' || !empty($_GET['pagina'])  && $_GET['pagina'] == 'historial_compras') ? 'bg-gradient-info' : ''; ?>">
-                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCompra" aria-expanded="true" aria-controls="collapseCompra">
-                        <i class="fas fa-cart-plus"></i>
-                        <span>Compras</span>
-                        <i class="fas fa-chevron-right float-right"></i>
-                    </a>
-                    <div id="collapseCompra" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                        <div class="bg-white py-2 collapse-inner rounded">
-                            <?php
-                            if (!empty($nueva_compra)) { ?>
-                                <a class="collapse-item" href="?pagina=compras">Nueva compra</a>
-                            <?php }
-                            if (!empty($compras)) { ?>
-                                <a class="collapse-item" href="?pagina=historial_compras">Lista compras</a>
-                            <?php } ?>
-                        </div>
-                    </div>
-                </li>
-            <?php } ?>
-
+        <?php if (!empty($productos)) { ?>
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
-            <?php if (!empty($nueva_venta) || !empty($ventas)) { ?>
-                <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'ventas' || !empty($_GET['pagina'])  && $_GET['pagina'] == 'historial') ? 'bg-gradient-info' : ''; ?>">
-                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseVenta" aria-expanded="true" aria-controls="collapseVenta">
-                        <i class="fas fa-solid fa-money-bill"></i>
-                        <span>Ventas</span>
-                        <i class="fas fa-chevron-right float-right"></i>
-                    </a>
-                    <div id="collapseVenta" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                        <div class="bg-white py-2 collapse-inner rounded">
-                            <?php
-                            if (!empty($nueva_venta)) { ?>
-                                <a class="collapse-item" href="?pagina=ventas">Nueva venta</a>
-                            <?php }
-                            if (!empty($ventas)) { ?>
-                                <a class="collapse-item" href="?pagina=historial">Lista ventas</a>
-                            <?php } ?>
-                        </div>
+
+            <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'productos') ? 'bg-gradient-info' : ''; ?>">
+                <a class="nav-link" href="?pagina=productos">
+                    <i class="fas fa-fw fa-list"></i>
+                    <span>Productos</span>
+                </a>
+            </li>
+        <?php } ?>
+
+        <?php if (!empty($nueva_compra) || !empty($compras)) { ?>
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+            <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'compras' || !empty($_GET['pagina'])  && $_GET['pagina'] == 'historial_compras') ? 'bg-gradient-info' : ''; ?>">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCompra" aria-expanded="true" aria-controls="collapseCompra">
+                    <i class="fas fa-cart-plus"></i>
+                    <span>Compras</span>
+                    <i class="fas fa-chevron-right float-right"></i>
+                </a>
+                <div id="collapseCompra" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <?php
+                        if (!empty($nueva_compra)) { ?>
+                            <a class="collapse-item" href="?pagina=compras">Nueva compra</a>
+                        <?php }
+                        if (!empty($compras)) { ?>
+                            <a class="collapse-item" href="?pagina=historial_compras">Lista compras</a>
+                        <?php } ?>
                     </div>
-                </li>
-            <?php } ?>
+                </div>
+            </li>
+        <?php } ?>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider d-none d-md-block">
+        <?php if (!empty($nueva_venta) || !empty($ventas)) { ?>
+            <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'ventas' || !empty($_GET['pagina'])  && $_GET['pagina'] == 'historial') ? 'bg-gradient-info' : ''; ?>">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseVenta" aria-expanded="true" aria-controls="collapseVenta">
+                    <i class="fas fa-solid fa-money-bill"></i>
+                    <span>Ventas</span>
+                    <i class="fas fa-chevron-right float-right"></i>
+                </a>
+                <div id="collapseVenta" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <?php
+                        if (!empty($nueva_venta)) { ?>
+                            <a class="collapse-item" href="?pagina=ventas">Nueva venta</a>
+                        <?php }
+                        if (!empty($ventas)) { ?>
+                            <a class="collapse-item" href="?pagina=historial">Lista ventas</a>
+                        <?php } ?>
+                    </div>
+                </div>
+            </li>
+        <?php } ?>
 
         </ul>
         <!-- End of Sidebar -->
@@ -262,7 +258,7 @@ if (!isset($_SESSION['rol'])) {
                     </ul>
                 </nav>
 
-                <div class="container-fluid">
+    <div class="container-fluid">
 
 
 

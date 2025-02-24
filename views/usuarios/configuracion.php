@@ -29,7 +29,8 @@
                             <!-- Fecha de Apertura -->
                             <div class="form-group mb-3">
                                 <label for="fecha" class="text-dark font-weight-bold">Fecha</label>
-                                <input type="text" class="form-control p-2 bg-light" id="datetime" readonly>
+                                <input type="text" class="form-control p-2 bg-light" id="datetime" 
+                                    style="pointer-events: none; user-select: none; outline: none; border: none; background: #f8f9fa;" disabled>
                             </div>
                             <!-- Botón de Abrir Caja -->
                             <div class="text-center">

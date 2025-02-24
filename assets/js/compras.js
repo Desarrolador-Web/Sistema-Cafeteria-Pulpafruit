@@ -40,8 +40,20 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .catch(error => console.error('Error al buscar el producto:', error));
     }
-    
-    
+
+    // Mostrar alerta cuando el usuario toca los campos de precio
+    function mostrarAlertaPrecio() {
+        Swal.fire({
+            title: 'Aviso',
+            text: 'Si desea modificar el valor del precio, pida al administrador que nivele los precios.',
+            icon: 'info',
+            confirmButtonText: 'Entendido'
+        });
+    }
+
+    // Detectar clic en los campos de precio, incluso si están bloqueados
+    precioCompraInput.addEventListener('click', mostrarAlertaPrecio);
+    precioVentaInput.addEventListener('click', mostrarAlertaPrecio);
 
     btnGuardar.addEventListener('click', function () {
         const barcode = barcodeInput.value.trim();
