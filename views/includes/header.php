@@ -71,10 +71,9 @@ if (!isset($_SESSION['rol'])) {
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="plantilla.php">
-                <div class="sidebar-brand-icon rotate-n-15">
-                    <img src="assets/img/logo.png" alt="LOGO-PNG" width="50">
+                <div class="sidebar-brand-icon">
+                    <img src="assets/img/logo.svg" alt="LOGO-PNG" width="50">
                 </div>
-                <div class="sidebar-brand-text mx-3"><sup>1.0</sup></div>
             </a>
 
             <!-- Divider -->

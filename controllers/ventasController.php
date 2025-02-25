@@ -40,7 +40,17 @@ switch ($option) {
     
         echo json_encode($result);
         break;
+
+    case 'verificarCajaSesion':    
+        // Tomar el id_usuario desde la sesión
+        $id_usuario = $_SESSION['idusuario'] ?? null;
+        
+        // Verificar si el usuario tiene sesión en 2
+        $caja_abierta = $ventas->checkCajaYSesion($id_usuario);
     
+        // Si la consulta devuelve un registro, permitir acceso
+        echo json_encode(['caja_abierta' => $caja_abierta ? true : false]);
+        break;
 
     case 'listarPersonal':
         $personal = $ventas->getPersonal();

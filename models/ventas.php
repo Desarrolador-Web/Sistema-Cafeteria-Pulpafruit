@@ -24,6 +24,18 @@ class Ventas {
         return $consult->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function checkCajaYSesion($id_usuario) {
+        $query = "SELECT id_info_caja FROM cf_informacion_cajas 
+                  WHERE id_usuario = :id_usuario AND sesion = '2' 
+                  ";
+        
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute(['id_usuario' => $id_usuario]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        return !empty($result);
+    }
+
     public function getAllProducts() {
         $query = "SELECT * FROM cf_producto WHERE estado_producto = 1";
         $stmt = $this->pdo->prepare($query);
