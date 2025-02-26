@@ -117,11 +117,12 @@ class Ventas {
     }
     
 
-    // Actualizar deuda y capacidad del personal
-    public function updateDeudaCapacidad($id_personal, $total) {
-        $query = "EXEC actualizarDeudaCapacidad ?, ?";
-        $stmt = $this->pdo->prepare($query);
-        return $stmt->execute([$id_personal, $total]);
-    }
+// Actualizar deuda y capacidad del personal
+public function updateDeudaCapacidad($id_personal, $total, $metodo) {
+    $query = "EXEC actualizarDeudaCapacidadPersonal ?, ?, ?";
+    $stmt = $this->pdo->prepare($query);
+    return $stmt->execute([$id_personal, $total, $metodo]);
+}
+
 
 }

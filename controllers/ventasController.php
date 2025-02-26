@@ -240,7 +240,7 @@ switch ($option) {
         }
     
         // Guardar la venta
-        $fechaHora = date('Y-m-d H:i:s'); // Fecha y hora exacta 
+        $fechaHora = date('Y-m-d H:i:s'); // Fecha y hora exacta
         $saleId = $ventas->saveVenta($cedula, $total, $metodo, $fechaHora, $id_user);
     
         // Guardar detalles y actualizar stock
@@ -249,6 +249,11 @@ switch ($option) {
             $product = $ventas->getProduct($id_product);
             $stock = $product['existencia'] - $item['cantidad'];
             $ventas->updateStock($stock, $id_product);
+        }
+    
+        // 🔹 **Nueva llamada a `updateDeudaCapacidad` después de guardar la venta**
+        if ($metodo == 3) {
+            $ventas->updateDeudaCapacidad($cedula, $total, $metodo);
         }
     
         unset($_SESSION['cart'][$id_user]); // Limpiar el carrito
