@@ -1,3 +1,8 @@
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="vendor/twbs/bootstrap/dist/css/bootstrap.min.css">
+
+<!-- Bootstrap JS (Asegúrate de que es el bundle, incluye Popper.js) -->
+<script src="vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
 <div class="container">
     <h1 class="h3 mb-4 text-center">Panel Administrativo</h1>
@@ -23,12 +28,20 @@
             <div class="metric-description">Consulta los productos que están actualmente agotados.</div>
         </div>
 
-        <!-- Nivelar Inventario -->
+        <!--  Nivelar inventario -->
         <div class="metric-card" id="metric-nivelar-inventario">
             <i class="fas fa-cogs metric-icon"></i>
             <div class="metric-title">Nivelar Inventario</div>
             <div class="metric-description">Ajusta la existencia y precios de los productos.</div>
         </div>
+
+        <!--  Descargar informe de créditos -->
+        <div class="metric-card" id="metric-descargar-informe">
+            <i class="fas fa-file-download metric-icon"></i>
+            <div class="metric-title">Descarga informe créditos</div>
+            <div class="metric-description">Permite descargar y visualizar un listado del personal que tiene crédito pendiente.</div>
+        </div>
+
     </div>
 </div>
 
@@ -155,4 +168,138 @@
         </div>
     </div>
 </div>
+
+<!-- Modal descargar informe -->
+<div class="modal fade" id="modalDescargarInforme" tabindex="-1" aria-labelledby="modalDescargarInforme" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalDescargarInformeLabel">Personal con crédito pendiente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Campo de búsqueda -->
+                <input type="text" id="buscadorInforme" class="form-control mb-3" placeholder="Buscar por cédula o nombre...">
+                
+                <!-- Tabla de datos -->
+                <table class="table table-striped table-hover" id="tablaInforme">
+                    <thead class="table-success">
+                        <tr>
+                            <th>Cédula</th>
+                            <th>Nombre</th>
+                            <th>Valor crédito</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaDescargarInforme">
+                        <!-- Los datos se cargarán dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button id="descargarPDF" class="btn btn-danger">Descargar PDF</button>
+                <button id="descargarExcel" class="btn btn-success">Descargar Excel</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

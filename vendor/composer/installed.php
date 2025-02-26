@@ -3,7 +3,7 @@
         'name' => '__root__',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '976b68040a58a4ffb52f612f0788cae6ebbaa5e0',
+        'reference' => '0e2c187d229f28897eb29911f066dcb8a5b49c71',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         '__root__' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '976b68040a58a4ffb52f612f0788cae6ebbaa5e0',
+            'reference' => '0e2c187d229f28897eb29911f066dcb8a5b49c71',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -351,6 +351,21 @@
             'install_path' => __DIR__ . '/../theseer/tokenizer',
             'aliases' => array(),
             'dev_requirement' => true,
+        ),
+        'twbs/bootstrap' => array(
+            'pretty_version' => 'v5.0.2',
+            'version' => '5.0.2.0',
+            'reference' => '688bce4fa695cc360a0d084e34f029b0c192b223',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../twbs/bootstrap',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'twitter/bootstrap' => array(
+            'dev_requirement' => false,
+            'replaced' => array(
+                0 => 'v5.0.2',
+            ),
         ),
         'wildbit/postmark-php' => array(
             'pretty_version' => 'v6.0.9',

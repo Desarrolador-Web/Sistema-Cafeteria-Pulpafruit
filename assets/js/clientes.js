@@ -1,4 +1,6 @@
 class Clientes {
+
+
     // Método para mostrar el modal de "Inicios de Sesión"
     mostrarIniciosSesion() {
         axios.get('http://localhost/Sistema-Cafeteria-Pulpafruit/controllers/clientesController.php?option=iniciosSesion')
@@ -253,6 +255,54 @@ class Clientes {
         boton.classList.add("btn-info");
         boton.setAttribute("onclick", "cliente.habilitarEdicion(this)");
     } 
+    
+
+    // Mostrar el modal con los datos del informe
+    mostrarDescargarInforme() {
+        axios.get('http://localhost/Sistema-Cafeteria-Pulpafruit/controllers/clientesController.php?option=descargarInforme')
+            .then((response) => {
+                if (response.data.tipo === 'success') {
+                    const contenidoTabla = response.data.data.map(persona => `
+                        <tr>
+                            <td>${persona.cedula}</td>
+                            <td>${persona.nombre}</td>
+                            <td>${persona.deuda}</td>
+                        </tr>
+                    `).join('');
+                    document.getElementById('tablaDescargarInforme').innerHTML = contenidoTabla;
+                    new bootstrap.Modal(document.getElementById('modalDescargarInforme')).show();
+                } else {
+                    alert('Error al cargar los datos: ' + response.data.mensaje);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Hubo un error al conectar con el servidor.');
+            });
+    }
+
+    // Función para filtrar la tabla en tiempo real
+    filtrarTabla() {
+        let input = document.getElementById("buscadorInforme").value.toLowerCase();
+        let filas = document.querySelectorAll("#tablaDescargarInforme tr");
+
+        filas.forEach(fila => {
+            let cedula = fila.cells[0].textContent.toLowerCase();
+            let nombre = fila.cells[1].textContent.toLowerCase();
+            fila.style.display = (cedula.includes(input) || nombre.includes(input)) ? "" : "none";
+        });
+    }
+
+    // Descargar PDF
+    descargarPDF() {
+        window.location.href = 'http://localhost/Sistema-Cafeteria-Pulpafruit/controllers/clientesController.php?option=descargarPDF';
+    }
+
+    // Descargar Excel
+    descargarExcel() {
+        window.location.href = 'http://localhost/Sistema-Cafeteria-Pulpafruit/controllers/clientesController.php?option=descargarExcel';
+    }
+
 }
 
 
@@ -264,4 +314,5 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('metric-usuarios-registrados').addEventListener('click', () => cliente.mostrarUsuariosRegistrados());
     document.getElementById('metric-productos-agotados').addEventListener('click', () => cliente.mostrarProductosAgotados());
     document.getElementById('metric-nivelar-inventario').addEventListener('click', () => cliente.mostrarNivelarInventario());
+    document.getElementById('metric-descargar-informe').addEventListener('click', () => cliente.mostrarDescargarInforme());
 });

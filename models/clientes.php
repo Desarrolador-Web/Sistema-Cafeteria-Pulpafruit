@@ -91,5 +91,15 @@ class ClientesModel {
                 return ['tipo' => 'error', 'mensaje' => 'No se pudo actualizar el producto'];
             }
         }
+
+        public function getDescargarInforme() {
+            $query = "SELECT 
+                        cedula,
+                        nombre,
+                        deuda
+                      FROM cf_personal
+                      WHERE deuda > 0";
+            return $this->pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        }
                 
 }

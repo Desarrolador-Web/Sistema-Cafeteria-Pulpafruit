@@ -58,6 +58,15 @@ switch ($option) {
         }
         break;
 
+    case 'descargarInforme':
+        try {
+            $datos = $clientesModel->getDescargarInforme();
+            echo json_encode(['tipo' => 'success', 'data' => $datos]);
+        } catch (Exception $e) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => $e->getMessage()]);
+        }
+        break;
+
     default:
         echo json_encode(['tipo' => 'error', 'mensaje' => 'Opción no válida']);
         break;

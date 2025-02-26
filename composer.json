@@ -3,6 +3,7 @@
         "phpunit/phpunit": "^11.2"
     },
     "require": {
-        "wildbit/postmark-php": "^6.0"
+        "wildbit/postmark-php": "^6.0",
+        "twbs/bootstrap": "5.0.2"
     }
 }
