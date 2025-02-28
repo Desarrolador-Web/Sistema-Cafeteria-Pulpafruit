@@ -1,36 +1,77 @@
 <?php
 require_once '../models/ventas.php';
-require_once '../models/clientes.php';
 
-date_default_timezone_set('America/Bogota'); 
+date_default_timezone_set('America/Bogota');
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 $ventas = new Ventas();
-$clientes = new ClientesModel();
 $id_user = $_SESSION['idusuario'];
+$rol_usuario = $_SESSION['rol'] ?? null;
+$mostrar_todos = in_array($rol_usuario, [1, 2]);
 
 $option = isset($_GET['option']) ? $_GET['option'] : '';
 
 switch ($option) {
-    
+
     case 'listar':
-        // Verifica si el id_sede está en la sesión
-        if (isset($_SESSION['id_sede'])) {
-            $id_sede = $_SESSION['id_sede'];
-            $result = $ventas->getProductsBySede($id_sede);  // Filtra los productos por sede
-            foreach ($result as $i => $item) {
-                $result[$i]['addcart'] = '<a href="#" class="btn btn-primary btn-sm" onclick="addCart(' . $item['id_producto'] . ')"><i class="fas fa-cart-plus"></i></a>';
-                $result[$i]['cantidad'] = '<span class="badge badge-info">' . $item['existencia'] . '</span>';
-            }
-            echo json_encode($result);
+        if ($mostrar_todos) {
+            // Mostrar todos los productos sin importar la sede
+            $result = $ventas->getAllProducts();
         } else {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'No se ha seleccionado ninguna sede.']);
+            // Mostrar productos filtrados por sede
+            $id_sede = $_SESSION['id_sede'] ?? null;
+            if ($id_sede) {
+                $result = $ventas->getProductsBySede($id_sede);
+            } else {
+                echo json_encode(['tipo' => 'error', 'mensaje' => 'No se ha seleccionado ninguna sede.']);
+                exit;
+            }
+        }
+    
+        foreach ($result as $i => $item) {
+            // Añadir botón de carrito a cada fila
+            $result[$i]['addcart'] = '<a href="#" class="btn btn-primary btn-sm" onclick="addCart(' . $item['id_producto'] . ')">
+                                        <i class="fas fa-cart-plus"></i>
+                                      </a>';
+        }
+    
+        echo json_encode($result);
+        break;
+
+    case 'verificarCajaSesion':    
+        // Tomar el id_usuario desde la sesión
+        $id_usuario = $_SESSION['idusuario'] ?? null;
+        
+        // Verificar si el usuario tiene sesión en 2
+        $caja_abierta = $ventas->checkCajaYSesion($id_usuario);
+    
+        // Si la consulta devuelve un registro, permitir acceso
+        echo json_encode(['caja_abierta' => $caja_abierta ? true : false]);
+        break;
+
+    case 'listarPersonal':
+        $personal = $ventas->getPersonal();
+        if ($personal) {
+            echo json_encode($personal);
+        } else {
+            echo json_encode([]);
         }
         break;
+        
     
+    case 'getPersonalById':
+        $id_personal = $_GET['id'] ?? null;
+        if ($id_personal) {
+            $personal = $ventas->getPersonalById($id_personal);
+            echo json_encode($personal);
+        } else {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'ID de personal no válido']);
+        }
+        break;
+        
 
     case 'addcart':
         $id_product = $_GET['id'];
@@ -75,13 +116,13 @@ switch ($option) {
             $product = $ventas->getProduct($id_product);
             if ($product) {
                 $product['cantidad'] = $item['cantidad'];
-                $product['precio_venta'] = $item['precio'];
+                $product['precio_venta'] = $item['precio'] ?? $product['precio_venta'] ?? 0;
                 $result[] = $product;
             }
         }
-
         echo json_encode($result);
         break;
+        
 
     case 'addcantidad':
         $data = json_decode(file_get_contents('php://input'), true);
@@ -129,43 +170,45 @@ switch ($option) {
     case 'saveventa':
         $data = json_decode(file_get_contents('php://input'), true);
     
-        if (is_null($data)) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'Datos de entrada inválidos']);
-            break;
+        // Inicializar método de pago
+        $metodo = $data['metodo'] ?? null;
+    
+        if (!$metodo) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Método de pago no especificado']);
+            exit;
         }
     
-        $id_cliente = isset($data['idCliente']) ? $data['idCliente'] : null;
-        $metodo = isset($data['metodo']) ? $data['metodo'] : null;
-    
-        if (is_null($id_cliente) || is_null($metodo)) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'Datos de cliente o método de pago no válidos']);
-            break;
-        }
-    
+        // Validar método de pago
         switch ($metodo) {
             case 'Efectivo':
                 $metodo = 1;
                 break;
-            case 'Credito':
-                $metodo = 3;
-                break;
             case 'Bancaria':
                 $metodo = 2;
+                break;
+            case 'Credito':
+                $metodo = 3;
                 break;
             default:
                 echo json_encode(['tipo' => 'error', 'mensaje' => 'Método de pago no válido']);
                 exit;
         }
     
-        if (!isset($_SESSION['cart'][$id_user])) {
-            $_SESSION['cart'][$id_user] = [];
+        // Determinar id_personal
+        $cedula = ($metodo == 3) ? ($data['cedula'] ?? null) : 0; // 0 si no es crédito
+    
+        if ($metodo == 3 && !$cedula) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'Debe seleccionar un personal para el método de pago Crédito.']);
+            exit;
         }
     
-        if (empty($_SESSION['cart'][$id_user])) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'CARRITO VACIO']);
-            break;
+        // Validar carrito
+        if (!isset($_SESSION['cart'][$id_user]) || empty($_SESSION['cart'][$id_user])) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'CARRITO VACÍO']);
+            exit;
         }
     
+        // Validar stock y calcular total
         $total = 0;
         $stock_insuficiente = false;
     
@@ -180,75 +223,74 @@ switch ($option) {
     
         if ($stock_insuficiente) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'STOCK INSUFICIENTE']);
-            break;
+            exit;
         }
     
-        $cliente = $clientes->getClienteById($id_cliente);
-        if (!$cliente) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'CLIENTE NO ENCONTRADO']);
-            break;
+        // Validar capacidad de crédito solo si el método es Crédito
+        if ($metodo == 3) {
+            $personal = $ventas->getPersonalById($cedula);
+            if (!$personal) {
+                echo json_encode(['tipo' => 'error', 'mensaje' => 'El personal seleccionado no existe']);
+                exit;
+            }
+            if ($personal['capacidad'] < $total) {
+                echo json_encode(['tipo' => 'error', 'mensaje' => 'CAPACIDAD DE CRÉDITO INSUFICIENTE']);
+                exit;
+            }
         }
     
-        if ($metodo == 3 && $cliente['capacidad'] < $total) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'CAPACIDAD DE CRÉDITO INSUFICIENTE']);
-            break;
-        }
+        // Guardar la venta
+        $fechaHora = date('Y-m-d H:i:s'); // Fecha y hora exacta
+        $saleId = $ventas->saveVenta($cedula, $total, $metodo, $fechaHora, $id_user);
     
-        $fecha = date('Y-m-d'); // Captura la fecha actual en la zona horaria configurada
-        $saleId = $ventas->saveVenta($id_cliente, $total, $metodo, $fecha, $id_user);
-    
-        // Obtener la sede del usuario desde la sesión
-        $id_sede = $_SESSION['id_sede'];
-    
+        // Guardar detalles y actualizar stock
         foreach ($_SESSION['cart'][$id_user] as $id_product => $item) {
-            $ventas->saveDetalle($id_product, $saleId, $item['cantidad'], $item['precio'], $id_sede);
+            $ventas->saveDetalle($id_product, $saleId, $item['cantidad'], $item['precio'], $_SESSION['id_sede']);
             $product = $ventas->getProduct($id_product);
             $stock = $product['existencia'] - $item['cantidad'];
             $ventas->updateStock($stock, $id_product);
         }
     
-        // Solo actualizar la deuda y capacidad del cliente si el método de pago es 3 (Credito)
-        if (isset($metodo) && $metodo == 3) {
-            $clientes->updateDeudaCapacidad($id_cliente, $total, $metodo);
+        // 🔹 **Nueva llamada a `updateDeudaCapacidad` después de guardar la venta**
+        if ($metodo == 3) {
+            $ventas->updateDeudaCapacidad($cedula, $total, $metodo);
         }
     
-        unset($_SESSION['cart'][$id_user]);
+        unset($_SESSION['cart'][$id_user]); // Limpiar el carrito
     
         echo json_encode(['tipo' => 'success', 'mensaje' => 'Venta guardada correctamente']);
         break;
-        
+
 
     case 'searchbarcode':
         $barcode = $_GET['barcode'];
         $producto = $ventas->getBarcode($barcode);
+    
         if (!$producto) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'PRODUCTO NO EXISTE']);
         } else {
             if (!isset($_SESSION['cart'][$id_user][$producto['id_producto']])) {
                 $_SESSION['cart'][$id_user][$producto['id_producto']] = ['cantidad' => 0, 'precio' => $producto['precio_venta']];
             }
-
+    
             $_SESSION['cart'][$id_user][$producto['id_producto']]['cantidad']++;
-
-            echo json_encode(['tipo' => 'success', 'mensaje' => 'PRODUCTO AGREGADO AL CARRITO', 'producto' => $producto]);
+    
+            echo json_encode([
+                'tipo' => 'success',
+                'mensaje' => 'Producto agregado correctamente',
+                'producto' => $producto
+            ]);
         }
         break;
-
-    case 'listar-clientes':
-        $result = $clientes->getClients();
-        echo json_encode($result);
-        break;
-    
+                
     case 'logout':
         // Destruir la sesión
         session_destroy();
     
         // Redirigir a la página principal
         header("Location: http://localhost/sistema-cafeteria-pulpafruit/");
-        exit();
         break;
         
-
     default:
         echo json_encode(['tipo' => 'error', 'mensaje' => 'Opción no válida']);
         break;

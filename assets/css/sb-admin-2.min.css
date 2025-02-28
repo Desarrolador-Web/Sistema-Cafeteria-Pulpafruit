@@ -3,7 +3,54 @@
 ::before {
     box-sizing: border-box
 }
+.metrics-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    padding: 20px;
+}
+.metric-card {
+    background-color: #ffffff; 
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 30px 20px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
 
+.input-bloqueado {
+background-color: #e9ecef !important; /* Color gris claro (igual a un campo deshabilitado) */
+pointer-events: none; /* Evita que se resalte o seleccione */
+border: 1px solid #ced4da; /* Mantiene el estilo de un input normal */
+cursor: default; /* Cambia el cursor para que no parezca editable */
+}
+
+.metric-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+.metric-icon {
+    font-size: 3.5rem;
+    color: #28a745; /* Verde claro */
+    transition: transform 0.3s ease;
+}
+.metric-card:hover .metric-icon {
+    transform: rotate(10deg) scale(1.1);
+}
+.metric-title {
+    font-size: 1.3rem;
+    margin-top: 15px;
+    font-weight: 600;
+}
+.metric-description {
+    font-size: 0.9rem;
+    color: #6c757d; /* Gris intermedio */
+    margin-top: 10px;
+}
+.modal-xl {
+    max-width: 72% !important;
+}
 
 
 body {
@@ -12,7 +59,7 @@ body {
     font-size: 1rem;
     font-weight: 400;
     line-height: 1.5;
-    color: #858796;
+    color: #428e5c;
     text-align: left;
     background-color: #fff
 }
@@ -93,7 +140,7 @@ a {
 }
 
 a:hover {
-    color: #224abe;
+    color: #2e8400;
     text-decoration: underline
 }
 
@@ -1777,17 +1824,13 @@ pre code {
     background-color: #cfcfd6
 }
 
-.table-success,
-.table-success>td,
-.table-success>th {
-    background-color: #bff0de
-}
 
 .table-success tbody+tbody,
 .table-success td,
 .table-success th,
 .table-success thead th {
-    border-color: #89e2c2
+    background: #c6c6c6;
+    color: #2c3f2c;
 }
 
 .table-hover .table-success:hover {
@@ -2577,7 +2620,7 @@ textarea.form-control.is-invalid {
 .btn.focus,
 .btn:focus {
     outline: 0;
-    box-shadow: 0 0 0 .2rem rgba(78, 115, 223, .25)
+    box-shadow: 0 0 0 .2rem rgba(4, 96, 27, 0.25)
 }
 
 .btn.disabled,
@@ -2596,8 +2639,7 @@ fieldset:disabled a.btn {
 
 .btn-primary {
     color: #fff;
-    background-color: #4e73df;
-    border-color: #4e73df
+    background-color: #237611;
 }
 
 .btn-primary:hover {
@@ -2678,14 +2720,13 @@ fieldset:disabled a.btn {
 
 .btn-success {
     color: #fff;
-    background-color: #1cc88a;
-    border-color: #1cc88a
+    background-color: #1c8c08;
 }
 
 .btn-success:hover {
     color: #fff;
-    background-color: #17a673;
-    border-color: #169b6b
+    background-color: #084e0b;
+    border-color: #116f04
 }
 
 .btn-success.focus,
@@ -2719,8 +2760,7 @@ fieldset:disabled a.btn {
 
 .btn-info {
     color: #fff;
-    background-color: #36b9cc;
-    border-color: #36b9cc
+    background-color: #08a406;
 }
 
 .btn-info:hover {
@@ -2935,12 +2975,12 @@ fieldset:disabled a.btn {
 
 .btn-outline-primary.focus,
 .btn-outline-primary:focus {
-    box-shadow: 0 0 0 .2rem rgba(78, 115, 223, .5)
+    box-shadow: 0 0 0 .2rem rgba(0, 106, 60, 0.5)
 }
 
 .btn-outline-primary.disabled,
 .btn-outline-primary:disabled {
-    color: #4e73df;
+    color: #0c7c08;
     background-color: transparent
 }
 
@@ -2948,8 +2988,8 @@ fieldset:disabled a.btn {
 .btn-outline-primary:not(:disabled):not(.disabled):active,
 .show>.btn-outline-primary.dropdown-toggle {
     color: #fff;
-    background-color: #4e73df;
-    border-color: #4e73df
+    background-color: #056917;
+    border-color: #067721
 }
 
 .btn-outline-primary:not(:disabled):not(.disabled).active:focus,
@@ -3896,7 +3936,7 @@ input[type=submit].btn-block {
 }
 
 .custom-control-input:focus~.custom-control-label::before {
-    box-shadow: 0 0 0 .2rem rgba(78, 115, 223, .25)
+    box-shadow: 0 0 0 .2rem rgba(3, 154, 83, 0.25)
 }
 
 .custom-control-input:focus:not(:checked)~.custom-control-label::before {
@@ -3958,8 +3998,8 @@ input[type=submit].btn-block {
 }
 
 .custom-checkbox .custom-control-input:indeterminate~.custom-control-label::before {
-    border-color: #4e73df;
-    background-color: #4e73df
+    border-color: #0b8307;
+    background-color: #128a07
 }
 
 .custom-checkbox .custom-control-input:indeterminate~.custom-control-label::after {
@@ -3967,7 +4007,7 @@ input[type=submit].btn-block {
 }
 
 .custom-checkbox .custom-control-input:disabled:checked~.custom-control-label::before {
-    background-color: rgba(78, 115, 223, .5)
+    background-color: rgba(38, 118, 9, 0.5)
 }
 
 .custom-checkbox .custom-control-input:disabled:indeterminate~.custom-control-label::before {
@@ -6922,7 +6962,7 @@ a.close.disabled {
 }
 
 .bg-primary {
-    background-color: #4e73df !important
+    background-color: #179502  !important
 }
 
 a.bg-primary:focus,
@@ -6944,7 +6984,7 @@ button.bg-secondary:hover {
 }
 
 .bg-success {
-    background-color: #1cc88a !important
+    background-color: rgb(46 171 41) !important;
 }
 
 a.bg-success:focus,
@@ -10985,9 +11025,6 @@ a:focus {
         opacity: 0
     }
 
-    100% {
-        opacity: 1
-    }
 }
 
 .animated--fade-in {
@@ -11000,9 +11037,7 @@ a:focus {
 }
 
 .bg-gradient-primary {
-    background-color: #4e73df;
-    background-image: linear-gradient(180deg, #4e73df 10%, #224abe 100%);
-    background-size: cover
+    background: #008500;
 }
 
 .bg-gradient-secondary {
@@ -11012,14 +11047,11 @@ a:focus {
 }
 
 .bg-gradient-success {
-    background-color: #1cc88a;
-    background-image: linear-gradient(180deg, #1cc88a 10%, #13855c 100%);
-    background-size: cover
+    background: #004808;
 }
 
 .bg-gradient-info {
-    background-color: #36b9cc;
-    background-image: linear-gradient(180deg, #36b9cc 10%, #258391 100%);
+    background-color: #004808;
     background-size: cover
 }
 

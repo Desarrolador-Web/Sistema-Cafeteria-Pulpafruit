@@ -1,7 +1,30 @@
 let minDate, maxDate, table;
 
 document.addEventListener('DOMContentLoaded', function () {
-  
+  // Añadir un input de búsqueda en cada columna del encabezado
+  $('#table_ventas thead tr').clone(true).appendTo('#table_ventas thead');
+  $('#table_ventas thead tr:eq(1) th').each(function (i) {
+    $(this).html('<input type="text" placeholder="Buscar" />');
+
+    // Aplicar estilos directamente desde el JavaScript
+    $('input', this).css({
+      'width': '100%',
+      'padding': '5px',
+      'margin-top': '5px',
+      'border': '1px solid #ccc',
+      'border-radius': '4px',
+      'font-size': '14px',
+      'box-sizing': 'border-box'
+    });
+
+    // Añadir evento para buscar en cada columna
+    $('input', this).on('keyup change', function () {
+      if (table.column(i).search() !== this.value) {
+        table.column(i).search(this.value).draw();
+      }
+    });
+  });
+
   // Inicializar DateTime Pickers
   minDate = new DateTime($('#desde'), {
     format: 'YYYY-MM-DD'
@@ -17,15 +40,16 @@ document.addEventListener('DOMContentLoaded', function () {
       dataSrc: ''
     },
     columns: [
-      { data: 'id_ventas' },
       { data: 'nombres' },
       { data: 'producto' },
-      { data: 'cantidad' },  
-      { data: 'precio_venta' },  
-      { data: 'subtotal' },  
+      { data: 'cantidad' },
+      { data: 'precio_venta' },
+      { data: 'subtotal' },
       { data: 'fecha' },
-      { data: 'metodo_pago' }  // Asegúrate de que esta columna está presente
+      { data: 'metodo_pago' } 
     ],
+    orderCellsTop: true,
+    fixedHeader: true,
     language: {
       url: 'https://cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json'
     }
@@ -41,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function (settings, data, dataIndex) {
       var min = minDate.val();
       var max = maxDate.val();
-      var date = new Date(data[6]); 
+      var date = new Date(data[6]);
 
       if (
         (!min && !max) ||
@@ -61,10 +85,8 @@ document.getElementById('export_pdf').addEventListener('click', function () {
 });
 
 function exportTableToPDF() {
-  // Crear una ventana emergente
   var pdfWindow = window.open('', '_blank');
 
-  // Crear el contenido HTML del documento de la tabla
   var style = `
       <style>
           table {width: 100%; border-collapse: collapse;}
@@ -88,10 +110,7 @@ function exportTableToPDF() {
       </html>
   `;
 
-  // Escribir el contenido en la nueva ventana
   pdfWindow.document.write(content);
-
-  // Esperar a que el documento se cargue, luego llamar a print
   pdfWindow.document.close();
   pdfWindow.focus();
   pdfWindow.print();

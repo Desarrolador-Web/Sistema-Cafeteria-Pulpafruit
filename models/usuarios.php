@@ -17,17 +17,12 @@ class UsuariosModel {
         return $consult->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getUsers() {
-        $consult = $this->pdo->prepare("SELECT u.*, c.nombre_caja FROM cf_usuario u INNER JOIN cf_caja c ON u.sede = c.id_caja WHERE u.estado_usuario = 1");
+    public function getUser() {
+        $consult = $this->pdo->prepare("SELECT id_usuario, nombres, apellidos, correo FROM cf_usuario WHERE estado_usuario = 1");
         $consult->execute();
         return $consult->fetchAll(PDO::FETCH_ASSOC);
-    }  
-
-    public function getUser($id) {
-        $consult = $this->pdo->prepare("SELECT * FROM cf_usuario WHERE id_usuario = ?");
-        $consult->execute([$id]);
-        return $consult->fetch(PDO::FETCH_ASSOC);
     }
+    
 
     public function comprobarCedula($cedula) {
         $consult = $this->pdo->prepare("SELECT * FROM cf_usuario WHERE id_usuario = ?");
@@ -35,19 +30,19 @@ class UsuariosModel {
         return $consult->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function saveUser($cedula, $nombres, $apellidos, $correo, $clave, $ubicacion) {
-        $consult = $this->pdo->prepare("INSERT INTO cf_usuario (id_usuario, nombres, apellidos, correo, clave, estado_usuario, id_autorizacion, sede) VALUES (?,?,?,?,?,1,1,?)");
-        return $consult->execute([$cedula, $nombres, $apellidos, $correo, $clave, $ubicacion]);
+    public function saveUser($cedula, $nombres, $apellidos, $correo, $clave, $rol) {
+        $consult = $this->pdo->prepare("INSERT INTO cf_usuario (id_usuario, nombres, apellidos, correo, clave, estado_usuario, id_autorizacion, rol) VALUES (?,?,?,?,?,1,1,?)");
+        return $consult->execute([$cedula, $nombres, $apellidos, $correo, $clave, $rol]);
+    }
+    
+    public function updateUser($nombres, $apellidos, $correo, $rol, $id) {
+        $consult = $this->pdo->prepare("UPDATE cf_usuario SET nombres=?, apellidos=?, correo=?, rol=? WHERE id_usuario=?");
+        return $consult->execute([$nombres, $apellidos, $correo, $rol, $id]);
     }
 
     public function deleteUser($id) {
         $consult = $this->pdo->prepare("UPDATE cf_usuario SET estado_usuario = ? WHERE id_usuario = ?");
         return $consult->execute([0, $id]);
-    }
-
-    public function updateUser($nombres, $apellidos, $correo, $id) {
-        $consult = $this->pdo->prepare("UPDATE cf_usuario SET nombres=?, apellidos=?, correo=? WHERE id_usuario=?");
-        return $consult->execute([$nombres, $apellidos, $correo, $id]);
     }
 
     public function getPermisos() {

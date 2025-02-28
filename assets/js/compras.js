@@ -1,255 +1,100 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const table_productos = document.querySelector('#table_productos tbody');
-    const btn_Recibido = document.querySelector('#btn-Recibido');
-    const btn_pendiente = document.querySelector('#btn-pendiente');
-    const formProductos = document.querySelector('#frmProductos');
-    const selectEmpresa = document.querySelector('#id_empresa');
+    const barcodeInput = document.getElementById('barcode');
+    const precioCompraInput = document.getElementById('precio_compra');
+    const precioVentaInput = document.getElementById('precio_venta');
+    const cantidadInput = document.getElementById('cantidad');
+    const selectSede = document.getElementById('selectSede');
+    const selectMetodo = document.getElementById('selectMetodo');
+    const btnGuardar = document.getElementById('btn-Recibido');
 
-    if (table_productos) {
-        cargarProductos();
-    }
+    barcodeInput.addEventListener('input', function () {
+        let barcode = barcodeInput.value.trim();
+        if (barcode.length > 0) {
+            buscarProductoPorBarcode(barcode);
+        }
+    });
 
-    if (btn_Recibido) {
-        btn_Recibido.onclick = function () {
-            // Mostrar el SweetAlert para elegir el método de compra
-            Swal.fire({
-                title: '¿De dónde viene el dinero?',
-                showCancelButton: true,
-                cancelButtonText: 'Cancelar',
-                confirmButtonText: 'Caja',
-                showDenyButton: true,
-                denyButtonText: 'Socio',
-            }).then((result) => {
-                let metodo_compra = 0;
-                if (result.isConfirmed) {
-                    metodo_compra = 2; // Caja
-                } else if (result.isDenied) {
-                    metodo_compra = 1; // Socio
-                }
-                if (metodo_compra !== 0) {
-                    registrarCompra(1, metodo_compra); // Recibido
-                }
-            });
-        };
-    }
+    function buscarProductoPorBarcode(barcode) {
+        axios.get(`controllers/comprasController.php?option=buscarProducto&barcode=${barcode}`)
+            .then(response => {
+                const data = response.data;
+                if (data.existe) {
+                    precioCompraInput.value = data.precio_compra;
+                    precioVentaInput.value = data.precio_venta;
     
-    if (btn_pendiente) {
-        btn_pendiente.onclick = function () {
-            Swal.fire({
-                title: '¿De dónde viene el dinero?',
-                showCancelButton: true,
-                cancelButtonText: 'Cancelar',
-                confirmButtonText: 'Caja',
-                showDenyButton: true,
-                denyButtonText: 'Socio',
-            }).then((result) => {
-                let metodo_compra = 0;
-                if (result.isConfirmed) {
-                    metodo_compra = 2; // Caja
-                } else if (result.isDenied) {
-                    metodo_compra = 1; // Socio
-                }
-                if (metodo_compra !== 0) {
-                    registrarCompra(0, metodo_compra); // Pendiente
-                }
-            });
-        };
-    }
-    
-    // Modificar la función registrarCompra para aceptar el nuevo parámetro `metodo_compra`
-    function registrarCompra(estado, metodo_compra) {
-        const formData = new FormData(formProductos);
-        formData.append('estado', estado);
-        formData.append('metodo_compra', metodo_compra); // Añadimos el método de compra
-    
-        // Resto del código permanece igual
-        axios.post('controllers/comprasController.php?option=registrarCompra', formData)
-            .then(function (response) {
-                const info = response.data;
-                if (info.tipo === 'success') {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Éxito',
-                        text: info.mensaje
-                    });
-                    cargarProductos();
-                    formProductos.reset();
+                    // Bloquear los campos visualmente
+                    precioCompraInput.setAttribute('readonly', true);
+                    precioVentaInput.setAttribute('readonly', true);
+                    precioCompraInput.classList.add('input-bloqueado');
+                    precioVentaInput.classList.add('input-bloqueado');
                 } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: info.mensaje
-                    });
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Ocurrió un error inesperado. Por favor, inténtelo de nuevo.'
-                });
-            });
-    }
+                    precioCompraInput.value = '';
+                    precioVentaInput.value = '';
     
-    function verificarCajaAbierta() {
-        fetch(ruta + 'controllers/adminController.php?option=verificarCaja')
-            .then(response => response.json())
-            .then(data => {
-                if (!data.cajaAbierta) {
-                    mostrarModalAbrirCaja();
-                } else if (!data.id_sede) {
-                    // Si no hay sede en la sesión, también muestra el modal
-                    mostrarModalAbrirCaja();
+                    // Desbloquear los campos si no se encontró el producto
+                    precioCompraInput.removeAttribute('readonly');
+                    precioVentaInput.removeAttribute('readonly');
+                    precioCompraInput.classList.remove('input-bloqueado');
+                    precioVentaInput.classList.remove('input-bloqueado');
                 }
             })
-            .catch(error => {
-                console.error('Error al verificar la caja:', error);
-            });
-    }
-    
-
-    function cargarProductos() {
-        axios.get('controllers/comprasController.php?option=listarProductos')
-            .then(function (response) {
-                const productos = response.data;
-                const tbody = document.querySelector('#table_productos tbody');
-        
-                if ($.fn.DataTable.isDataTable('#table_productos')) {
-                    $('#table_productos').DataTable().destroy();
-                }
-        
-                tbody.innerHTML = '';
-        
-                if (Array.isArray(productos)) {
-                    productos.forEach(function (producto) {
-                        console.log(producto);  // Verifica el contenido de `producto`
-                        
-                        const row = document.createElement('tr');
-        
-                        row.innerHTML = `
-                            <td>${producto.idcompra}</td>
-                            <td>${producto.codigo}</td>
-                            <td>${producto.descripcion}</td>
-                            <td>${producto.precio_compra}</td>
-                            <td>${producto.precio_venta}</td>
-                            <td>${producto.empresa}</td> 
-                            <td><img src="${producto.imagen}" alt="Imagen del Producto" width="50" /></td>
-                            <td>${producto.existencia}</td>
-                            <td>
-                                ${producto.status == 1 
-                                    ? '<button class="btn btn-success btn-sm" disabled>Recibido</button>' 
-                                    : `<button class="btn btn-warning btn-sm" onclick="cambiarEstado(${producto.id_producto}, 1)">Pendiente</button>`}
-                            </td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-        
-                    $('#table_productos').DataTable({
-                        dom: 'Bfrtip',
-                        buttons: [
-                            'copy', 'csv', 'excel', 'pdf', 'print'
-                        ],
-                        language: {
-                            url: 'https://cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json'
-                        }
-                    });
-                } else {
-                    console.log('La respuesta no es un arreglo:', productos);
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+            .catch(error => console.error('Error al buscar el producto:', error));
     }
 
-    if (selectEmpresa) {
-        cargarEmpresas();
-    }
-
-    function cargarEmpresas() {
-        axios.get('controllers/comprasController.php?option=listarEmpresas')
-            .then(function (response) {
-                const empresas = response.data;
-                const select = document.querySelector('#id_empresa');
-                select.innerHTML = '<option value="">Seleccione una empresa</option>';
-
-                if (Array.isArray(empresas)) {
-                    empresas.forEach(function (empresa) {
-                        const option = document.createElement('option');
-                        option.value = empresa.id_empresa;
-                        option.textContent = empresa.razon_social;
-                        select.appendChild(option);
-                    });
-                } else {
-                    console.log('La respuesta no es un arreglo:', empresas);
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-    }
-
-
-    window.cambiarEstado = function (id, nuevoEstado) {
+    // Mostrar alerta cuando el usuario toca los campos de precio
+    function mostrarAlertaPrecio() {
         Swal.fire({
-            title: 'Ingrese el código de barras para actualizar el producto pendiente:',
-            input: 'text',
-            inputAttributes: {
-                autocapitalize: 'off'
-            },
-            showCancelButton: true,
-            confirmButtonText: 'Actualizar',
-            cancelButtonText: 'Cancelar',
-            showLoaderOnConfirm: true,
-            preConfirm: (barcode) => {
-                if (!/^\d+$/.test(barcode) || barcode.trim() === '') {
-                    Swal.showValidationMessage(
-                        'El código de barras debe ser una serie de números y no puede estar vacío.'
-                    );
-                    return false; // Para evitar enviar un valor incorrecto
-                }
-                return barcode;
-            },
-            allowOutsideClick: () => !Swal.isLoading()
-        }).then((result) => {
-            if (result.isConfirmed) {
-                console.log('ID Producto:', id); // Depuración
-                console.log('Código de Barras:', result.value); // Depuración
-    
-                // Enviar datos como formulario regular sin especificar el Content-Type
-                const formData = new FormData();
-                formData.append('id', id);
-                formData.append('estado', nuevoEstado);
-                formData.append('barcode', result.value);
-    
-                axios.post('controllers/comprasController.php?option=cambiarEstado', formData)
-                .then(function (response) {
-                    const info = response.data;
-                    if (info.tipo === 'success') {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Éxito',
-                            text: info.mensaje
-                        });
-                        cargarProductos();
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: info.mensaje
-                        });
-                    }
-                })
-                .catch(function (error) {
-                    console.log(error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Ocurrió un error inesperado. Por favor, inténtelo de nuevo.'
-                    });
-                });
-            }
+            title: 'Aviso',
+            text: 'Si desea modificar el valor del precio, pida al administrador que nivele los precios.',
+            icon: 'info',
+            confirmButtonText: 'Entendido'
         });
+    }
+
+    // Detectar clic en los campos de precio, incluso si están bloqueados
+    precioCompraInput.addEventListener('click', mostrarAlertaPrecio);
+    precioVentaInput.addEventListener('click', mostrarAlertaPrecio);
+
+    btnGuardar.addEventListener('click', function () {
+        const barcode = barcodeInput.value.trim();
+        const precio_compra = precioCompraInput.value.trim();
+        const precio_venta = precioVentaInput.value.trim();
+        const cantidad = cantidadInput.value.trim();
+        const sede = selectSede.value;
+        const metodo = selectMetodo.value;
+
+        if (!barcode || !precio_compra || !precio_venta || !cantidad || !sede || !metodo) {
+            Swal.fire('Error', 'Todos los campos son obligatorios.', 'error');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('barcode', barcode);
+        formData.append('precio_compra', precio_compra);
+        formData.append('precio_venta', precio_venta);
+        formData.append('cantidad', cantidad);
+        formData.append('sede', sede);
+        formData.append('metodo', metodo);
+
+        axios.post('controllers/comprasController.php?option=registrarCompra', formData)
+            .then(response => {
+                const data = response.data;
+                if (data.tipo === 'success') {
+                    Swal.fire('Éxito', data.mensaje, 'success');
+                    limpiarFormulario();
+                } else {
+                    Swal.fire('Error', data.mensaje, 'error');
+                }
+            })
+            .catch(error => console.error('Error al guardar la compra:', error));
+    });
+
+    function limpiarFormulario() {
+        barcodeInput.value = '';
+        precioCompraInput.value = '';
+        precioVentaInput.value = '';
+        cantidadInput.value = '';
+        selectSede.value = '';
+        selectMetodo.value = '';
     }
 });

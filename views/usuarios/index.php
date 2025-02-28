@@ -31,16 +31,16 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <label for="ubicacion">Ubicación <span class="text-danger">*</span></label>
+                    <label for="ubicacion">Perfil<span class="text-danger">*</span></label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
                         </div>
                         <select class="form-control" id="ubicacion" name="ubicacion">
-                            <option value="">Seleccione Ubicación</option>
-                            <option value="1">Planta Principal</option>
-                            <option value="2">Planta 2</option>
-                            <option value="3">CEDI</option>
+                            <option value="">Seleccione Rol del usuario</option>
+                            <option value="1">Super Admin</option>
+                            <option value="2">Admin</option>
+                            <option value="3">Vendedor</option>
                         </select>
                     </div>
                 </div>

@@ -21,6 +21,34 @@
     <link rel="stylesheet" type="text/css" href="<?php echo RUTA . 'assets/'; ?>css/datatables.min.css" />
     <link rel="stylesheet" type="text/css" href="<?php echo RUTA . 'assets/'; ?>css/dataTables.dateTime.min.css" />
 </head>
+
+<?php
+// Asegurar que la sesión esté iniciada
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Variables de sesión
+$_SESSION['rol'] = $_SESSION['rol'] ?? null;
+$rol_usuario = $_SESSION['rol'];
+$id_user = $_SESSION['idusuario'] ?? null;
+
+// Validar si la vista está minimizada
+$mini = !empty($_GET['pagina']) && in_array($_GET['pagina'], ['ventas', 'compras']);
+
+// Instanciar AdminModel
+require_once __DIR__ . '/../../models/admin.php';
+$admin = new AdminModel();
+
+// Inicializar estadoCaja para evitar el Warning
+$estadoCaja = 0;
+
+// Determinar estado de la caja para roles 1 y 2
+if (in_array($rol_usuario, [1, 2]) && $id_user) {
+    $estadoCaja = $admin->getEstadoCaja($id_user);
+}
+?>
+
 <?php $mini = false;
 if (!empty($_GET['pagina'])) {
     if ($_GET['pagina'] == 'ventas' || $_GET['pagina'] == 'compras') {
@@ -29,48 +57,82 @@ if (!empty($_GET['pagina'])) {
 }
 ?>
 
+<?php
+if (!isset($_SESSION['rol'])) {
+    $_SESSION['rol'] = null; // Establecer un valor predeterminado si no existe
+}
+?>
+
+
 <body id="page-top" class="<?php echo ($mini) ? 'sidebar-toggled' : ''; ?>">
 
-    <!-- Page Wrapper -->
     <div id="wrapper">
-
-        <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion <?php echo ($mini) ? 'toggled' : ''; ?>" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="plantilla.php">
-                <div class="sidebar-brand-icon rotate-n-15">
-                    <img src="assets/img/logo.png" alt="LOGO-PNG" width="50">
+                <div class="sidebar-brand-icon">
+                    <img src="assets/img/logo.svg" alt="LOGO-PNG" width="50">
                 </div>
-                <div class="sidebar-brand-text mx-3"><sup>1.0</sup></div>
             </a>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0">
-
-            <!-- Nav Item - Dashboard -->
-            <!-- <li class="nav-item <?php echo (empty($_GET['pagina'])) ? 'bg-gradient-info' : ''; ?>">
-                <a class="nav-link" href="plantilla.php">
-                    <i class="fas fa-chart-pie"></i>
-                    <span>Panel de control</span></a>
-            </li> -->
 
             <!-- Divider -->
             <hr class="sidebar-divider">
 
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Contenido
-            </div>
-            <?php if (!empty($clientes)) { ?>
-                <!-- Nav Item - Pages Collapse Menu -->
-                <!-- <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'clientes') ? 'bg-gradient-info' : ''; ?>">
+            <?php 
+            // Mostrar la opción "Panel de control" solo si el rol no es 3
+            if (!empty($clientes) && $_SESSION['rol'] != 3) { ?>
+                <!-- Opción panel de control, antes llamada clientes -->
+                <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'clientes') ? 'bg-gradient-info' : ''; ?>">
                     <a class="nav-link" href="?pagina=clientes">
-                        <i class="fas fa-fw fa-users"></i>
-                        <span>Clientes</span>
+                    <i class="fas fa-chart-pie"></i>
+                        <span>Panel de control</span>
                     </a>
-                </li> -->
+                </li>
             <?php } ?>
+
+
+        <!-- Validar para roles 1 y 2 -->
+        <?php if (in_array($rol_usuario, [1, 2])): ?>
+            <?php if ($estadoCaja == 1): ?>
+                <!-- Caja Abierta: Mostrar opción para Cerrar Caja -->
+                <li class="nav-item <?php echo (empty($_GET['pagina'])) ? 'bg-gradient-info' : ''; ?>">
+                    <a class="nav-link" href="plantilla.php">
+                        <i class="fas fa-cash-register"></i>
+                        <span>Cerrar Caja</span>
+                    </a>
+                </li>
+            <?php elseif ($estadoCaja == 2 && !empty($configuracion)): ?>
+                <!-- Caja Cerrada: Mostrar opción para Abrir Caja -->
+                <hr class="sidebar-divider d-none d-md-block">
+                <li class="nav-item <?php echo (!empty($_GET['pagina']) && $_GET['pagina'] == 'configuracion') ? 'bg-gradient-info' : ''; ?>">
+                    <a class="nav-link" href="?pagina=configuracion">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Abrir Caja</span>
+                    </a>
+                </li>
+            <?php elseif ($estadoCaja == 0): ?>
+                <!-- Sin Registro: Mostrar opción para Abrir Caja -->
+                <hr class="sidebar-divider d-none d-md-block">
+                <li class="nav-item <?php echo (!empty($_GET['pagina']) && $_GET['pagina'] == 'configuracion') ? 'bg-gradient-info' : ''; ?>">
+                    <a class="nav-link" href="?pagina=configuracion">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Abrir Caja</span>
+                    </a>
+                </li>
+            <?php endif; ?>
+        <?php else: ?>
+            <!-- Otros Roles: Mostrar siempre Cerrar Caja -->
+            <li class="nav-item <?php echo (empty($_GET['pagina'])) ? 'bg-gradient-info' : ''; ?>">
+                <a class="nav-link" href="plantilla.php">
+                    <i class="fas fa-cash-register"></i>
+                    <span>Cerrar Caja</span>
+                </a>
+            </li>
+        <?php endif; ?>
+    
+
+
 
             <?php if (!empty($proveedor)) { ?>
                 <hr class="sidebar-divider d-none d-md-block">
@@ -83,8 +145,9 @@ if (!empty($_GET['pagina'])) {
                 </li>
             <?php } ?>
 
-            <?php if (!empty($usuarios)) { ?>
-                <!-- Divider -->
+            <?php 
+            // Mostrar la opción de usuarios solo si el rol no es 3
+            if (!empty($usuarios) && $_SESSION['rol'] != 3) { ?>
                 <hr class="sidebar-divider d-none d-md-block">
                 <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'usuarios') ? 'bg-gradient-info' : ''; ?>">
                     <a class="nav-link" href="?pagina=usuarios">
@@ -93,6 +156,7 @@ if (!empty($_GET['pagina'])) {
                     </a>
                 </li>
             <?php } ?>
+
 
             <?php if (!empty($productos)) { ?>
                 <!-- Divider -->
@@ -134,7 +198,7 @@ if (!empty($_GET['pagina'])) {
             <?php if (!empty($nueva_venta) || !empty($ventas)) { ?>
                 <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'ventas' || !empty($_GET['pagina'])  && $_GET['pagina'] == 'historial') ? 'bg-gradient-info' : ''; ?>">
                     <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseVenta" aria-expanded="true" aria-controls="collapseVenta">
-                        <i class="fas fa-cash-register"></i>
+                        <i class="fas fa-solid fa-money-bill"></i>
                         <span>Ventas</span>
                         <i class="fas fa-chevron-right float-right"></i>
                     </a>
@@ -151,23 +215,6 @@ if (!empty($_GET['pagina'])) {
                     </div>
                 </li>
             <?php } ?>
-
-
-            <!-- <?php if (!empty($configuracion)) { ?> -->
-                <!-- Divider -->
-                <!-- <hr class="sidebar-divider d-none d-md-block">
-
-                <li class="nav-item <?php echo (!empty($_GET['pagina']) && $_GET['pagina'] == 'configuracion') ? 'bg-gradient-info' : ''; ?>">
-                    <a class="nav-link" href="?pagina=configuracion">
-                        <i class="fas fa-user-cog"></i>
-                        <span>Configuración</span>
-                    </a>
-                </li> -->
-            <!-- <?php } ?> -->
-            <!-- Sidebar Toggler (Sidebar) -->
-            <!-- <div class="text-center d-none d-md-inline mt-3">
-                <button class="rounded-circle border-0" id="sidebarToggle"><i class="fas fa-chevron-circle-left text-gray-400"></i></button>
-            </div> -->
 
         </ul>
         <!-- End of Sidebar -->
@@ -189,8 +236,6 @@ if (!empty($_GET['pagina'])) {
 
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
-
-
                         <div class="topbar-divider d-none d-sm-block"></div>
 
                         <!-- Nav Item - User Information -->
@@ -217,5 +262,7 @@ if (!empty($_GET['pagina'])) {
                 </nav>
 
                 <div class="container-fluid">
+
+
 
 

@@ -8,7 +8,7 @@ const clave = document.querySelector('#clave');
 const id_user = document.querySelector('#id_user');
 const btn_nuevo = document.querySelector('#btn-nuevo');
 const btn_save = document.querySelector('#btn-save');
-const ubicacion = document.querySelector('#ubicacion');
+const rol = document.querySelector('#ubicacion');
 
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -19,9 +19,8 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         columns: [
             { data: 'id_usuario' },
-            { data: 'nombre_completo' }, 
+            { data: 'nombre_completo' },
             { data: 'correo' },
-            { data: 'sede_nombre' },
             { data: 'accion' }
         ],
         language: {
@@ -29,11 +28,12 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         "order": [[0, 'desc']]
     });
+    
 
     frm.onsubmit = function (e) {
         e.preventDefault();
-        if (cedula.value == '' || nombres.value == '' || apellidos.value == '' || correo.value == '' || clave.value == '') {
-            message('error', 'TODO LOS CAMPOS CON * SON REQUERIDOS');
+        if (cedula.value == '' || nombres.value == '' || apellidos.value == '' || correo.value == '' || clave.value == '' || rol.value == '') {
+            message('error', 'TODOS LOS CAMPOS CON * SON REQUERIDOS');
         } else {
             const frmData = new FormData(frm);
             axios.post(ruta + 'controllers/usuariosController.php?option=save', frmData)
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.log(error);
                 });
         }
-    }
+    };
 
     btn_nuevo.onclick = function () {
         frm.reset();

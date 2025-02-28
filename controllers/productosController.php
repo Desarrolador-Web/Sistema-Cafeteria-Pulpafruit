@@ -1,77 +1,101 @@
 <?php
-$option = (empty($_GET['option'])) ? '' : $_GET['option'];
 require_once '../models/productos.php';
-$productos = new Productos();
-switch ($option) {
 
-    case 'listar':
-        // Verifica si el id_sede está en la sesión
-        if (isset($_SESSION['id_sede'])) {
-            $id_sede = $_SESSION['id_sede'];
-            $data = $productos->getProductsBySede($id_sede);  // Filtra los productos por sede
-            for ($i = 0; $i < count($data); $i++) {
-                $data[$i]['accion'] = '<div class="d-flex">
-                <a class="btn btn-danger btn-sm" onclick="deleteProducto(' . $data[$i]['id_producto'] . ')"><i class="fas fa-eraser"></i></a>
-                <a class="btn btn-primary btn-sm" onclick="editProducto(' . $data[$i]['id_producto'] . ')"><i class="fas fa-edit"></i></a>
-                </div>';
-            }
-            echo json_encode($data);
-        } else {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'No se ha seleccionado ninguna sede.']);
-        }
-        break;
-    
+class ProductoController {
+    private $productoModel;
 
-    case 'save':
-        $barcode = $_POST['barcode'];
-        $nombre = $_POST['nombre'];
-        $precio_compra = $_POST['precio_compra'];
-        $precio_venta = $_POST['precio_venta'];
-        $stock = $_POST['stock'];
-        $imagen = $_FILES['imagen']['name'];
-        $id_proveedor = $_POST['id_proveedor'];
-        $id_product = $_POST['id_product'];
-        if ($id_product == '') {
-            $consult = $productos->comprobarBarcode($barcode);
-            if (empty($consult)) {
-                $result = $productos->saveProduct($barcode, $nombre, $precio_compra, $precio_venta, $stock, $imagen, $id_proveedor);
-                if ($result) {
-                    $res = array('tipo' => 'success', 'mensaje' => 'PRODUCTO REGISTRADO');
-                } else {
-                    $res = array('tipo' => 'error', 'mensaje' => 'ERROR AL AGREGAR');
-                }
-            } else {
-                $res = array('tipo' => 'error', 'mensaje' => 'EL BARCODE YA EXISTE');
-            }
-        } else {
-            $result = $productos->updateProduct($barcode, $nombre, $precio_compra, $precio_venta, $stock, $imagen, $id_proveedor, $id_product);
-            if ($result) {
-                $res = array('tipo' => 'success', 'mensaje' => 'PRODUCTO MODIFICADO');
-            } else {
-                $res = array('tipo' => 'error', 'mensaje' => 'ERROR AL MODIFICAR');
-            }
-        }
-        echo json_encode($res);
-        break;
+    public function __construct() {
+        $this->productoModel = new Compras();
+    }
 
-    case 'delete':
-        $id = $_GET['id'];
-        $data = $productos->deleteProducto($id);
-        if ($data) {
-            $res = array('tipo' => 'success', 'mensaje' => 'PRODUCTO ELIMINADO');
-        } else {
-            $res = array('tipo' => 'error', 'mensaje' => 'ERROR AL ELIMINAR');
-        }
-        echo json_encode($res);
-        break;
-        
-    case 'edit':
-        $id = $_GET['id'];
-        $data = $productos->getProduct($id);
+    private function jsonResponse($data) {
         echo json_encode($data);
-        break;
-    default:
-        # code...
-        break;
+        exit;
+    }
+
+    public function listarProductos() {
+        if (!isset($_GET['id_caja'], $_GET['rolUsuario'])) {
+            $this->jsonResponse(['error' => 'Faltan parámetros necesarios']);
+        }
+
+        $id_caja = intval($_GET['id_caja']);
+        $rolUsuario = intval($_GET['rolUsuario']);
+
+        $productos = $this->productoModel->getProducts($id_caja, $rolUsuario);
+        $this->jsonResponse(['productos' => $productos ?: []]);
+    }
+
+    public function listarProveedores() {
+        $this->jsonResponse(['proveedores' => $this->productoModel->getProveedores()]);
+    }
+
+    public function verificarBarcode() {
+        if (!isset($_GET['barcode'])) {
+            $this->jsonResponse(['error' => 'Falta el código de barras']);
+        }
+
+        $existe = $this->productoModel->verificarProductoPorBarcode(trim($_GET['barcode']));
+        $this->jsonResponse(['existe' => $existe, 'mensaje' => $existe ? 
+            'El producto ya existe. Debe comprarlo para añadir existencias.' 
+            : 'El producto no existe.']);
+    }
+
+    public function registrarProducto() {
+        $camposRequeridos = ['barcode', 'descripcion', 'precio_compra', 'precio_venta', 'cantidad', 'id_empresa', 'id_caja'];
+
+        foreach ($camposRequeridos as $campo) {
+            if (empty($_POST[$campo])) {
+                $this->jsonResponse(['tipo' => 'error', 'mensaje' => 'Todos los campos son obligatorios.']);
+            }
+        }
+
+        $imagen = $this->subirImagen();
+        $resultado = $this->productoModel->saveProduct(
+            trim($_POST['barcode']),
+            trim($_POST['descripcion']),
+            (float)$_POST['precio_compra'],
+            (float)$_POST['precio_venta'],
+            (int)$_POST['cantidad'],
+            (int)$_POST['id_empresa'],
+            (int)$_POST['id_caja'],
+            $imagen
+        );
+
+        $this->jsonResponse([
+            'tipo' => $resultado ? 'success' : 'error',
+            'mensaje' => $resultado ? 'Producto registrado con éxito.' : 'Error al registrar el producto.'
+        ]);
+    }
+
+    private function subirImagen() {
+        if (!isset($_FILES['imagen']) || $_FILES['imagen']['error'] !== 0) {
+            return '';
+        }
+
+        $directorio = '../uploads/';
+        if (!file_exists($directorio)) {
+            mkdir($directorio, 0777, true);
+        }
+
+        $ruta = 'uploads/' . basename($_FILES['imagen']['name']);
+        move_uploaded_file($_FILES['imagen']['tmp_name'], '../' . $ruta);
+        return $ruta;
+    }
 }
 
+// Instancia del controlador y ejecución de acción
+$controller = new ProductoController();
+$option = $_GET['option'] ?? '';
+
+$acciones = [
+    'listarProductos' => 'listarProductos',
+    'listarProveedores' => 'listarProveedores',
+    'verificarBarcode' => 'verificarBarcode',
+    'registrarProducto' => 'registrarProducto'
+];
+
+if (array_key_exists($option, $acciones)) {
+    $controller->{$acciones[$option]}();
+} else {
+    echo json_encode(['tipo' => 'error', 'mensaje' => 'Opción no válida.']);
+}
