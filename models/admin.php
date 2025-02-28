@@ -155,4 +155,33 @@ class AdminModel {
         $query = $this->pdo->prepare($sql);
         return $query->execute([$valorCierre, $fechaCierre, $id_info_caja]);
     }
+
+    public function obtenerPersonalConDescuento()
+    {
+        $query = "
+            DECLARE @periodo INT;
+
+            SELECT @periodo = numero 
+            FROM periodos 
+            WHERE GETDATE() BETWEEN fecha_inicio AND fecha_fin;
+
+            IF @periodo IS NULL
+                SELECT TOP 1 @periodo = numero 
+                FROM periodos 
+                WHERE fecha_inicio <= GETDATE()
+                ORDER BY fecha_inicio DESC;
+
+            SELECT 
+                p.cedula AS cedula,
+                @periodo AS periodo,
+                p.descuento
+            FROM cf_personal p
+            WHERE p.descuento > 0;
+        ";
+
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 }

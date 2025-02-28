@@ -193,7 +193,20 @@ switch ($option) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'No se pudo registrar el código en la base de datos']);
         }
         break;
-        
+
+    case 'obtenerPersonalConDescuento':
+        // Llamamos al modelo para obtener los datos
+        $datos = $admin->obtenerPersonalConDescuento();
+    
+        // Depuración: Imprimir los datos antes de enviarlos al JS
+        header('Content-Type: application/json');
+        echo json_encode([
+            'tipo' => (!empty($datos)) ? 'success' : 'error',
+            'datos' => $datos,
+            'mensaje' => (!empty($datos)) ? 'Datos obtenidos correctamente' : 'No se encontraron datos'
+        ]);
+        exit;
+
 
     default:
         echo json_encode(['tipo' => 'error', 'mensaje' => 'Opción no válida.']);
