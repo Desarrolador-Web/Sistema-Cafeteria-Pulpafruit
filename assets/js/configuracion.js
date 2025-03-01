@@ -11,43 +11,31 @@ document.addEventListener('DOMContentLoaded', function () {
     actualizarFechaHora();
     setInterval(actualizarFechaHora, 1000);
 
-    // Evento para el botón de abrir caja
     document.getElementById('abrirCaja').addEventListener('click', () => {
         const valorApertura = document.getElementById('valor').value;
         const fechaApertura = document.getElementById('datetime').value;
-
-        // Validar que el valor de apertura no esté vacío o sea cero
-        if (!valorApertura || valorApertura <= 0) {
-            Swal.fire({
-                title: 'Error',
-                text: 'El valor de apertura es obligatorio y debe ser mayor a cero.',
-                icon: 'error',
-                confirmButtonText: 'Aceptar'
-            });
-            return;
-        }
-
-        // Crear el objeto de datos
+        const idSede = document.getElementById('sede').value;
+    
+        // Crear el objeto de datos de manera explícita
         const data = {
             valorApertura: valorApertura,
-            fechaApertura: fechaApertura
+            fechaApertura: fechaApertura,
+            idSede: idSede
         };
-
+    
+        console.log("Enviando datos al backend:", JSON.stringify(data)); // Log para depuración
+    
         // Enviar los datos al controlador mediante fetch
         fetch(`${ruta}controllers/configuracionController.php?option=abrirCaja`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data) // Asegurar que el JSON es correcto
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Error en la respuesta del servidor');
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
+            console.log("Respuesta del backend:", data); // Log para verificar la respuesta
             if (data.tipo === 'success') {
                 Swal.fire({
                     title: '¡Caja Abierta!',
@@ -55,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     icon: 'success',
                     confirmButtonText: 'Aceptar'
                 }).then(() => {
-                    window.location.reload(); // Refresca la página automáticamente
+                    window.location.reload();
                 });
             } else {
                 Swal.fire({
@@ -67,6 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         })
         .catch(error => {
+            console.error("Error en la solicitud:", error);
             Swal.fire({
                 title: 'Error',
                 text: 'Error al abrir la caja: ' + error.message,
@@ -75,4 +64,4 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     });
-});
+})    

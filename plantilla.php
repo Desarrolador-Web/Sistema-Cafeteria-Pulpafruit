@@ -36,11 +36,6 @@ $id_sede = $_SESSION['id_sede'] ?? null;
 // Determinar si el usuario puede ver todos los registros (rol 1 o 2)
 $mostrar_todos = in_array($rol_usuario, [1, 2]);
 
-// Si el rol es 1 o 2, establecer id_sede a 4
-if ($mostrar_todos) {
-    $_SESSION['id_sede'] = 4;
-    $id_sede = 4;
-}
 
 // Exponer las variables al frontend evitando duplicación
 echo "<script>const rolUsuario = " . json_encode($rol_usuario) . ";</script>";

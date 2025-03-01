@@ -8,9 +8,9 @@
 </head>
 <body class="bg-light">
     <!-- Page Heading -->
-<div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0 text-gray-800">Abrir Caja</h1>
-</div>
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Abrir Caja</h1>
+    </div>
 
     <div class="container-fluid p-0">
         <div class="row m-0">
@@ -26,11 +26,24 @@
                                 <label for="valor" class="text-dark font-weight-bold">Valor de Apertura</label>
                                 <input type="number" class="form-control p-2" id="valor" placeholder="Ingrese el valor de apertura" required>
                             </div>
+
+                            <!-- Selección de Sede -->
+                            <div class="form-group mb-3">
+                                <label for="sede" class="text-dark font-weight-bold">Seleccione la Sede</label>
+                                <select class="form-control p-2" id="sede" required>
+                                    <option value="" disabled selected>Seleccione una sede</option>
+                                    <option value="1">Planta Principal</option>
+                                    <option value="2">Planta 2</option>
+                                    <option value="3">CEDI</option>
+                                </select>
+                            </div>
+
                             <!-- Fecha de Apertura -->
                             <div class="form-group mb-3">
                                 <label for="fecha" class="text-dark font-weight-bold">Fecha</label>
                                 <input type="text" class="form-control p-2 bg-light" id="datetime" readonly>
                             </div>
+
                             <!-- Botón de Abrir Caja -->
                             <div class="text-center">
                                 <button type="button" class="btn btn-success btn-lg w-100" id="abrirCaja">Abrir Caja</button>
