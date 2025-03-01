@@ -60,10 +60,24 @@ document.addEventListener('DOMContentLoaded', function () {
     const barcodeInput = document.getElementById('barcode');
     const formProductos = document.getElementById('frmProductos');
     const btnRecibido = document.getElementById('btn-Recibido');
-    const modalMensajeRol = document.getElementById('modalMensajeRol');
-    const guardarModal = document.getElementById('guardarModal');
-    const cerrarModal = document.getElementById('cerrarModal');
-    const selectSede = document.getElementById('selectSede');
+
+    // La sede se toma directamente desde plantilla.php
+    let idCaja = idSede; // idSede ya está disponible en el frontend
+
+    console.log("Sede obtenida desde plantilla.php:", idCaja);
+
+    // Cargar la lista de productos y proveedores al iniciar
+    ProductoService.listarProductos(idCaja, rolUsuario)
+        .then(response => {
+            if (response.data.productos) UIHandler.mostrarProductos(response.data.productos);
+        })
+        .catch(error => console.error('Error al cargar productos:', error));
+
+    ProductoService.listarProveedores()
+        .then(response => {
+            if (response.data.proveedores) UIHandler.cargarProveedores(response.data.proveedores);
+        })
+        .catch(error => console.error('Error al cargar proveedores:', error));
 
     // Validar si el código de barras ya existe
     barcodeInput.addEventListener('blur', function () {
@@ -80,48 +94,32 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Error al verificar el código de barras:', error));
     });
 
-    // Cargar productos y proveedores al inicio
-    ProductoService.listarProductos(idSede, rolUsuario)
-        .then(response => {
-            if (response.data.productos) UIHandler.mostrarProductos(response.data.productos);
-        })
-        .catch(error => console.error('Error al cargar productos:', error));
-
-    ProductoService.listarProveedores()
-        .then(response => {
-            if (response.data.proveedores) UIHandler.cargarProveedores(response.data.proveedores);
-        })
-        .catch(error => console.error('Error al cargar proveedores:', error));
-
-    // Manejo del modal "Recibido"
+    // Evento al hacer clic en "Recibido" para registrar el producto
     btnRecibido.addEventListener('click', function () {
-        modalMensajeRol.style.display = 'flex';
-    });
-
-    cerrarModal.addEventListener('click', function () {
-        modalMensajeRol.style.display = 'none';
-    });
-
-    guardarModal.addEventListener('click', function () {
-        const idCaja = selectSede.value;
         if (!idCaja) {
-            UIHandler.mostrarAlerta('Error', 'Por favor seleccione una sede antes de continuar.', 'error');
+            UIHandler.mostrarAlerta('Error', 'No se ha podido obtener la sede del usuario.', 'error');
             return;
         }
 
         const formData = new FormData(formProductos);
-        formData.append('id_caja', idCaja);
+        formData.append('id_caja', idCaja); // Se asigna la sede obtenida desde plantilla.php
 
         ProductoService.registrarProducto(formData)
             .then(response => {
                 if (response.data.tipo === 'success') {
                     UIHandler.mostrarAlerta('Éxito', response.data.mensaje, 'success');
-                    modalMensajeRol.style.display = 'none';
                     formProductos.reset();
-                    ProductoService.listarProductos(idSede, rolUsuario)
+                    ProductoService.listarProductos(idCaja, rolUsuario)
                         .then(response => {
                             if (response.data.productos) UIHandler.mostrarProductos(response.data.productos);
                         });
+
+                    // Volver a cargar los proveedores por si se registró un nuevo proveedor
+                    ProductoService.listarProveedores()
+                        .then(response => {
+                            if (response.data.proveedores) UIHandler.cargarProveedores(response.data.proveedores);
+                        });
+
                 } else {
                     UIHandler.mostrarAlerta('Error', response.data.mensaje, 'error');
                 }
