@@ -1,9 +1,3 @@
-<!-- Bootstrap CSS -->
-<link rel="stylesheet" href="vendor/twbs/bootstrap/dist/css/bootstrap.min.css">
-
-<!-- Bootstrap JS (Asegúrate de que es el bundle, incluye Popper.js) -->
-<script src="vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
 <div class="container">
     <h1 class="h3 mb-4 text-center">Panel Administrativo</h1>
     <div class="metrics-container">
@@ -39,19 +33,21 @@
         <div class="metric-card" id="metric-descargar-informe">
             <i class="fas fa-file-download metric-icon"></i>
             <div class="metric-title">Descarga informe créditos</div>
-            <div class="metric-description">Permite descargar y visualizar un listado del personal que tiene crédito pendiente.</div>
+            <div class="metric-description">Permite descargar y visualizar un listado del personal que tiene crédito
+                pendiente.</div>
         </div>
 
     </div>
 </div>
 
 <!-- Modal Nivelar Inventario -->
-<div class="modal fade" id="modalNivelarInventario" tabindex="-1" aria-labelledby="modalNivelarInventarioLabel" aria-hidden="true">
+<div class="modal fade" id="modalNivelarInventario" tabindex="-1" aria-labelledby="modalNivelarInventarioLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header bg-success text-white">
                 <h5 class="modal-title" id="modalNivelarInventarioLabel">Nivelar Inventario</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <table class="table table-striped table-hover">
@@ -72,19 +68,20 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Modal inicios de sesión -->
-<div class="modal fade" id="modalIniciosSesion" tabindex="-1" aria-labelledby="modalIniciosSesionLabel" aria-hidden="true">
+<div class="modal fade" id="modalIniciosSesion" tabindex="-1" aria-labelledby="modalIniciosSesionLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header bg-success text-white">
                 <h5 class="modal-title" id="modalIniciosSesionLabel">Inicios de Sesión</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <table class="table table-striped table-hover">
@@ -104,19 +101,20 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Modal usuarios registrados -->
-<div class="modal fade" id="modalUsuariosRegistrados" tabindex="-1" aria-labelledby="modalUsuariosRegistradosLabel" aria-hidden="true">
+<div class="modal fade" id="modalUsuariosRegistrados" tabindex="-1" aria-labelledby="modalUsuariosRegistradosLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header bg-success text-white">
                 <h5 class="modal-title" id="modalUsuariosRegistradosLabel">Usuarios Registrados</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <table class="table table-striped table-hover">
@@ -132,20 +130,21 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Modal productos agotados -->
-<div class="modal fade" id="modalProductosAgotados" tabindex="-1" aria-labelledby="modalProductosAgotadosLabel" aria-hidden="true">
+<div class="modal fade" id="modalProductosAgotados" tabindex="-1" aria-labelledby="modalProductosAgotadosLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <!-- Encabezado del modal con el mismo estilo -->
             <div class="modal-header bg-success text-white">
                 <h5 class="modal-title" id="modalProductosAgotadosLabel">Productos Agotados</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <!-- Tabla con los mismos estilos -->
@@ -163,24 +162,23 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Modal descargar informe -->
-<div class="modal fade" id="modalDescargarInforme" tabindex="-1" aria-labelledby="modalDescargarInforme" aria-hidden="true">
+<div class="modal fade" id="modalDescargarInforme" tabindex="-1" aria-labelledby="modalDescargarInforme"
+    aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header bg-success text-white">
                 <h5 class="modal-title" id="modalDescargarInformeLabel">Personal con crédito pendiente</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <!-- Campo de búsqueda -->
-                <input type="text" id="buscadorInforme" class="form-control mb-3" placeholder="Buscar por cédula o nombre...">
-                
+
                 <!-- Tabla de datos -->
                 <table class="table table-striped table-hover" id="tablaInforme">
                     <thead class="table-success">
@@ -190,116 +188,16 @@
                             <th>Valor crédito</th>
                         </tr>
                     </thead>
-                    <tbody id="tablaDescargarInforme">
+                    <tbody id="tablaInformeBody">
                         <!-- Los datos se cargarán dinámicamente -->
                     </tbody>
                 </table>
             </div>
             <div class="modal-footer">
-                <button id="descargarPDF" class="btn btn-danger">Descargar PDF</button>
-                <button id="descargarExcel" class="btn btn-success">Descargar Excel</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button id="descargarPDF" class="btn btn-danger">Descargar PDF</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
 </div>
 <script src="vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

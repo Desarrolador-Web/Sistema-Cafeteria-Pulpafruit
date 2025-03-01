@@ -75,21 +75,19 @@ switch ($option) {
         }
     
         $id_usuario = $_SESSION['idusuario'];
+        $rol_usuario = $_SESSION['rol'];  // Obtener el rol del usuario
         $valorCierre = $_POST['valorCierre'];
         $fechaCierre = date('Y-m-d H:i:s');
         $observacion = $_POST['observacion'] ?? null;
     
-        // Depuración
-        error_log("ID Usuario: $id_usuario");
-        error_log("Valor de Cierre: $valorCierre");
-        error_log("Observación: $observacion");
+        $id_info_caja = $admin->obtenerCajaAbiertaUsuario($id_usuario)['id_info_caja'];
     
-        // Obtener diferencia calculada
+        // Obtener la diferencia calculada
         $diferencia = $admin->obtenerDiferenciaVentasCompras($id_usuario);
         $resultadoFinal = $diferencia['ResultadoFinal'] ?? 0;
     
         if (floatval($valorCierre) === floatval($resultadoFinal)) {
-            // Valores coinciden, cerrar caja
+            // Si los valores coinciden, se cierra la caja normalmente
             $resultado = $admin->cerrarCaja($id_info_caja, $valorCierre, $fechaCierre);
             if ($resultado) {
                 echo json_encode(['tipo' => 'success', 'mensaje' => 'Caja cerrada exitosamente']);
@@ -97,7 +95,17 @@ switch ($option) {
                 echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al cerrar la caja']);
             }
         } else {
-            // Valores no coinciden, manejar observación
+            // Si el usuario es rol 3, primero debe ingresar el código de autorización
+            if ($rol_usuario == 3) {
+                echo json_encode([
+                    'tipo' => 'error',
+                    'mensaje' => 'Los valores no coinciden. Se requiere autorización.',
+                    'resultado' => $resultadoFinal
+                ]);
+                exit;
+            }
+    
+            // Si no es rol 3, puede cerrar con observación
             if (!empty($observacion)) {
                 $resultado = $admin->cerrarCajaConObservacion($id_usuario, $valorCierre, $fechaCierre, $observacion);
                 if ($resultado) {
@@ -114,6 +122,7 @@ switch ($option) {
             }
         }
         break;
+    
         
 
     case 'abrirCaja':
@@ -193,7 +202,6 @@ switch ($option) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'No se pudo registrar el código en la base de datos']);
         }
         break;
-        
 
     default:
         echo json_encode(['tipo' => 'error', 'mensaje' => 'Opción no válida.']);
