@@ -6,7 +6,7 @@
 
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0 text-gray-800">Nueva compra</h1>
+    <h1 class="h3 mb-0 text-gray-800">Registro de Producto</h1>
 </div>
 
 <!-- Modal -->
@@ -93,24 +93,6 @@
                 </tbody>
             </table>
         </div>
-    </div>
-</div>
-
-<!-- Modal definido en la vista -->
-<div id="modalMensajeRol" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center;">
-    <div style="background: white; padding: 20px; border-radius: 8px; width: 300px; text-align: center;">
-        <h5>Mensaje</h5>
-        <p id="modalMensajeTexto">Mensaje predeterminado</p>
-        
-        <label for="selectSede">Seleccione la sede:</label>
-        <select id="selectSede" style="width: 100%; margin: 10px 0; padding: 5px;">
-            <option value="1">Planta Principal</option>
-            <option value="2">Planta 2</option>
-            <option value="3">CEDI</option>
-        </select>
-
-        <button id="guardarModal" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;">Guardar</button>
-        <button id="cerrarModal" style="padding: 10px 20px; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Cerrar</button>
     </div>
 </div>
 

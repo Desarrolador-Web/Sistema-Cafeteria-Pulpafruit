@@ -168,7 +168,13 @@ function manejarCierreCaja() {
                             cancelButtonText: 'Cancelar'
                         }).then((result) => {
                             if (result.isConfirmed && result.value) {
+                                // Guardar la observación
                                 cerrarCajaConObservacion(idInfoCaja, valorCierre, result.value);
+                    
+                                // Enviar código de verificación SOLO si es un rol 3
+                                if (parseInt(rolUsuario) === 3) {
+                                    enviarCodigoAutorizacion(idInfoCaja);
+                                }                    
                             }
                         });
                     } else {
@@ -222,40 +228,37 @@ function cerrarCajaConObservacion(idInfoCaja, valorCierre, observacion) {
         method: 'POST',
         body: formDataObservacion
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Error en la respuesta del servidor');
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
         if (data.tipo === 'success') {
-            Swal.fire({
-                title: 'Caja cerrada exitosamente',
-                icon: 'success',
-                confirmButtonText: 'Aceptar'
-            }).then(() => {
-                window.location.reload();
-            });
-        } else {
-            Swal.fire({
-                title: 'Error al cerrar caja',
-                text: data.mensaje,
-                icon: 'error',
-                confirmButtonText: 'Aceptar'
-            });
-        }
+            // Después de guardar la observación, solicitar el código de verificación
+            if (parseInt(rolUsuario) === 3) {
+                Swal.fire({
+                    title: 'Ingresa el código de autorización',
+                    input: 'text',
+                    inputPlaceholder: 'Escribe el código enviado a tu correo',
+                    showCancelButton: true,
+                    confirmButtonText: 'Validar código',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed && result.value) {
+                        validarCodigoAutorizacion(idInfoCaja, result.value);
+                    }
+                });
+            } else {
+                // Si no es rol 3, permite el cierre inmediato
+                Swal.fire({
+                    title: 'Caja cerrada exitosamente',
+                    icon: 'success',
+                    confirmButtonText: 'Aceptar'
+                }).then(() => {
+                    window.location.reload();
+                });
+            }
+        } 
     })
-    .catch(error => {
-        console.error('Error al cerrar caja:', error);
-        Swal.fire({
-            title: 'Error',
-            text: 'Error al cerrar caja: ' + error,
-            icon: 'error',
-            confirmButtonText: 'Aceptar'
-        });
-    });
 }
+
 
 
 // Función para enviar el código de autorización
@@ -358,4 +361,5 @@ function validarCodigoAutorizacion(idInfoCaja, codigoAutorizacion) {
             confirmButtonText: 'Aceptar'
         });
     });
+    
 }

@@ -3,19 +3,9 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.bootstrap4.min.css">
 
-<!-- Bootstrap JS (Asegúrate de que es el bundle, incluye Popper.js) -->
 <script src="vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap4.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.bootstrap4.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
+
 
 <!-- SweetAlert2 CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -46,11 +36,6 @@ $id_sede = $_SESSION['id_sede'] ?? null;
 // Determinar si el usuario puede ver todos los registros (rol 1 o 2)
 $mostrar_todos = in_array($rol_usuario, [1, 2]);
 
-// Si el rol es 1 o 2, establecer id_sede a 4
-if ($mostrar_todos) {
-    $_SESSION['id_sede'] = 4;
-    $id_sede = 4;
-}
 
 // Exponer las variables al frontend evitando duplicación
 echo "<script>const rolUsuario = " . json_encode($rol_usuario) . ";</script>";

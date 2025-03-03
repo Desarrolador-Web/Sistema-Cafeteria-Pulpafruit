@@ -146,8 +146,8 @@ if (!isset($_SESSION['rol'])) {
             <?php } ?>
 
             <?php 
-            // Mostrar la opción de usuarios solo si el rol no es 3
-            if (!empty($usuarios) && $_SESSION['rol'] != 3) { ?>
+            // Mostrar la opción de usuarios solo si el rol es 1
+            if (!empty($usuarios) && $_SESSION['rol'] == 1) { ?>
                 <hr class="sidebar-divider d-none d-md-block">
                 <li class="nav-item <?php echo (!empty($_GET['pagina'])  && $_GET['pagina'] == 'usuarios') ? 'bg-gradient-info' : ''; ?>">
                     <a class="nav-link" href="?pagina=usuarios">

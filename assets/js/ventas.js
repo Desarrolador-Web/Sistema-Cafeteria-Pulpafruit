@@ -45,7 +45,7 @@ function verificarCajaYSesion(idUsuario) {
                 icon: 'error',
                 title: 'Acceso denegado',
                 text: 'Debe tener abierta una caja para poder vender',
-                confirmButtonText: 'Ir a otra página'
+                confirmButtonText: 'Ir a abrir caja'
             }).then(() => {
                 window.location.href = '?pagina=configuracion';
             });

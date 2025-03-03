@@ -63,7 +63,7 @@ switch ($option) {
         $productoId = $compras->saveOrUpdateProduct($barcode, '', 0, $precio_compra, $precio_venta, '', $cantidad, 1, $sede);
     
         if (!$productoId) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al guardar el producto.']);
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'El producto que desea comprar no existe en esta sede.']);
             break;
         }
     

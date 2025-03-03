@@ -15,6 +15,36 @@ document.addEventListener('DOMContentLoaded', function () {
         static registrarProducto(formData) {
             return axios.post('controllers/productosController.php?option=registrarProducto', formData);
         }
+
+        static verificarCajaSesion(idUsuario, callback) {
+            axios.post('controllers/ventasController.php?option=verificarCajaSesion', new URLSearchParams({
+                id_usuario: idUsuario
+            }))
+            .then(response => {
+                console.log("Verificación de caja abierta:", response.data);
+                if (response.data.caja_abierta === true) {
+                    callback(true);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Acceso denegado',
+                        text: 'Debe tener una caja abierta para gestionar productos.',
+                        confirmButtonText: 'Ir a abrir caja'
+                    }).then(() => {
+                        window.location.href = '?pagina=configuracion';
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("Error al verificar la caja:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ocurrió un error al verificar la caja. Intente nuevamente.',
+                    confirmButtonText: 'Aceptar'
+                });
+            });
+        }
     }
 
     class UIHandler {
@@ -56,16 +86,50 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    console.log("ID Usuario en JS:", idUsuario);
+
+    if (!idUsuario) {
+        console.error("Error: idUsuario no está definido en la sesión.");
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de sesión',
+            text: 'No se pudo obtener el usuario. Por favor, inicie sesión nuevamente.',
+            confirmButtonText: 'Aceptar'
+        }).then(() => {
+            window.location.href = 'login.php';
+        });
+        return;
+    }
+
+    let idCaja = idSede;
+    console.log("Sede obtenida desde plantilla.php:", idCaja);
+
+    ProductoService.verificarCajaSesion(idUsuario, function (cajaAbierta) {
+        if (cajaAbierta) {
+            console.log("Acceso permitido a productos");
+            cargarDatosProductos();
+        }
+    });
+
+    function cargarDatosProductos() {
+        ProductoService.listarProductos(idCaja, rolUsuario)
+            .then(response => {
+                if (response.data.productos) UIHandler.mostrarProductos(response.data.productos);
+            })
+            .catch(error => console.error('Error al cargar productos:', error));
+
+        ProductoService.listarProveedores()
+            .then(response => {
+                if (response.data.proveedores) UIHandler.cargarProveedores(response.data.proveedores);
+            })
+            .catch(error => console.error('Error al cargar proveedores:', error));
+    }
+
     // Elementos del DOM
     const barcodeInput = document.getElementById('barcode');
     const formProductos = document.getElementById('frmProductos');
     const btnRecibido = document.getElementById('btn-Recibido');
-    const modalMensajeRol = document.getElementById('modalMensajeRol');
-    const guardarModal = document.getElementById('guardarModal');
-    const cerrarModal = document.getElementById('cerrarModal');
-    const selectSede = document.getElementById('selectSede');
 
-    // Validar si el código de barras ya existe
     barcodeInput.addEventListener('blur', function () {
         const barcode = barcodeInput.value.trim();
         if (!barcode) return;
@@ -80,32 +144,9 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Error al verificar el código de barras:', error));
     });
 
-    // Cargar productos y proveedores al inicio
-    ProductoService.listarProductos(idSede, rolUsuario)
-        .then(response => {
-            if (response.data.productos) UIHandler.mostrarProductos(response.data.productos);
-        })
-        .catch(error => console.error('Error al cargar productos:', error));
-
-    ProductoService.listarProveedores()
-        .then(response => {
-            if (response.data.proveedores) UIHandler.cargarProveedores(response.data.proveedores);
-        })
-        .catch(error => console.error('Error al cargar proveedores:', error));
-
-    // Manejo del modal "Recibido"
     btnRecibido.addEventListener('click', function () {
-        modalMensajeRol.style.display = 'flex';
-    });
-
-    cerrarModal.addEventListener('click', function () {
-        modalMensajeRol.style.display = 'none';
-    });
-
-    guardarModal.addEventListener('click', function () {
-        const idCaja = selectSede.value;
         if (!idCaja) {
-            UIHandler.mostrarAlerta('Error', 'Por favor seleccione una sede antes de continuar.', 'error');
+            UIHandler.mostrarAlerta('Error', 'No se ha podido obtener la sede del usuario.', 'error');
             return;
         }
 
@@ -116,12 +157,17 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => {
                 if (response.data.tipo === 'success') {
                     UIHandler.mostrarAlerta('Éxito', response.data.mensaje, 'success');
-                    modalMensajeRol.style.display = 'none';
                     formProductos.reset();
-                    ProductoService.listarProductos(idSede, rolUsuario)
+                    ProductoService.listarProductos(idCaja, rolUsuario)
                         .then(response => {
                             if (response.data.productos) UIHandler.mostrarProductos(response.data.productos);
                         });
+
+                    ProductoService.listarProveedores()
+                        .then(response => {
+                            if (response.data.proveedores) UIHandler.cargarProveedores(response.data.proveedores);
+                        });
+
                 } else {
                     UIHandler.mostrarAlerta('Error', response.data.mensaje, 'error');
                 }
