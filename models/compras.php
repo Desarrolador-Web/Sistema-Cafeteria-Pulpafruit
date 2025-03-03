@@ -58,6 +58,14 @@ class Compras {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function buscarProductoPorBarcodeYSede($barcode, $id_caja) {
+        $sql = "SELECT id_producto FROM cf_producto WHERE codigo_producto = ? AND id_caja = ?";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$barcode, $id_caja]);
+        return $stmt->fetchColumn(); // Retorna el ID del producto si existe, o `false` si no existe
+    }
+    
+
     public function saveCompra($sede, $total, $id_usuario, $estado, $id_caja, $metodo_compra) {
         date_default_timezone_set('America/Bogota');
         $fecha = date('Y-m-d H:i:s');
