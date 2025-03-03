@@ -75,19 +75,27 @@ switch ($option) {
         }
     
         $id_usuario = $_SESSION['idusuario'];
-        $rol_usuario = $_SESSION['rol'];  // Obtener el rol del usuario
+        $rol_usuario = $_SESSION['rol'];  
         $valorCierre = $_POST['valorCierre'];
         $fechaCierre = date('Y-m-d H:i:s');
         $observacion = $_POST['observacion'] ?? null;
     
-        $id_info_caja = $admin->obtenerCajaAbiertaUsuario($id_usuario)['id_info_caja'];
+        // Obtener el ID de la caja abierta del usuario
+        $cajaAbierta = $admin->obtenerCajaAbiertaUsuario($id_usuario);
+        if (!$cajaAbierta) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'No hay caja abierta para cerrar']);
+            exit;
+        }
+        
+        $id_info_caja = $cajaAbierta['id_info_caja'];
     
-        // Obtener la diferencia calculada
+        // Obtener el Total_Arqueo desde la base de datos
         $diferencia = $admin->obtenerDiferenciaVentasCompras($id_usuario);
-        $resultadoFinal = $diferencia['ResultadoFinal'] ?? 0;
+        $totalArqueo = $diferencia['Total_Arqueo'] ?? 0;
     
-        if (floatval($valorCierre) === floatval($resultadoFinal)) {
-            // Si los valores coinciden, se cierra la caja normalmente
+        // Comparar el valor de cierre ingresado con el calculado
+        if (floatval($valorCierre) === floatval($totalArqueo)) {
+            // Si los valores coinciden, cerrar la caja normalmente
             $resultado = $admin->cerrarCaja($id_info_caja, $valorCierre, $fechaCierre);
             if ($resultado) {
                 echo json_encode(['tipo' => 'success', 'mensaje' => 'Caja cerrada exitosamente']);
@@ -95,12 +103,12 @@ switch ($option) {
                 echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al cerrar la caja']);
             }
         } else {
-            // Si el usuario es rol 3, primero debe ingresar el código de autorización
+            // Si el usuario es rol 3, debe ingresar el código de autorización
             if ($rol_usuario == 3) {
                 echo json_encode([
                     'tipo' => 'error',
                     'mensaje' => 'Los valores no coinciden. Se requiere autorización.',
-                    'resultado' => $resultadoFinal
+                    'resultado' => $totalArqueo // Enviar al frontend para mostrarlo en la alerta
                 ]);
                 exit;
             }
@@ -117,12 +125,11 @@ switch ($option) {
                 echo json_encode([
                     'tipo' => 'error',
                     'mensaje' => 'Los valores no coinciden y no se recibió una observación válida',
-                    'resultado' => $resultadoFinal
+                    'resultado' => $totalArqueo // Enviar al frontend para su comparación
                 ]);
             }
         }
         break;
-    
         
 
     case 'abrirCaja':

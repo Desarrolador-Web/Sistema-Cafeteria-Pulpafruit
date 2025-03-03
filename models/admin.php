@@ -78,38 +78,55 @@ class AdminModel {
     
     public function obtenerDiferenciaVentasCompras($id_usuario) {
         $sql = "
-
-        WITH VentasTotales AS (
-            SELECT SUM(v.total) AS TotalVentas
-            FROM cf_ventas v
-            INNER JOIN cf_informacion_cajas ic
-                ON v.id_usuario = ic.id_usuario
-            WHERE ic.id_usuario = ?
-              AND ic.fecha_cierre IS NULL
-              AND ic.valor_cierre IS NULL
-              AND v.fecha >= ic.fecha_apertura  
-              AND v.fecha <= GETDATE()  
-        ),
-        ComprasTotales AS (
-            SELECT SUM(c.total_compra) AS TotalCompras
-            FROM cf_compras c
-            INNER JOIN cf_informacion_cajas ic
-                ON c.id_usuario = ic.id_usuario
-            WHERE ic.id_usuario = ?
-              AND ic.fecha_cierre IS NULL
-              AND ic.valor_cierre IS NULL
-              AND c.fecha_compra >= ic.fecha_apertura  
-              AND c.fecha_compra <= GETDATE()  
-        )
-        SELECT ISNULL(VentasTotales.TotalVentas, 0) - ISNULL(ComprasTotales.TotalCompras, 0) AS ResultadoFinal
-        FROM VentasTotales, ComprasTotales;
-        
+            DECLARE @usuarioCaja INT, 
+                    @fechaApertura DATETIME, 
+                    @valorApertura DECIMAL(10,2), 
+                    @sedeCaja INT,
+                    @totalVentas DECIMAL(10,2),
+                    @totalCompras DECIMAL(10,2),
+                    @totalFinal DECIMAL(10,2),
+                    @totalArqueo DECIMAL(10,2);
+    
+            -- Capturar valores de la apertura de caja
+            SELECT 
+                @usuarioCaja = id_usuario,
+                @fechaApertura = fecha_apertura, 
+                @valorApertura = valor_apertura,
+                @sedeCaja = id_sede
+            FROM cf_informacion_cajas 
+            WHERE id_usuario = ? 
+            AND sesion = '2';
+    
+            -- Calcular la suma de ventas desde la fecha de apertura hasta el momento actual
+            SELECT @totalVentas = COALESCE(SUM(total), 0)  
+            FROM cf_ventas 
+            WHERE id_usuario = @usuarioCaja
+            AND metodo <> 3  
+            AND fecha >= @fechaApertura  
+            AND fecha <= GETDATE();  
+    
+            -- Calcular la suma de compras desde la fecha de apertura hasta el momento actual
+            SELECT @totalCompras = COALESCE(SUM(total_compra), 0)  
+            FROM cf_compras 
+            WHERE id_usuario = @usuarioCaja
+            AND fecha_compra >= @fechaApertura  
+            AND fecha_compra <= GETDATE();  
+    
+            -- Calcular el total final (ventas + valor de apertura)
+            SET @totalFinal = @totalVentas + @valorApertura;
+    
+            -- Calcular el Total_Arqueo (Total_Final - Total_Compras)
+            SET @totalArqueo = @totalFinal - @totalCompras;
+    
+            -- Devolver solo el total de arqueo
+            SELECT @totalArqueo AS Total_Arqueo;
         ";
-        
+    
         $query = $this->pdo->prepare($sql);
-        $query->execute([$id_usuario, $id_usuario]);
-        return $query->fetch(PDO::FETCH_ASSOC);
+        $query->execute([$id_usuario]);
+        return $query->fetch(PDO::FETCH_ASSOC); 
     }
+    
 
     public function obtenerCajaAbiertaUsuario($id_usuario) {
         // Cambia LIMIT por TOP 1, que es compatible con SQL Server
