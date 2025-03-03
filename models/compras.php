@@ -66,8 +66,10 @@ class Compras {
                 VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$sede, $total, $fecha, $id_usuario, $estado, $id_caja, $metodo_compra]);
+    
         return $stmt->errorCode() == '00000' ? $this->pdo->lastInsertId() : false;
     }
+    
 
     public function saveOrUpdateProduct($barcode, $descripcion, $id_empresa, $precio_compra, $precio_venta, $imagen, $cantidad, $estado, $id_caja) {
         $sql_check = "SELECT id_producto, existencia FROM cf_producto WHERE codigo_producto = ? AND estado_producto = 1 AND id_caja = ?";
