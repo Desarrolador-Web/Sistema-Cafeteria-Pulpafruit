@@ -27,8 +27,13 @@ document.addEventListener('DOMContentLoaded', function () {
   table = $('#table_compras').DataTable({
     ajax: {
       url: ruta + 'controllers/historialComprasController.php?option=historial',
+      type: 'POST',
+      data: function(d) {
+        d.id_sede = idSede; 
+        d.id_usuario = idUsuario;
+      },
       dataSrc: ''
-    },
+    },    
     columns: [
       { data: 'id' },
       { data: 'nombre' },
