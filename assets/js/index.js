@@ -114,7 +114,7 @@ function manejarCierreCaja() {
         const valorCierre = document.querySelector('#valorCierre').value;
         const valorCierreNumerico = parseFloat(valorCierre);
 
-        console.log('Valor de cierre capturado:', valorCierre); 
+        console.log('Valor de cierre capturado:', valorCierre);
 
         fetch(ruta + 'controllers/adminController.php?option=obtenerIdCajaAbierta', {
             method: 'GET'
@@ -128,8 +128,7 @@ function manejarCierreCaja() {
         .then(data => {
             if (data.id_info_caja) {
                 const idInfoCaja = data.id_info_caja;
-
-                console.log('ID de caja abierta:', idInfoCaja); 
+                console.log('ID de caja abierta:', idInfoCaja);
 
                 const formData = new FormData();
                 formData.append('id_info_caja', idInfoCaja);
@@ -146,7 +145,8 @@ function manejarCierreCaja() {
                     return response.json();
                 })
                 .then(data => {
-                    console.log('Respuesta del servidor:', data); 
+                    console.log('Respuesta del servidor:', data);
+
                     if (data.tipo === 'success') {
                         Swal.fire({
                             title: 'Caja cerrada exitosamente',
@@ -157,10 +157,13 @@ function manejarCierreCaja() {
                             window.location.reload();
                         });
                     } else if (data.tipo === 'error' && data.resultado !== undefined) {
-                        // Mostrar SweetAlert para ingresar observación
+                        // Comparar el valor ingresado con totalArqueo
+                        const totalArqueo = parseFloat(data.resultado);
+                        console.log('Total arqueo esperado:', totalArqueo);
+
                         Swal.fire({
                             title: 'Valores no coinciden',
-                            text: 'Los valores no coinciden. Por favor, ingresa una observación.',
+                            text: `El valor de cierre ingresado no coincide con el esperado. Ingresa una observación.`,
                             input: 'text',
                             inputPlaceholder: 'Escribe tu observación aquí',
                             showCancelButton: true,
@@ -168,13 +171,12 @@ function manejarCierreCaja() {
                             cancelButtonText: 'Cancelar'
                         }).then((result) => {
                             if (result.isConfirmed && result.value) {
-                                // Guardar la observación
                                 cerrarCajaConObservacion(idInfoCaja, valorCierre, result.value);
-                    
+
                                 // Enviar código de verificación SOLO si es un rol 3
                                 if (parseInt(rolUsuario) === 3) {
                                     enviarCodigoAutorizacion(idInfoCaja);
-                                }                    
+                                }
                             }
                         });
                     } else {
@@ -216,6 +218,7 @@ function manejarCierreCaja() {
         });
     });
 }
+
 
 
 function cerrarCajaConObservacion(idInfoCaja, valorCierre, observacion) {

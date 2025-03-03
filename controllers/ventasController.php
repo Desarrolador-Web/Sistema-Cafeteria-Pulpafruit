@@ -170,7 +170,7 @@ switch ($option) {
     case 'saveventa':
         $data = json_decode(file_get_contents('php://input'), true);
     
-        // Inicializar método de pago
+        // Validar método de pago
         $metodo = $data['metodo'] ?? null;
     
         if (!$metodo) {
@@ -178,7 +178,6 @@ switch ($option) {
             exit;
         }
     
-        // Validar método de pago
         switch ($metodo) {
             case 'Efectivo':
                 $metodo = 1;
@@ -194,15 +193,19 @@ switch ($option) {
                 exit;
         }
     
-        // Determinar id_personal
-        $cedula = ($metodo == 3) ? ($data['cedula'] ?? null) : 0; // 0 si no es crédito
-    
-        if ($metodo == 3 && !$cedula) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'Debe seleccionar un personal para el método de pago Crédito.']);
-            exit;
+        // Asignar id_personal según el método de pago
+        if ($metodo == 3) {
+            $cedula = $data['cedula'] ?? null;
+            if (!$cedula) {
+                echo json_encode(['tipo' => 'error', 'mensaje' => 'Debe seleccionar un personal para el método de pago Crédito.']);
+                exit;
+            }
+        } else {
+            // Para pagos en efectivo (1) o bancarios (2), asociar a "Sin Personal" (cedula = 0)
+            $cedula = 0;
         }
     
-        // Validar carrito
+        // Validar que el carrito no esté vacío
         if (!isset($_SESSION['cart'][$id_user]) || empty($_SESSION['cart'][$id_user])) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'CARRITO VACÍO']);
             exit;
@@ -251,15 +254,17 @@ switch ($option) {
             $ventas->updateStock($stock, $id_product);
         }
     
-        // 🔹 **Nueva llamada a `updateDeudaCapacidad` después de guardar la venta**
+        // Actualizar deuda y capacidad si la venta fue a crédito
         if ($metodo == 3) {
             $ventas->updateDeudaCapacidad($cedula, $total, $metodo);
         }
     
-        unset($_SESSION['cart'][$id_user]); // Limpiar el carrito
+        // Limpiar carrito después de la venta
+        unset($_SESSION['cart'][$id_user]);
     
         echo json_encode(['tipo' => 'success', 'mensaje' => 'Venta guardada correctamente']);
         break;
+        
 
 
     case 'searchbarcode':

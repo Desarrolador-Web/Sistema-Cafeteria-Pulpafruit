@@ -50,32 +50,36 @@ switch ($option) {
     
         if (empty($barcode) || empty($precio_compra) || empty($precio_venta) || empty($cantidad) || empty($sede) || empty($metodo)) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Todos los campos son obligatorios.']);
-            break;
+            exit;
         }
     
+        // Verificar si el producto existe en la sede antes de registrar la compra
+        $productoId = $compras->buscarProductoPorBarcodeYSede($barcode, $sede);
+    
+        if (!$productoId) {
+            echo json_encode(['tipo' => 'error', 'mensaje' => 'El producto que desea comprar no existe en esta sede.']);
+            exit; // Detener la ejecución si el producto no existe en la sede
+        }
+    
+        // Registrar la compra
         $compraId = $compras->saveCompra($sede, $precio_compra * $cantidad, $id_user, 1, $sede, $metodo);
     
         if (!$compraId) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al registrar la compra.']);
-            break;
+            exit;
         }
     
-        $productoId = $compras->saveOrUpdateProduct($barcode, '', 0, $precio_compra, $precio_venta, '', $cantidad, 1, $sede);
-    
-        if (!$productoId) {
-            echo json_encode(['tipo' => 'error', 'mensaje' => 'El producto que desea comprar no existe en esta sede.']);
-            break;
-        }
-    
+        // Guardar el detalle de la compra
         $detalleGuardado = $compras->saveDetalle($productoId, $compraId, $cantidad, $precio_compra);
     
         if (!$detalleGuardado) {
             echo json_encode(['tipo' => 'error', 'mensaje' => 'Error al guardar el detalle de la compra.']);
-            break;
+            exit;
         }
     
         echo json_encode(['tipo' => 'success', 'mensaje' => 'Compra registrada con éxito.']);
         break;
+        
     
     default:
         echo json_encode(['tipo' => 'error', 'mensaje' => 'Opción no válida.']);
